@@ -1,6 +1,5 @@
 import html
 import math
-from datetime import datetime
 
 from v32.cartmigration.models.basecart import LeBasecart
 from v32.cartmigration.libs.utils import *
