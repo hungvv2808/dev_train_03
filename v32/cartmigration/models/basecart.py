@@ -3,24 +3,26 @@ import csv
 import html
 import io
 import math
-import pycurl
 import random
 import unicodedata
 import zlib
 from itertools import product
 from urllib.parse import urlencode
 from xml.etree import ElementTree
+
 import chardet
 import pandas
+import pycurl
 # import grequests
 import requests
 
-from cartmigration.libs.request_thread import RequestThread
-from cartmigration.libs.strip_html import StripHtml
-from cartmigration.libs.strip_html import StripHtmlWix
-from cartmigration.libs.utils import *
-from cartmigration.models.migration import LeMigration
-from cartmigration.models.setup import Setup
+from v32.cartmigration.libs.request_thread import RequestThread
+from v32.cartmigration.libs.strip_html import StripHtml
+from v32.cartmigration.libs.strip_html import StripHtmlWix
+from v32.cartmigration.libs.utils import *
+from v32.cartmigration.models.migration import LeMigration
+from v32.cartmigration.models.setup import Setup
+
 
 class LeBasecart(LeMigration):
 	URL_PROXY = 'http://45.56.81.195/img_proxy.php?img='
@@ -120,7 +122,8 @@ class LeBasecart(LeMigration):
 	FW_ASTRA = 2
 	FW_SONICWALL = 3
 	FW_SITELOCK = 4
-	def __init__(self, data = None):
+
+	def __init__(self, data=None):
 		super().__init__(data)
 		self.cat_parent = list()
 		self._notice = None
@@ -200,8 +203,7 @@ class LeBasecart(LeMigration):
 
 		}
 
-
-	def log_primary(self, entity_type, error, entity_id = None, code = None, warning = None):
+	def log_primary(self, entity_type, error, entity_id=None, code=None, warning=None):
 		msg = entity_type.capitalize()
 		if entity_id:
 			msg += ' id ' + to_str(entity_id) + ': '
@@ -325,10 +327,11 @@ class LeBasecart(LeMigration):
 	def get_upload_file_name(self, upload_name):
 		return upload_name + '.csv'
 
-	def storage_csv_by_type(self, type_storage, next_storage, success = False, finish = False, unset = list):
+	def storage_csv_by_type(self, type_storage, next_storage, success=False, finish=False, unset=list):
 		if not success:
 			success = next_storage
-		if not self._notice['src']['config']['file'][type_storage]['upload'] or self._notice['src']['config']['file'][type_storage]['storage']:
+		if not self._notice['src']['config']['file'][type_storage]['upload'] or \
+				self._notice['src']['config']['file'][type_storage]['storage']:
 			if finish:
 				self._notice['src']['storage']['result'] = 'success'
 				self._notice['src']['storage']['init'] = False
@@ -407,14 +410,16 @@ class LeBasecart(LeMigration):
 	where: list with 2 value. example ['orderid', 123]
 	filter file: orderid > 123
 	'''
-	def read_csv(self, file_upload, to_dict = True, delimiter = ",", has_reversed = False, where = list):
+
+	def read_csv(self, file_upload, to_dict=True, delimiter=",", has_reversed=False, where=list):
 		if not os.path.isfile(file_upload):
 			return None
 		encoding = ['utf-8', 'utf-16', 'cp1252', 'latin1', 'iso-8859-1']
 
 		for encode in encoding:
 			try:
-				data_csv = pandas.read_csv(file_upload, sep = delimiter, encoding = encode, low_memory = False, na_values = None, error_bad_lines = False)
+				data_csv = pandas.read_csv(file_upload, sep=delimiter, encoding=encode, low_memory=False,
+										   na_values=None, error_bad_lines=False)
 				data_filter = False
 				if where:
 					try:
@@ -454,7 +459,7 @@ class LeBasecart(LeMigration):
 		encoding = ['utf-8', 'utf-16', 'cp1252', 'latin1', 'iso-8859-1']
 		for encode in encoding:
 			try:
-				f = open(file, 'r', encoding = encode)
+				f = open(file, 'r', encoding=encode)
 				reader = csv.reader(f)
 				header = next(reader)
 				f.close()
@@ -549,7 +554,7 @@ class LeBasecart(LeMigration):
 		except Exception as e:
 			return response_error(e)
 
-	def combination_from_multi_dict(self, data = None):
+	def combination_from_multi_dict(self, data=None):
 		if data is None:
 			data = dict()
 		data = list(data.values())
@@ -578,7 +583,7 @@ class LeBasecart(LeMigration):
 		return result
 
 	# TODO: Cart
-	def get_cart(self, cart_type, cart_version = None, special_type = False):
+	def get_cart(self, cart_type, cart_version=None, special_type=False):
 		convert_version = parse_version(re.sub(r"[^0-9.]", '', to_str(cart_version)))
 		if special_type and cart_type == 'magento':
 			if not cart_version:
@@ -587,7 +592,7 @@ class LeBasecart(LeMigration):
 			if to_len(version) > 2 and to_int(version[0]) == 1 and to_int(version[1]) > 9:
 				return 'cart/magento/magento19'
 			# magento_version = parse_version(to_str(cart_version).replace('.ee', ''))
-			if convert_version >= parse_version("2.0.0") or ('ee' in cart_version) :
+			if convert_version >= parse_version("2.0.0") or ('ee' in cart_version):
 				if 'ee' in cart_version:
 					return 'cart/magento/magento2ee'
 
@@ -671,7 +676,9 @@ class LeBasecart(LeMigration):
 		if cart_type == 'wpecommerce':
 			if convert_version == parse_version('3.6'):
 				return 'cart/wpecommerce36'
-			if str(convert_version).find('3.8.1') >= 0 or convert_version >= parse_version('3.10.1') or convert_version == parse_version('3.14.0') or convert_version == parse_version('3.12.0'):
+			if str(convert_version).find('3.8.1') >= 0 or convert_version >= parse_version(
+					'3.10.1') or convert_version == parse_version('3.14.0') or convert_version == parse_version(
+				'3.12.0'):
 				return 'cart/wpecommerce3814'
 			if convert_version > parse_version('2.9.9') and convert_version != parse_version('3.8.1'):
 				return 'cart/wpecommerce38'
@@ -886,7 +893,7 @@ class LeBasecart(LeMigration):
 			return 'cart/' + cart_type
 		return 'basecart'
 
-	def old_get_cart(self, cart_type, cart_version = None, special_type = False):
+	def old_get_cart(self, cart_type, cart_version=None, special_type=False):
 
 		if special_type and cart_type == 'magento':
 			if not cart_version:
@@ -1218,7 +1225,7 @@ class LeBasecart(LeMigration):
 					version += to_int(val[0]) * pow(10, max(0, num - index))
 		return version
 
-	def get_connector_url(self, action, token = None, cart_type = None):
+	def get_connector_url(self, action, token=None, cart_type=None):
 		if not cart_type:
 			cart_type = self.get_type()
 		if not token:
@@ -1236,7 +1243,7 @@ class LeBasecart(LeMigration):
 		url = self._cart_url.rstrip('/') + '/' + to_str(suffix).lstrip('/')
 		return url
 
-	def get_connector_data(self, url, data = None, proxies = ''):
+	def get_connector_data(self, url, data=None, proxies=''):
 		if not proxies and self._type and self._notice[self._type]['config'].get('proxy'):
 			proxies = self._notice[self._type]['config'].get('proxy')
 		if self.use_proxies and not proxies:
@@ -1249,7 +1256,7 @@ class LeBasecart(LeMigration):
 		start_time = time.time()
 		method = 'request_by_' + self.connector_method
 
-		result = getattr(self, method)(url, data, proxies = proxies)
+		result = getattr(self, method)(url, data, proxies=proxies)
 		time_str = to_str(time.time() - start_time) + 's'
 
 		if self.LOG_QUERIES or (self._type and self._notice[self._type]['config'].get('debug')):
@@ -1258,7 +1265,7 @@ class LeBasecart(LeMigration):
 		if solve['result'] == 'token':
 			return solve
 		if (not result or solve['result'] != 'success') and self.connector_method == 'post':
-			get_result = self.request_by_get(url, data, proxies = proxies)
+			get_result = self.request_by_get(url, data, proxies=proxies)
 			get_solve = self.solve_result_connector_data(get_result)
 			if get_solve['result'] == 'success':
 				self.connector_method = 'get'
@@ -1267,7 +1274,8 @@ class LeBasecart(LeMigration):
 		# 	return self.get_connector_data(url, data, self.PROXY_HOST)
 		retry = 0
 		# retry if not decode data
-		while (((not result or solve['result'] != 'success') and self.get_type() == 'src') or (solve and solve['result'] == 'decode')) and self._notice['running'] and not self._has_retry:
+		while (((not result or solve['result'] != 'success') and self.get_type() == 'src') or (
+				solve and solve['result'] == 'decode')) and self._notice['running'] and not self._has_retry:
 			if 'action=clearcache' in url:
 				return response_success()
 			msg_log = dict()
@@ -1340,12 +1348,16 @@ class LeBasecart(LeMigration):
 		except:
 			return False
 
-	def uploadImageConnector(self, image_process, save_path, rename = None, override = None, is_proxy = False, check_map = True, ssl_image = False):
-		if not image_process or ('download_image' in self._notice['target']['config'] and not self._notice['target']['config']['download_image']):
+	def uploadImageConnector(self, image_process, save_path, rename=None, override=None, is_proxy=False, check_map=True,
+							 ssl_image=False):
+		if not image_process or (
+				'download_image' in self._notice['target']['config'] and not self._notice['target']['config'][
+			'download_image']):
 			return False
 		param_rename = True
 		param_override = False
-		if self._notice['config'].get('ignore_existed_images') or self._notice['config'].get('reset') or self._notice['config'].get('remigrate'):
+		if self._notice['config'].get('ignore_existed_images') or self._notice['config'].get('reset') or self._notice[
+			'config'].get('remigrate'):
 			param_rename = False
 			param_override = False
 		else:
@@ -1358,7 +1370,7 @@ class LeBasecart(LeMigration):
 		url_image = self.get_connector_url('image')
 		in_map = False
 		if not is_proxy and check_map:
-			path = self.get_map_field_by_src(self.TYPE_PATH_IMAGE, None, image_process['url'], field = 'code_desc')
+			path = self.get_map_field_by_src(self.TYPE_PATH_IMAGE, None, image_process['url'], field='code_desc')
 			if path:
 				in_map = True
 				param_rename = False
@@ -1367,7 +1379,8 @@ class LeBasecart(LeMigration):
 			else:
 				param_rename = True
 				param_override = False
-		image_process['url'] = image_process['url'].replace('http://', 'https://') if ssl_image or self.ssl_image else image_process['url']
+		image_process['url'] = image_process['url'].replace('http://', 'https://') if ssl_image or self.ssl_image else \
+			image_process['url']
 		params = {
 			'url': self.URL_PROXY + image_process['url'] if is_proxy or self.image_proxy else image_process['url'],
 			'rename': param_rename
@@ -1403,9 +1416,10 @@ class LeBasecart(LeMigration):
 				self.insert_map(self.TYPE_PATH_IMAGE, None, None, image_process['url'], image_import_path)
 			return image_import_path
 		if not is_proxy and self.image_proxy is None:
-			return self.uploadImageConnector(image_process, save_path, rename, override, is_proxy = True, ssl_image = ssl_image)
+			return self.uploadImageConnector(image_process, save_path, rename, override, is_proxy=True,
+											 ssl_image=ssl_image)
 		if not ssl_image and self.ssl_image is None and 'http://' in image_process['url']:
-			return self.uploadImageConnector(image_process, save_path, rename, override, is_proxy = False, ssl_image = True)
+			return self.uploadImageConnector(image_process, save_path, rename, override, is_proxy=False, ssl_image=True)
 		if ssl_image:
 			self.ssl_image = False
 		if is_proxy:
@@ -1420,7 +1434,7 @@ class LeBasecart(LeMigration):
 
 		return image_import_path
 
-	def move_image_connector(self, image_process, save_path, old_path, rename = True):
+	def move_image_connector(self, image_process, save_path, old_path, rename=True):
 		params = {
 			'url': image_process['url'],
 			'rename': rename,
@@ -1461,7 +1475,8 @@ class LeBasecart(LeMigration):
 	def encode_connector_data(self, data):
 		encode_data = dict()
 		for k, v in data.items():
-			if parse_version(to_str(self._notice[self._type]['config'].get('connector_version'))) >= parse_version('1.0.1'):
+			if parse_version(to_str(self._notice[self._type]['config'].get('connector_version'))) >= parse_version(
+					'1.0.1'):
 				encode_data[k] = self.gzdeflate(v)
 			else:
 				encode_data[k] = string_to_base64(v)
@@ -1489,7 +1504,7 @@ class LeBasecart(LeMigration):
 				data['query'] = json.dumps(query)
 		return data
 
-	def request_by_method(self, method, url, data, custom_headers = None, auth = None, proxies = ''):
+	def request_by_method(self, method, url, data, custom_headers=None, auth=None, proxies=''):
 		timeout = 60
 		if not self._notice or not self._notice['running']:
 			timeout = 15
@@ -1557,12 +1572,13 @@ class LeBasecart(LeMigration):
 						res = response_head.getvalue().decode()
 					except Exception as e:
 						res = False
-				if status in [403, 406] and to_str(method).lower() == 'post' and self._type and self._notice[self._type].get('setup_type') == 'connector':
+				if status in [403, 406] and to_str(method).lower() == 'post' and self._type and self._notice[
+					self._type].get('setup_type') == 'connector':
 					return self.request_by_get(url, data, custom_headers, auth, proxies)
 				if (status in [403, 406] or status > 500) and not use_proxy:
 					c.close()
 					response_head.close()
-					return self.request_by_method(method, url, data, custom_headers, auth, proxies = self.PROXY_HOST)
+					return self.request_by_method(method, url, data, custom_headers, auth, proxies=self.PROXY_HOST)
 				# if 'An appropriate representation of the requested resource could not be found on this server. This error was generated by Mod_Security.' in res:
 				# 	msg_log = dict()
 				# 	msg_log['data'] = to_str(json_encode(data_log) if data_log else data)
@@ -1597,16 +1613,17 @@ class LeBasecart(LeMigration):
 						msg_log['status'] = status
 						msg_log['response'] = res
 						msg_log['error'] = ' Delay ' + to_str(retry) + 'm: status = ' + to_str(status), 'not Acceptable'
-						self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies = proxies)
+						self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies=proxies)
 						self.sleep_time(60 * retry, status)
 					elif status == 404 and self._notice[self._type]['setup_type'] == 'connector':
 						if not proxies:
 							c.close()
 							response_head.close()
-							return self.request_by_method(method, url, data, custom_headers, auth, proxies = self.PROXY_HOST)
+							return self.request_by_method(method, url, data, custom_headers, auth,
+														  proxies=self.PROXY_HOST)
 						if retry <= 0:
 							self._stop_action = True
-							self.sleep_time(0, 404, warning = True, resume_action = True)
+							self.sleep_time(0, 404, warning=True, resume_action=True)
 						else:
 							msg_log = dict()
 							msg_log['data'] = to_str(json_encode(data_log) if data_log else data)
@@ -1615,7 +1632,7 @@ class LeBasecart(LeMigration):
 							msg_log['status'] = 404
 							msg_log['response'] = res
 							msg_log['error'] = ' Delay ' + to_str(5 * (5 - retry)) + 's: status = 404 not found'
-							self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies = proxies)
+							self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies=proxies)
 							self.sleep_time(5 * (5 - retry), status)
 					# sleep 10p for status >= 500 (!=503) and only in case migration is in step3 ( running )
 					elif status == 502 and res == 'Proxy Error' and use_proxy:
@@ -1631,7 +1648,7 @@ class LeBasecart(LeMigration):
 						msg_log['status'] = status
 						msg_log['response'] = res
 						msg_log['error'] = ' Delay 3m: status = ' + to_str(status), 'delay'
-						self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies = proxies)
+						self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies=proxies)
 						self.sleep_time(3 * 60, status)
 
 					if retry <= 0:
@@ -1650,7 +1667,7 @@ class LeBasecart(LeMigration):
 						msg_log['status'] = status
 						msg_log['response'] = res
 						msg_log['error'] = ''
-						self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies = proxies)
+						self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies=proxies)
 				# status < 300: success
 				else:
 					if proxies:
@@ -1676,9 +1693,9 @@ class LeBasecart(LeMigration):
 					msg_log['method'] = method
 					msg_log['error'] = to_str(error)
 					if error_code == pycurl.TIMEOUT:
-						self.log_error(url, msg_log, to_str(self.get_type()) + '_timeout', is_proxies = proxies)
+						self.log_error(url, msg_log, to_str(self.get_type()) + '_timeout', is_proxies=proxies)
 						retry = 0
-						self.sleep_time(0.01, 'timeout', warning = True)
+						self.sleep_time(0.01, 'timeout', warning=True)
 						break
 					self.sleep_time(1, 'pycurl')
 					msg_log['delay'] = '1s'
@@ -1693,7 +1710,7 @@ class LeBasecart(LeMigration):
 
 				else:
 					time.sleep(1)
-					return self.request_by_method(method, url, data, custom_headers, auth, proxies = self.PROXY_HOST)
+					return self.request_by_method(method, url, data, custom_headers, auth, proxies=self.PROXY_HOST)
 
 				# if error_code == pycurl.TIMEOUT:
 				# 	if use_proxy:
@@ -1728,7 +1745,7 @@ class LeBasecart(LeMigration):
 					msg_log['data_encode'] = origin_data
 					msg_log['method'] = method
 					msg_log['error'] = to_str(error)
-					self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies = proxies)
+					self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies=proxies)
 
 			except Exception as e:
 				retry -= 1
@@ -1751,14 +1768,14 @@ class LeBasecart(LeMigration):
 					msg_log['data_encode'] = origin_data
 					msg_log['method'] = method
 					msg_log['error'] = to_str(error)
-					self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies = proxies)
+					self.log_error(url, msg_log, to_str(self.get_type()) + '_status', is_proxies=proxies)
 		self._has_retry = (retry < 5)
 		return res
 
-	def request_by_post(self, url, data, custom_headers = None, auth = None, proxies = ''):
-		return self.request_by_method("post", url, data, custom_headers, auth, proxies = proxies)
+	def request_by_post(self, url, data, custom_headers=None, auth=None, proxies=''):
+		return self.request_by_method("post", url, data, custom_headers, auth, proxies=proxies)
 
-	def request_by_get(self, url, data = None, custom_headers = None, auth = None, proxies = ''):
+	def request_by_get(self, url, data=None, custom_headers=None, auth=None, proxies=''):
 		if data:
 			if '?' not in url:
 				url += '?'
@@ -1768,26 +1785,28 @@ class LeBasecart(LeMigration):
 				url += urllib.parse.urlencode(data)
 			elif isinstance(data, str):
 				url += data
-		return self.request_by_method("get", url, data, custom_headers, auth, proxies = proxies)
+		return self.request_by_method("get", url, data, custom_headers, auth, proxies=proxies)
 
-	def request_by_put(self, url, data, custom_headers = None, auth = None, proxies = ''):
-		return self.request_by_method("put", url, data, custom_headers, auth, proxies = proxies)
+	def request_by_put(self, url, data, custom_headers=None, auth=None, proxies=''):
+		return self.request_by_method("put", url, data, custom_headers, auth, proxies=proxies)
 
-	def request_by_delete(self, url, data, custom_headers = None, auth = None, proxies = ''):
-		return self.request_by_method("delete", url, data, custom_headers, auth, proxies = proxies)
+	def request_by_delete(self, url, data, custom_headers=None, auth=None, proxies=''):
+		return self.request_by_method("delete", url, data, custom_headers, auth, proxies=proxies)
 
-	def old_request_by_post(self, url, data, custom_headers = None, auth = None):
+	def old_request_by_post(self, url, data, custom_headers=None, auth=None):
 		# if 'pycurl' in self._notice[self._type]['config'] and self._notice[self._type]['config']['pycurl']:
 		# 	return self.pycurl_request_by_post( url, data, custom_headers, auth)
 		if not custom_headers:
 			custom_headers = dict()
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 		elif isinstance(custom_headers, dict) and not custom_headers.get('User-Agent'):
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 
 		res = False
 		try:
-			r = requests.post(url, data, headers = custom_headers, auth = auth)
+			r = requests.post(url, data, headers=custom_headers, auth=auth)
 
 			res = r.text
 			r.raise_for_status()
@@ -1802,12 +1821,14 @@ class LeBasecart(LeMigration):
 			self.log("OOps: Something Else" + to_str(err) + " : " + to_str(res))
 		return res
 
-	def old_request_by_get(self, url, data = None, custom_headers = None, auth = None):
+	def old_request_by_get(self, url, data=None, custom_headers=None, auth=None):
 		if not custom_headers:
 			custom_headers = dict()
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 		elif isinstance(custom_headers, dict) and not custom_headers.get('User-Agent'):
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 
 		res = False
 		if data:
@@ -1816,7 +1837,7 @@ class LeBasecart(LeMigration):
 			elif isinstance(data, str):
 				url += '?' + data
 		try:
-			r = requests.get(url, headers = custom_headers, auth = auth)
+			r = requests.get(url, headers=custom_headers, auth=auth)
 			res = r.text
 			r.raise_for_status()
 		except requests.exceptions.HTTPError as errh:
@@ -1829,16 +1850,18 @@ class LeBasecart(LeMigration):
 			self.log("OOps: Something Else" + to_str(err) + " : " + to_str(res))
 		return res
 
-	def old_request_by_put(self, url, data, custom_headers = None, auth = None):
+	def old_request_by_put(self, url, data, custom_headers=None, auth=None):
 		if not custom_headers:
 			custom_headers = dict()
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 		elif isinstance(custom_headers, dict) and not custom_headers.get('User-Agent'):
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 
 		res = False
 		try:
-			r = requests.put(url, data, headers = custom_headers, auth = auth)
+			r = requests.put(url, data, headers=custom_headers, auth=auth)
 			res = r.text
 			r.raise_for_status()
 		except requests.exceptions.HTTPError as errh:
@@ -1851,16 +1874,18 @@ class LeBasecart(LeMigration):
 			self.log("OOps: Something Else" + to_str(err) + " : " + to_str(res))
 		return res
 
-	def old_request_by_delete(self, url, data, custom_headers = None, auth = None):
+	def old_request_by_delete(self, url, data, custom_headers=None, auth=None):
 		if not custom_headers:
 			custom_headers = dict()
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 		elif isinstance(custom_headers, dict) and not custom_headers.get('User-Agent'):
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 
 		res = False
 		try:
-			r = requests.delete(url, data = data, headers = custom_headers, auth = auth)
+			r = requests.delete(url, data=data, headers=custom_headers, auth=auth)
 			res = r.text
 			r.raise_for_status()
 		except requests.exceptions.HTTPError as errh:
@@ -1873,10 +1898,11 @@ class LeBasecart(LeMigration):
 			self.log("OOps: Something Else" + to_str(err) + " : " + to_str(res))
 		return res
 
-	def image_exist(self, url, path = ''):
+	def image_exist(self, url, path=''):
 		image_process = self.process_image_before_import(url, path)
 		try:
-			exist = requests.head(image_process['url'], headers={"User-Agent": self.USER_AGENT}, timeout = 10, verify = False)
+			exist = requests.head(image_process['url'], headers={"User-Agent": self.USER_AGENT}, timeout=10,
+								  verify=False)
 		except requests.exceptions.Timeout as errt:
 			self.log("image " + image_process['url'] + 'connection timeout', self._type + '_image')
 			return False
@@ -1910,14 +1936,14 @@ class LeBasecart(LeMigration):
 			new_url = to_str(new_url).replace('#', '%23')
 		return new_url
 
-	def add_prefix_path(self, path, prefix = ''):
+	def add_prefix_path(self, path, prefix=''):
 		join_path = ''
 		if prefix:
 			join_path += prefix.rstrip('\\/') + '/'
 		join_path += path.lstrip('\\/').replace('?', '')
 		return join_path
 
-	def change_img_src_in_text(self, body_html, img_desc = False, prefix = ''):
+	def change_img_src_in_text(self, body_html, img_desc=False, prefix=''):
 		if not body_html or (not self._notice['config']['img_des'] and not img_desc):
 			# if body_html:
 			# 	body_html = re.compile(r"<img[^>]+>").sub('', body_html)
@@ -1945,7 +1971,8 @@ class LeBasecart(LeMigration):
 					continue
 				img_src = img_src[0]
 				links.append(img_src[1])
-		save_path_target = self._notice['target']['config']['image'] if self._notice['target']['config'].get('image') else self._notice['target']['config']['image_product']
+		save_path_target = self._notice['target']['config']['image'] if self._notice['target']['config'].get(
+			'image') else self._notice['target']['config']['image_product']
 		for link in links:
 			# download and replace
 			url = link
@@ -1955,14 +1982,17 @@ class LeBasecart(LeMigration):
 			if not netloc:
 				url = self._notice['src']['cart_url'].strip('/') + '/' + url.strip('/')
 			image_process = self.process_image_before_import(url, '')
-			image_import_path = self.uploadImageConnector(image_process, self.add_prefix_path(basename, save_path_target.rstrip('/') + '/content'))
+			image_import_path = self.uploadImageConnector(image_process, self.add_prefix_path(basename,
+																							  save_path_target.rstrip(
+																								  '/') + '/content'))
 			if image_import_path:
 				new_image = self.get_url_suffix(image_import_path)
 				body_html = body_html.replace(link, new_image)
 		return body_html
 
 	# map
-	def select_map(self, _migration_id = None, map_type = None, id_src = None, id_desc = None, code_src = None, code_desc = None, value = None):
+	def select_map(self, _migration_id=None, map_type=None, id_src=None, id_desc=None, code_src=None, code_desc=None,
+				   value=None):
 		where = dict()
 		if _migration_id:
 			where['migration_id'] = _migration_id
@@ -1987,7 +2017,8 @@ class LeBasecart(LeMigration):
 			data = None
 		return data
 
-	def update_map(self, map_type, id_src = None, code_src = None, id_desc = None, code_desc = None, value = None, additional_data = None):
+	def update_map(self, map_type, id_src=None, code_src=None, id_desc=None, code_desc=None, value=None,
+				   additional_data=None):
 		if not id_src and not code_src:
 			return response_error()
 		data = dict()
@@ -2009,8 +2040,8 @@ class LeBasecart(LeMigration):
 		result = self.update_obj(TABLE_MAP, data, where)
 		return result
 
-	def update_order_number_into_map(self, convert, new_order_id, id_src = None, code_src = None):
-		order = self.get_map_field_by_src(self.TYPE_ORDER, id_src, code_src, field = 'additional_data')
+	def update_order_number_into_map(self, convert, new_order_id, id_src=None, code_src=None):
+		order = self.get_map_field_by_src(self.TYPE_ORDER, id_src, code_src, field='additional_data')
 
 	def construct_additional_data_map(self, src, target):
 		return {
@@ -2020,7 +2051,7 @@ class LeBasecart(LeMigration):
 			}
 		}
 
-	def select_image_map(self, id_src = None, id_desc = None, code_src = None, code_desc = None, value = None):
+	def select_image_map(self, id_src=None, id_desc=None, code_src=None, code_desc=None, value=None):
 		where = dict()
 		where['migration_id'] = self._migration_id
 		where['type'] = self.TYPE_IMAGE
@@ -2043,7 +2074,7 @@ class LeBasecart(LeMigration):
 			data = list()
 		return data
 
-	def select_category_map(self, id_src = None, id_desc = None, code_src = None, code_desc = None, value = None):
+	def select_category_map(self, id_src=None, id_desc=None, code_src=None, code_desc=None, value=None):
 		where = dict()
 		where['migration_id'] = self._migration_id
 		where['type'] = self.TYPE_CATEGORY
@@ -2085,7 +2116,7 @@ class LeBasecart(LeMigration):
 
 		return data
 
-	def get_map_field_by_src(self, map_type = None, id_src = None, code_src = None, field = 'id_desc'):
+	def get_map_field_by_src(self, map_type=None, id_src=None, code_src=None, field='id_desc'):
 		if not id_src and not code_src:
 			return False
 		_migration_id = self._migration_id
@@ -2098,7 +2129,8 @@ class LeBasecart(LeMigration):
 			return False
 		return map_data.get(field, False)
 
-	def insert_map(self, map_type = None, id_src = None, id_desc = None, code_src = None, code_desc = None, value = None, additional_data = None):
+	def insert_map(self, map_type=None, id_src=None, id_desc=None, code_src=None, code_desc=None, value=None,
+				   additional_data=None):
 		if to_int(id_src) == 0 and to_str(id_src) != '0':
 			id_src = None
 		data_insert = {
@@ -2112,7 +2144,8 @@ class LeBasecart(LeMigration):
 		}
 		if self._notice.get('version') and parse_version(self._notice.get('version')) >= parse_version("2.1.0"):
 			data_insert['created_at'] = get_current_time()
-		if to_int(self._notice['mode']) == MIGRATION_DEMO and parse_version(self._notice.get('version', '1.0.0')) >= parse_version('1.0.3'):
+		if to_int(self._notice['mode']) == MIGRATION_DEMO and parse_version(
+				self._notice.get('version', '1.0.0')) >= parse_version('1.0.3'):
 			if not additional_data:
 				additional_data = self.get_mapping_info_by_type(map_type, id_desc)
 			if additional_data:
@@ -2131,18 +2164,22 @@ class LeBasecart(LeMigration):
 			target = self.convert_data['name'] if self.convert_data.get('name') else id_desc
 			mapping = self.construct_additional_data_map(src, target)
 		if entity_type == self.TYPE_CUSTOMER:
-			name = get_value_by_key_in_dict(self.convert_data, 'first_name', '') + ' ' + get_value_by_key_in_dict(self.convert_data, 'middle_name', '') + ' ' + get_value_by_key_in_dict(self.convert_data, 'last_name', '')
+			name = get_value_by_key_in_dict(self.convert_data, 'first_name', '') + ' ' + get_value_by_key_in_dict(
+				self.convert_data, 'middle_name', '') + ' ' + get_value_by_key_in_dict(self.convert_data, 'last_name',
+																					   '')
 			name = to_str(name).strip(' ')
 			mapping = self.construct_additional_data_map(name, self.convert_data['email'])
 
 		if entity_type == self.TYPE_ORDER:
-			src_id = self.convert_data['order_number'] if self.convert_data.get('order_number') else self.convert_data['id']
+			src_id = self.convert_data['order_number'] if self.convert_data.get('order_number') else self.convert_data[
+				'id']
 			target_id = id_desc
 			mapping = self.construct_additional_data_map(src_id, target_id)
 
 		return mapping
+
 	# query connector
-	def create_insert_query_connector(self, table, data, params = False, prefix = True):
+	def create_insert_query_connector(self, table, data, params=False, prefix=True):
 		table = '_DBPRF_' + table if prefix else table
 		query = "INSERT INTO `" + table + "` " + self.dict_to_insert_condition(data)
 		res = {
@@ -2155,7 +2192,7 @@ class LeBasecart(LeMigration):
 			}
 		return res
 
-	def create_select_query_connector(self, table, where, fields = None, prefix = True):
+	def create_select_query_connector(self, table, where, fields=None, prefix=True):
 		table = '_DBPRF_' + table if prefix else table
 		select = '*'
 		if fields:
@@ -2174,15 +2211,16 @@ class LeBasecart(LeMigration):
 			'query': query
 		}
 
-	def create_update_query_connector(self, table, data_set, where, prefix = True):
+	def create_update_query_connector(self, table, data_set, where, prefix=True):
 		table = '_DBPRF_' + table if prefix else table
-		query = "UPDATE `" + table + "` SET " + self.dict_to_set_condition(data_set) + " WHERE " + self.dict_to_where_condition(where)
+		query = "UPDATE `" + table + "` SET " + self.dict_to_set_condition(
+			data_set) + " WHERE " + self.dict_to_where_condition(where)
 		return {
 			'type': 'update',
 			'query': query,
 		}
 
-	def create_delete_query_connector(self, table, where, prefix = True):
+	def create_delete_query_connector(self, table, where, prefix=True):
 		table = '_DBPRF_' + table if prefix else table
 		query = "DELETE FROM `" + table + "` WHERE " + self.dict_to_where_condition(where)
 		return {
@@ -2190,7 +2228,7 @@ class LeBasecart(LeMigration):
 			'query': query,
 		}
 
-	def import_data_connector(self, query, import_type = 'query', entity_id = '', primary = False, params = True):
+	def import_data_connector(self, query, import_type='query', entity_id='', primary=False, params=True):
 		if params:
 			query['params'] = {
 				'insert_id': True,
@@ -2215,37 +2253,37 @@ class LeBasecart(LeMigration):
 		self._query_error = None
 		return error
 
-	def import_tax_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_tax_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'taxes', entity_id, primary, params)
 
-	def import_manufacturer_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_manufacturer_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'manufacturers', entity_id, primary, params)
 
-	def import_category_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_category_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'categories', entity_id, primary, params)
 
-	def import_product_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_product_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'products', entity_id, primary, params)
 
-	def import_customer_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_customer_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'customers', entity_id, primary, params)
 
-	def import_order_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_order_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'orders', entity_id, primary, params)
 
-	def import_review_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_review_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'reviews', entity_id, primary, params)
 
-	def import_page_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_page_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'pages', entity_id, primary, params)
 
-	def import_blog_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_blog_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'blogs', entity_id, primary, params)
 
-	def import_coupon_data_connector(self, query, primary = False, entity_id = '', params = True):
+	def import_coupon_data_connector(self, query, primary=False, entity_id='', params=True):
 		return self.import_data_connector(query, 'coupon', entity_id, primary, params)
 
-	def select_data_connector(self, query, _type = 'select', is_log = True):
+	def select_data_connector(self, query, _type='select', is_log=True):
 		data = self.get_connector_data(self.get_connector_url('query'), {
 			'query': json.dumps(query),
 		})
@@ -2256,7 +2294,7 @@ class LeBasecart(LeMigration):
 			self.log(query, _type, is_log)
 		return data
 
-	def query_data_connector(self, query, _type = 'query', is_log = True):
+	def query_data_connector(self, query, _type='query', is_log=True):
 		data = self.get_connector_data(self.get_connector_url('query'), {
 			'query': json.dumps(query),
 		})
@@ -2267,7 +2305,7 @@ class LeBasecart(LeMigration):
 			self.log(query, _type, is_log)
 		return data
 
-	def select_multiple_data_connector(self, queries, _type = 'select', is_log = True):
+	def select_multiple_data_connector(self, queries, _type='select', is_log=True):
 		all_data = self.get_connector_data(self.get_connector_url('query'), {
 			'serialize': True,
 			'query': json.dumps(queries),
@@ -2282,7 +2320,7 @@ class LeBasecart(LeMigration):
 					self.log(msg, _type, is_log)
 		return all_data
 
-	def query_multiple_data_connector(self, queries, _type = 'select', is_log = True):
+	def query_multiple_data_connector(self, queries, _type='select', is_log=True):
 		if isinstance(queries, list):
 			queries = self.list_to_dict(queries)
 		all_data = self.get_connector_data(self.get_connector_url('query'), {
@@ -2301,7 +2339,7 @@ class LeBasecart(LeMigration):
 					self.log(msg, _type, is_log)
 		return all_data
 
-	def import_multiple_data_connector(self, queries, import_type = 'query', is_log = True, insert_id = False):
+	def import_multiple_data_connector(self, queries, import_type='query', is_log=True, insert_id=False):
 		result = True
 		all_import = self.get_connector_data(self.get_connector_url('query'), {
 			'serialize': True,
@@ -2358,7 +2396,7 @@ class LeBasecart(LeMigration):
 		return '<span class="message-alert-warning">' + to_str(warning) + '</span>'
 
 	# Convert result of query get count to count
-	def list_to_count_import(self, data, name = False):
+	def list_to_count_import(self, data, name=False):
 		if not data:
 			return 0
 		count = 0
@@ -2371,7 +2409,7 @@ class LeBasecart(LeMigration):
 			count = 0
 		return count
 
-	def warning_import_entity(self, type_import, id_import = None, code = None, error_code = ''):
+	def warning_import_entity(self, type_import, id_import=None, code=None, error_code=''):
 		msg = type_import.capitalize() + ' '
 		if code:
 			msg += 'code: ' + code
@@ -2633,7 +2671,7 @@ class LeBasecart(LeMigration):
 		return {
 			'path': '',
 			'name': '',
-			'limit': '',# 0 if unlimited
+			'limit': '',  # 0 if unlimited
 			'max_day': '',
 			'date_expired': '',
 			'price': 0.00,
@@ -2648,6 +2686,7 @@ class LeBasecart(LeMigration):
 		return {
 			'name': ''
 		}
+
 	def construct_seo_product(self):
 		return {
 			'request_path': '',
@@ -3158,7 +3197,7 @@ class LeBasecart(LeMigration):
 
 	# END CONSTRUCT
 
-	def join_text_to_key(self, text, length = False, char = '-', lower = True):
+	def join_text_to_key(self, text, length=False, char='-', lower=True):
 		text += " "
 		if length:
 			length = to_int(length)
@@ -3198,7 +3237,7 @@ class LeBasecart(LeMigration):
 		currencies_symbol = json_decode(self.CURRENCIES_SYMBOL)
 		return currencies_symbol.get(code, code)
 
-	def get_state_name_by_code(self, state_code, country_code = None):
+	def get_state_name_by_code(self, state_code, country_code=None):
 		if not state_code:
 			return ''
 		where = dict()
@@ -3215,7 +3254,7 @@ class LeBasecart(LeMigration):
 			data = None
 		return data
 
-	def get_map_customer_group(self, group_id = None):
+	def get_map_customer_group(self, group_id=None):
 		if not group_id:
 			return 0
 		res = 0
@@ -3230,7 +3269,7 @@ class LeBasecart(LeMigration):
 
 	# TODO: BEFORE MIGRATION
 
-	def prepare_display_setup_source(self, request = None):
+	def prepare_display_setup_source(self, request=None):
 		cart_type = self._notice['src']['cart_type']
 		setup_type = self.source_cart_setup(cart_type)
 		self._notice['src']['setup_type'] = setup_type
@@ -3257,19 +3296,23 @@ class LeBasecart(LeMigration):
 				response['title'] = title
 				return response
 		if check_url['result'] != 'success' and not self.is_module_connector(request):
-			response = response_warning("Can’t connect to source store url {} currently, please check if your url is live and accessible and try again.".format(url_to_link(url_check)))
+			response = response_warning(
+				"Can’t connect to source store url {} currently, please check if your url is live and accessible and try again.".format(
+					url_to_link(url_check)))
 			response['elm_error'] = "#source-cart-url"
 			response['title'] = 'Source Connection Error'
 			if setup_type in ['connector', 'module_connector']:
-				response['msg'] = "Can’t connect to source store connector url {}, please check if this link is accessible and try again.".format(url_to_link(url_check))
+				response[
+					'msg'] = "Can’t connect to source store connector url {}, please check if this link is accessible and try again.".format(
+					url_to_link(url_check))
 				detect_cart = self.detect_cart_type(self._cart_url)
 				result = response_success()
 				if detect_cart:
-					result = create_response('carttype', data = detect_cart)
+					result = create_response('carttype', data=detect_cart)
 					result['cart_type'] = cart_type
 				detect_root = self.detect_root_url()
 				if detect_root:
-					result = create_response('root_url', data = detect_root)
+					result = create_response('root_url', data=detect_root)
 					result['cart_url'] = self._cart_url
 				title, msg = self.get_msg_by_result(result)
 				if title and msg:
@@ -3282,8 +3325,10 @@ class LeBasecart(LeMigration):
 		if setup_type == "module_connector" and request:
 			check_url = self.check_url(self.get_url_suffix(self.CONNECTOR_SUFFIX), time_out)
 			if check_url['result'] != 'success':
-				if request.get('src_type_upload') == 'api' and not self._notice['src']['config'].get('module_installed'):
-					check_url = self.check_url(self.get_url_suffix(self.get_path_connector() + self.CONNECTOR_SUFFIX), time_out)
+				if request.get('src_type_upload') == 'api' and not self._notice['src']['config'].get(
+						'module_installed'):
+					check_url = self.check_url(self.get_url_suffix(self.get_path_connector() + self.CONNECTOR_SUFFIX),
+											   time_out)
 					if check_url['result'] != 'success':
 						install = self.install_module_connector(request)
 						if install['result'] != 'success':
@@ -3306,26 +3351,35 @@ class LeBasecart(LeMigration):
 
 			check = self.get_connector_data(connector_url)
 			if not check:
-				response = response_warning("Cannot reach connector! It should be uploaded at: " + self.get_url_suffix(self.CONNECTOR_SUFFIX))
+				response = response_warning(
+					"Cannot reach connector! It should be uploaded at: " + self.get_url_suffix(self.CONNECTOR_SUFFIX))
 				response['elm_error'] = "#source-cart-url"
 				response['title'] = 'Source Url Error'
 				if setup_type == 'module_connector' and self._notice['src']['config'].get('type_upload') == 'api':
 					if self.is_module_connector(request):
-						response['msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(self._type, self._type)
+						response[
+							'msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(
+							self._type, self._type)
 				return response
 			if check['result'] == 'token':
-				response = response_warning('Source token not correct! Probably you used the connector from another account. Please download and reupload connector from your account. <a href="https://litextension.com/faq/docs/unwanted-errors-fix/what-are-the-connector-files-and-how-to-download-them/" target="_blank">More details</a>')
+				response = response_warning(
+					'Source token not correct! Probably you used the connector from another account. Please download and reupload connector from your account. <a href="https://litextension.com/faq/docs/unwanted-errors-fix/what-are-the-connector-files-and-how-to-download-them/" target="_blank">More details</a>')
 				response['elm_error'] = "#source_connector"
 				if self.is_module_connector(request):
-					response['msg'] = "Source token not correct! Please <a href='{}' target='_blank'>click</a> to change token and try again".format(self.get_link_change_token())
+					response[
+						'msg'] = "Source token not correct! Please <a href='{}' target='_blank'>click</a> to change token and try again".format(
+						self.get_link_change_token())
 					response['elm_error'] = "#source-cart-url"
 				response['title'] = "Source Token Error"
 
 				return response
 			if check['result'] != 'success':
-				response = response_warning("Unfortunately, Source Connector is unable to read your site’s configuration. We can help you resolve this, please contact us.")
+				response = response_warning(
+					"Unfortunately, Source Connector is unable to read your site’s configuration. We can help you resolve this, please contact us.")
 				if self.is_module_connector(request):
-					response['msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(self._type, self._type)
+					response[
+						'msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(
+						self._type, self._type)
 				response['elm_error'] = "#source-cart-url"
 				response['title'] = 'Source Url Error'
 
@@ -3333,28 +3387,33 @@ class LeBasecart(LeMigration):
 			data = check['data']
 			if not data:
 				response = response_warning("Cannot reach database from source connector!")
-				response['msg'] += ' <a href="https://litextension.com/faq/docs/unwanted-errors-fix/i-keep-getting-the-cannot-reach-database-from-source-target-connector-message-what-should-i-do/" target="_blank">More details!</a>'
+				response[
+					'msg'] += ' <a href="https://litextension.com/faq/docs/unwanted-errors-fix/i-keep-getting-the-cannot-reach-database-from-source-target-connector-message-what-should-i-do/" target="_blank">More details!</a>'
 
 				response['elm_error'] = "#source-cart-url"
 				response['title'] = 'Source Url Error'
 				return response
 			if not self.check_cart_type_sync(data['cms'], self._notice['src']['cart_type']):
-				response = response_warning("Source Cart type not correct! Your url looks like a " + to_str(data['cms']).capitalize()  + " but your selected cart type is " + cart_type.capitalize() + ". Please check and try again")
+				response = response_warning("Source Cart type not correct! Your url looks like a " + to_str(data[
+																												'cms']).capitalize() + " but your selected cart type is " + cart_type.capitalize() + ". Please check and try again")
 				response['elm_error'] = "#form-source-select"
 				response['title'] = "Source Cart Type Error"
 				return response
 			connect = data['connect']
 			if (not connect) or (connect['result'] != 'success'):
 				response = response_warning("Cannot reach database from source connector!")
-				response['msg'] += ' <a href="https://litextension.com/faq/docs/general-questions/customer-support/why-is-your-migration-showing-error-there-is-an-error-when-reading-your-source-target-cart-database/" target="_blank">More details!</a>'
+				response[
+					'msg'] += ' <a href="https://litextension.com/faq/docs/general-questions/customer-support/why-is-your-migration-showing-error-there-is-an-error-when-reading-your-source-target-cart-database/" target="_blank">More details!</a>'
 
 				response['elm_error'] = "#source-cart-url"
 				response['title'] = 'Source Url Error'
 				return response
-			config_keys = ['cookie_key', 'version', 'table_prefix', 'charset', 'image', 'image_product', 'image_category', 'image_manufacturer', 'extend', 'connector_version']
+			config_keys = ['cookie_key', 'version', 'table_prefix', 'charset', 'image', 'image_product',
+						   'image_category', 'image_manufacturer', 'extend', 'connector_version']
 			for config_key in config_keys:
 				config_value = data[config_key] if config_key in data else ''
-				if config_key == 'version' and self._notice['src']['config'].get('version') and 'ee' in self._notice['src']['config'].get('version'):
+				if config_key == 'version' and self._notice['src']['config'].get('version') and 'ee' in \
+						self._notice['src']['config'].get('version'):
 					config_value += '.ee'
 				self._notice['src']['config'][config_key] = config_value
 			if 'view' in data:
@@ -3380,7 +3439,7 @@ class LeBasecart(LeMigration):
 
 		return response_success()
 
-	def prepare_display_setup_target(self, request = None):
+	def prepare_display_setup_target(self, request=None):
 		cart_type = self._notice['target']['cart_type']
 		setup_type = self.target_cart_setup(cart_type)
 		self._notice['target']['setup_type'] = setup_type
@@ -3407,21 +3466,28 @@ class LeBasecart(LeMigration):
 				response['title'] = title
 				return response
 		if check_url['result'] != 'success' and not self.is_module_connector(request):
-			response = response_warning("Can’t connect to target store url {} currently, please check if your url is live and accessible and try again.".format(url_to_link(url_check)))
+			response = response_warning(
+				"Can’t connect to target store url {} currently, please check if your url is live and accessible and try again.".format(
+					url_to_link(url_check)))
 			response['elm_error'] = "#target-cart-url"
 			response['title'] = 'Source Connection Error'
 			if setup_type == 'connector':
-				response['msg'] = "Can’t connect to target store connector url {}, please check if this link is accessible and try again.".format(url_to_link(url_check))
+				response[
+					'msg'] = "Can’t connect to target store connector url {}, please check if this link is accessible and try again.".format(
+					url_to_link(url_check))
 				detect_cart = self.detect_cart_type(self._cart_url)
 				if detect_cart:
-					response['msg'] = "Can’t connect to target store currently. Your url looks like a " + detect_cart.capitalize() + " but your selected cart type is " + cart_type.capitalize() + ". Please check and try again"
+					response[
+						'msg'] = "Can’t connect to target store currently. Your url looks like a " + detect_cart.capitalize() + " but your selected cart type is " + cart_type.capitalize() + ". Please check and try again"
 
 			return response
 		if setup_type == "module_connector" and request:
 			check_url = self.check_url(self.get_url_suffix(self.CONNECTOR_SUFFIX), time_out)
 			if check_url['result'] != 'success':
-				if request.get('target_type_upload') == 'api' and not self._notice['target']['config'].get('module_installed'):
-					check_url = self.check_url(self.get_url_suffix(self.get_path_connector() + "/" + self.CONNECTOR_SUFFIX), time_out)
+				if request.get('target_type_upload') == 'api' and not self._notice['target']['config'].get(
+						'module_installed'):
+					check_url = self.check_url(
+						self.get_url_suffix(self.get_path_connector() + "/" + self.CONNECTOR_SUFFIX), time_out)
 					if check_url['result'] != 'success':
 						install = self.install_module_connector(request)
 						if install['result'] != 'success':
@@ -3445,42 +3511,55 @@ class LeBasecart(LeMigration):
 
 			check = self.get_connector_data(connector_url)
 			if not check:
-				response = response_warning("Cannot reach connector! It should be uploaded at: " + self.get_url_suffix(self.CONNECTOR_SUFFIX))
-				response['msg'] += ' <a href="https://litextension.com/faq/docs/general-questions/customer-support/why-is-your-migration-showing-error-there-is-an-error-when-reading-your-source-target-cart-database/" target="_blank">More details!</a>'
+				response = response_warning(
+					"Cannot reach connector! It should be uploaded at: " + self.get_url_suffix(self.CONNECTOR_SUFFIX))
+				response[
+					'msg'] += ' <a href="https://litextension.com/faq/docs/general-questions/customer-support/why-is-your-migration-showing-error-there-is-an-error-when-reading-your-source-target-cart-database/" target="_blank">More details!</a>'
 
 				response['elm_error'] = "#target-cart-url"
 				response['title'] = "Target Connection Error"
 				if self.is_module_connector(request):
-					response['msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(self._type, self._type)
+					response[
+						'msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(
+						self._type, self._type)
 				return response
 			if check['result'] == 'token':
-				response = response_warning('Target token not correct! Probably you used the connector from another account. Please download and reupload connector from your account. <a href="https://litextension.com/faq/docs/unwanted-errors-fix/what-are-the-connector-files-and-how-to-download-them/" target="_blank">More details</a>')
+				response = response_warning(
+					'Target token not correct! Probably you used the connector from another account. Please download and reupload connector from your account. <a href="https://litextension.com/faq/docs/unwanted-errors-fix/what-are-the-connector-files-and-how-to-download-them/" target="_blank">More details</a>')
 				response['elm_error'] = "#target_connector"
 				response['title'] = "Target Token Error"
 				if self.is_module_connector(request):
-					response['msg'] = "Target token not correct! Please <a href='{}' target='_blank'>click</a> to change token and try again".format(self.get_link_change_token())
+					response[
+						'msg'] = "Target token not correct! Please <a href='{}' target='_blank'>click</a> to change token and try again".format(
+						self.get_link_change_token())
 					response['elm_error'] = "#target-cart-url"
 
 				return response
 			if check['result'] != 'success':
-				response = response_warning("Unfortunately, Target Connector is unable to read your site’s configuration. We can help you resolve this, please contact us.")
+				response = response_warning(
+					"Unfortunately, Target Connector is unable to read your site’s configuration. We can help you resolve this, please contact us.")
 				if self.is_module_connector(request):
-					response['msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(self._type, self._type)
+					response[
+						'msg'] = 'Migration module installed but we failed to access the connector. Please <a href="#" hide="#{}-module-connector-auto" show="#{}-module-connector-manually" class="js-btn-module-connector">click</a> to manually upload connector!'.format(
+						self._type, self._type)
 				response['elm_error'] = "#target-cart-url"
 				response['title'] = "Target Url Error"
 				return response
 			data = check['data']
 			if not data:
 				response = response_warning("Cannot reach database from target connector!")
-				response['msg'] += ' <a href="https://litextension.com/faq/docs/unwanted-errors-fix/i-keep-getting-the-cannot-reach-database-from-source-target-connector-message-what-should-i-do/" target="_blank">More details!</a>'
+				response[
+					'msg'] += ' <a href="https://litextension.com/faq/docs/unwanted-errors-fix/i-keep-getting-the-cannot-reach-database-from-source-target-connector-message-what-should-i-do/" target="_blank">More details!</a>'
 
 				response['elm_error'] = "#target-cart-url"
 				response['title'] = "Target Url Error"
 				return response
 			if not self.check_cart_type_sync(data['cms'], self._notice['target']['cart_type']):
-				response = response_warning("Target Cart type not correct! Your url looks like a " + to_str(data['cms']).capitalize()  + " but your selected cart type is " + cart_type.capitalize() + ". Please check and try again")
+				response = response_warning("Target Cart type not correct! Your url looks like a " + to_str(data[
+																												'cms']).capitalize() + " but your selected cart type is " + cart_type.capitalize() + ". Please check and try again")
 				if self._notice['target']['cart_type'] == 'woocommerce:':
-					response['msg'] = "Target Cart type not correct! Your url looks like a " + to_str(data['cms']).capitalize()  + " but your selected cart type is " + cart_type.capitalize() + ". Please check if Woocommerce is installed on your Target? If no, please install and try again."
+					response['msg'] = "Target Cart type not correct! Your url looks like a " + to_str(data[
+																										  'cms']).capitalize() + " but your selected cart type is " + cart_type.capitalize() + ". Please check if Woocommerce is installed on your Target? If no, please install and try again."
 				response['elm_error'] = "#form-target-select"
 				response['title'] = "Target Cart Type Error"
 				return response
@@ -3490,10 +3569,12 @@ class LeBasecart(LeMigration):
 				response['elm_error'] = "#target-cart-url"
 				response['title'] = "Target Url Error"
 				return response
-			config_keys = ['cookie_key', 'version', 'table_prefix', 'charset', 'image', 'image_product', 'image_category', 'image_manufacturer', 'extend', 'connector_version']
+			config_keys = ['cookie_key', 'version', 'table_prefix', 'charset', 'image', 'image_product',
+						   'image_category', 'image_manufacturer', 'extend', 'connector_version']
 			for config_key in config_keys:
 				config_value = data[config_key] if config_key in data else ''
-				if config_key == 'version' and self._notice['target']['config'].get('version') and 'ee' in self._notice['target']['config'].get('version'):
+				if config_key == 'version' and self._notice['target']['config'].get('version') and 'ee' in \
+						self._notice['target']['config'].get('version'):
 					config_value += '.ee'
 				self._notice['target']['config'][config_key] = config_value
 			if 'view' in data:
@@ -3517,11 +3598,14 @@ class LeBasecart(LeMigration):
 
 	def display_storage(self):
 		supports = ['languages_select', 'site_map', 'language_map', 'category_map', 'attribute_map', 'order_status_map',
-		            'currency_map', 'country_map', 'customer_group_map', 'taxes', 'manufacturers', 'categories',
-		            'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules',
-		            'add_new', 'clear_shop', 'img_des', 'ignore_image', 'pre_prd', 'pre_cus', 'pre_ord', 'seo', 'multi_languages_select']
+					'currency_map', 'country_map', 'customer_group_map', 'taxes', 'manufacturers', 'categories',
+					'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons',
+					'cartrules',
+					'add_new', 'clear_shop', 'img_des', 'ignore_image', 'pre_prd', 'pre_cus', 'pre_ord', 'seo',
+					'multi_languages_select']
 		for support in supports:
-			self._notice['support'][support] = self._notice['src']['support'][support] and self._notice['target']['support'][support]
+			self._notice['support'][support] = self._notice['src']['support'][support] and \
+											   self._notice['target']['support'][support]
 		self._notice['step'] = 'storage'
 		return response_success()
 
@@ -3542,7 +3626,7 @@ class LeBasecart(LeMigration):
 
 	def prepare_display_upload(self, data):
 		config_keys = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages',
-		               'blogs', 'coupons', 'cartrules']
+					   'blogs', 'coupons', 'cartrules']
 		str_config = []
 		# for
 		for config_key in config_keys:
@@ -3572,9 +3656,15 @@ class LeBasecart(LeMigration):
 		return response_success()
 
 	def display_config(self):
-		supports = ['languages_select', 'site_map', 'language_map', 'category_map', 'attribute_map', 'order_status_map', 'currency_map', 'country_map', 'customer_group_map', 'taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'add_new', 'clear_shop', 'img_des', 'ignore_image', 'pre_prd', 'pre_cus', 'pre_ord', 'seo', 'cus_pass', 'seo_301', 'strip_html', 'smart_collection', 'quotes', 'newsletters', 'multi_languages_select']
+		supports = ['languages_select', 'site_map', 'language_map', 'category_map', 'attribute_map', 'order_status_map',
+					'currency_map', 'country_map', 'customer_group_map', 'taxes', 'manufacturers', 'categories',
+					'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons',
+					'cartrules', 'add_new', 'clear_shop', 'img_des', 'ignore_image', 'pre_prd', 'pre_cus', 'pre_ord',
+					'seo', 'cus_pass', 'seo_301', 'strip_html', 'smart_collection', 'quotes', 'newsletters',
+					'multi_languages_select']
 		for support in supports:
-			self._notice['support'][support] = self._notice['src']['support'][support] and self._notice['target']['support'][support]
+			self._notice['support'][support] = self._notice['src']['support'][support] and \
+											   self._notice['target']['support'][support]
 		if to_len(self._notice['src']['languages']) > 1:
 			self._notice['support']['languages_select'] = True
 		else:
@@ -3592,7 +3682,8 @@ class LeBasecart(LeMigration):
 		self._notice['resume']['process'] = 'configuring'
 		self._notice['src']['languages'] = self.list_to_dict(self._notice['src']['languages'])
 		self._notice['target']['languages'] = self.list_to_dict(self._notice['target']['languages'])
-		if self._notice['migration_id'] and not self._notice['config'].get('recent') and not self._notice['config'].get('remigrate'):
+		if self._notice['migration_id'] and not self._notice['config'].get('recent') and not self._notice['config'].get(
+				'remigrate'):
 			setup = Setup()
 			check_setup = setup.setup_db_for_migration(self._notice['migration_id'])
 			if not check_setup:
@@ -3638,10 +3729,13 @@ class LeBasecart(LeMigration):
 								self._notice['map']['site'][str(site_src_id)].append(site_target_id)
 					self._notice['map']['category_data'] = map_root_cat
 
-			# endif
+		# endif
 		# endif
 		# endfor
-		config_keys = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'add_new', 'clear_shop', 'img_des', 'ignore_image', 'pre_cus', 'pre_ord', 'pre_prd', 'seo', 'seo_plugin', 'skip_demo', 'cus_pass', 'seo_301', 'strip_html', 'smart_collection', 'quotes', 'newsletters']
+		config_keys = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages',
+					   'blogs', 'coupons', 'cartrules', 'add_new', 'clear_shop', 'img_des', 'ignore_image', 'pre_cus',
+					   'pre_ord', 'pre_prd', 'seo', 'seo_plugin', 'skip_demo', 'cus_pass', 'seo_301', 'strip_html',
+					   'smart_collection', 'quotes', 'newsletters']
 		str_config = ['seo_plugin']
 		# for
 		for config_key in config_keys:
@@ -3653,7 +3747,8 @@ class LeBasecart(LeMigration):
 				if self._notice['config']['add_new']:
 					self._notice['config']['real_pre_prd'] = value
 				else:
-					self._notice['config']['real_pre_prd'] = (config_key in data) and (('clear_shop' in data) or (to_str(self._notice['target'].get('number_of_prd', 0)) == '0'))
+					self._notice['config']['real_pre_prd'] = (config_key in data) and (('clear_shop' in data) or (
+							to_str(self._notice['target'].get('number_of_prd', 0)) == '0'))
 			if (config_key == 'products') and (config_key in data) and self._notice['support']['attributes']:
 				self._notice['config']['attributes'] = value
 			if (config_key == 'add_new') and (self._notice['config']['recent']):
@@ -3686,7 +3781,8 @@ class LeBasecart(LeMigration):
 			self._notice['resume']['process'] = 'payment'
 		else:
 			self._notice['resume']['process'] = 'migrating'
-			if self._notice['config']['skip_demo'] or self._notice['demo']['status'] == 'success' or self._notice['config'].get('remigrate'):
+			if self._notice['config']['skip_demo'] or self._notice['demo']['status'] == 'success' or self._notice[
+				'config'].get('remigrate'):
 				self._notice['resume']['process'] = 'payment'
 		self._notice['target']['clear_demo']['function'] = 'clear_target_products_demo'
 		return response_success()
@@ -3723,18 +3819,22 @@ class LeBasecart(LeMigration):
 			if self._notice.get('version') and parse_version(self._notice.get('version')) >= parse_version("2.1.0"):
 				column_map = self.select_raw("SHOW COLUMNS FROM `migration_map` LIKE 'created_at'")
 				if not column_map['data']:
-					self.query_raw("ALTER TABLE `migration_map` ADD `created_at` varchar(25) COLLATE 'utf8_general_ci' NULL")
-		if (not self._notice['config']['add_new'] and self._notice['demo'].get('status') != 'success') or self._notice['config'].get('reset'):
+					self.query_raw(
+						"ALTER TABLE `migration_map` ADD `created_at` varchar(25) COLLATE 'utf8_general_ci' NULL")
+		if (not self._notice['config']['add_new'] and self._notice['demo'].get('status') != 'success') or self._notice[
+			'config'].get('reset'):
 			_migration_id = self._migration_id
 			table_name = self.get_table_name(TABLE_MAP)
 			no_delete = [self.TYPE_IMAGE, self.TYPE_PATH_IMAGE]
 			cart_no_delete = list()
-			if self._notice['src']['cart_type'] == 'magento' and self._notice['target']['cart_type'] == 'magento' and self._notice['config'].get('reset'):
+			if self._notice['src']['cart_type'] == 'magento' and self._notice['target']['cart_type'] == 'magento' and \
+					self._notice['config'].get('reset'):
 				cart_no_delete = [self.TYPE_ATTR, self.TYPE_ATTR_OPTION]
 			no_delete = list(set(no_delete + cart_no_delete))
 			if self._notice['config'].get('remigrate') and not self._notice['config'].get('reset'):
 				self.backup_table_map()
-			query = "DELETE FROM `" + table_name + "` WHERE migration_id = " + to_str(_migration_id) + " AND `type` NOT IN " + self.list_to_in_condition(no_delete)
+			query = "DELETE FROM `" + table_name + "` WHERE migration_id = " + to_str(
+				_migration_id) + " AND `type` NOT IN " + self.list_to_in_condition(no_delete)
 			delete = self.query_raw(query)
 			if not delete or delete['result'] != 'success':
 				return error_database()
@@ -3742,25 +3842,33 @@ class LeBasecart(LeMigration):
 			self.delete_obj(TABLE_RECENT, {'migration_id': self._migration_id})
 
 		if self._notice['config'].get('update_latest_data') and not self._notice['config'].get('reset'):
-			entities = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
+			entities = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders',
+						'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
 			for entity_type in entities:
 				if entity_type not in self._notice['process']:
 					continue
 				if self._notice['target']['config'].get('entity_update', dict()).get(entity_type):
 					self._notice['process'][entity_type]['id_src'] = 0
-					self._notice['process'][entity_type]['total'] = to_int(self._notice['process'][entity_type]['total']) + to_int(self._notice['process'][entity_type].get('total_update', 0))
-		if not self._notice['src']['language_default'] or (self._notice['src']['language_default'] and to_str(self._notice['src']['language_default']) not in self._notice['map']['languages']):
+					self._notice['process'][entity_type]['total'] = to_int(
+						self._notice['process'][entity_type]['total']) + to_int(
+						self._notice['process'][entity_type].get('total_update', 0))
+		if not self._notice['src']['language_default'] or (
+				self._notice['src']['language_default'] and to_str(self._notice['src']['language_default']) not in
+				self._notice['map']['languages']):
 			for src_lang_id, target_lang_id in self._notice['map']['languages'].items():
 				self._notice['src']['language_default'] = src_lang_id
 				break
 		target_language_id = list(map(lambda x: to_str(x), list(self._notice['map']['languages'].values())))
-		if to_str(self._notice['target']['language_default']) not in target_language_id and self._notice['map']['languages'] and self._notice['map']['languages'].get(to_str(self._notice['src']['language_default'])):
-			self._notice['target']['language_default'] = self._notice['map']['languages'][to_str(self._notice['src']['language_default'])]
+		if to_str(self._notice['target']['language_default']) not in target_language_id and self._notice['map'][
+			'languages'] and self._notice['map']['languages'].get(to_str(self._notice['src']['language_default'])):
+			self._notice['target']['language_default'] = self._notice['map']['languages'][
+				to_str(self._notice['src']['language_default'])]
 		return response_success()
 
 	def prepare_display_import_source(self):
 		if not self._notice['config'].get('recent'):
-			entities = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
+			entities = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders',
+						'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
 			self._previous_notice = copy.deepcopy(self._notice)
 			for entity in entities:
 				self._notice['process'][entity] = self.get_default_process()
@@ -3771,7 +3879,8 @@ class LeBasecart(LeMigration):
 
 	def after_display_import_source(self):
 		if not self._notice['config'].get('recent'):
-			entities = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
+			entities = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders',
+						'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
 			notice = copy.deepcopy(self._notice)
 			for entity in entities:
 				notice['process'][entity] = copy.deepcopy(self._previous_notice['process'][entity])
@@ -3780,7 +3889,6 @@ class LeBasecart(LeMigration):
 			self._notice = notice
 			del self._previous_notice
 		return response_success()
-
 
 	def display_import_target(self):
 		return response_success()
@@ -3805,13 +3913,16 @@ class LeBasecart(LeMigration):
 			limit_app_mode = self.get_app_mode_limit()
 			if limit_app_mode and limit_app_mode['result'] == 'success':
 				limit_app_mode_data = limit_app_mode['data']
-		types = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
+		types = ['taxes', 'manufacturers', 'categories', 'attributes', 'products', 'customers', 'orders', 'reviews',
+				 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
 		for entity_type in types:
 			if entity_type not in self._notice['process']:
 				continue
 			entity_limit = limit
 			if limit_app_mode_data:
-				if to_str(limit_app_mode_data['entities']) == 'all' or (isinstance(limit_app_mode_data['entities'], list) and entity_type in limit_app_mode_data['entities']):
+				if to_str(limit_app_mode_data['entities']) == 'all' or (
+						isinstance(limit_app_mode_data['entities'], list) and entity_type in limit_app_mode_data[
+					'entities']):
 					entity_limit = limit_app_mode_data['limit']
 				else:
 					entity_limit = 0
@@ -3824,7 +3935,8 @@ class LeBasecart(LeMigration):
 				count = 0
 			self._notice['process'][entity_type]['total'] = count
 			if self._notice['config']['recent']:
-				self._notice['process'][entity_type]['real_total'] = to_int(total) + to_int(self._notice['process'][entity_type]['real_total'])
+				self._notice['process'][entity_type]['real_total'] = to_int(total) + to_int(
+					self._notice['process'][entity_type]['real_total'])
 			else:
 				self._notice['process'][entity_type]['real_total'] = total
 		self._notice['step'] = 'import'
@@ -3840,7 +3952,7 @@ class LeBasecart(LeMigration):
 	def display_update(self):
 		return response_success()
 
-	def get_query_display_import_source(self, update = False):
+	def get_query_display_import_source(self, update=False):
 		return dict()
 
 	# TODO: CLEAR TARGET DATA
@@ -3852,7 +3964,8 @@ class LeBasecart(LeMigration):
 		fn_clear = getattr(self, self._notice['target']['clear']['function'])
 		clear = fn_clear()
 		if clear['result'] == 'success':
-			entities = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules']
+			entities = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages',
+						'blogs', 'coupons', 'cartrules']
 			entity_select = list()
 			for entity in entities:
 				if self._notice['config'][entity]:
@@ -3873,13 +3986,15 @@ class LeBasecart(LeMigration):
 		if self._notice['demo']['clear']:
 			return response_success()
 		types = ['products', 'orders']
-		entities = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages', 'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
+		entities = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages',
+					'blogs', 'coupons', 'cartrules', 'quotes', 'newsletters']
 		if to_int(self._notice['mode']) == self.MIGRATION_DEMO and self._notice['demo']['status'] != 'skip':
 			key_total = 'total'
 		else:
 			key_total = 'real_total'
 		functions = ['clear_target_products_demo', 'clear_target_orders_demo']
-		if self._notice['demo']['status'] != 'success' or not hasattr(self, self._notice['target']['clear_demo']['function']) or self._notice['target']['clear_demo']['function'] not in functions:
+		if self._notice['demo']['status'] != 'success' or not hasattr(self, self._notice['target']['clear_demo'][
+			'function']) or self._notice['target']['clear_demo']['function'] not in functions:
 			self._notice['demo']['clear'] = True
 
 			for entity_type in entities:
@@ -3938,7 +4053,7 @@ class LeBasecart(LeMigration):
 		migration = self.get_info_migration(migration_id)
 		folder_upload = root_path + '/' + DIR_UPLOAD + '/' + to_str(migration_id)
 		if self._is_test:
-			folder_upload = root_path + '/' + DIR_UPLOAD + '/' + get_config_ini('src', 'file', file = 'test.ini')
+			folder_upload = root_path + '/' + DIR_UPLOAD + '/' + get_config_ini('src', 'file', file='test.ini')
 			return folder_upload
 		if migration and migration['migration_group'] == GROUP_TEST:
 			migration_test = self.select_row(TABLE_MIGRATION_TEST, {'migration_id': migration_id})
@@ -3957,7 +4072,7 @@ class LeBasecart(LeMigration):
 		if not type_import:
 			result += "Finished migration!"
 		types = ['taxes', 'manufacturers', 'categories', 'products', 'customers', 'orders', 'reviews', 'pages',
-		         'blogs', 'coupons', 'cartrules']
+				 'blogs', 'coupons', 'cartrules']
 		index = types.index(type_import)
 		for i, value in enumerate(types):
 			if index <= i and self._notice['config'][value]:
@@ -4070,7 +4185,6 @@ class LeBasecart(LeMigration):
 
 	def convert_category_export(self, category, categories_ext):
 		return response_success()
-
 
 	def get_category_id_import(self, convert, category, categories_ext):
 		return convert['id']
@@ -4482,6 +4596,7 @@ class LeBasecart(LeMigration):
 
 	def finish_blog_export(self):
 		return response_success()
+
 	# TODO: Coupon
 	def prepare_coupons_import(self):
 		return response_success()
@@ -4548,7 +4663,7 @@ class LeBasecart(LeMigration):
 			if self._notice[self.get_type()]['config'].get('auth'):
 				auth['user'] = to_str(self._notice[self.get_type()]['config']['auth'].get('user'))
 				auth['pass'] = to_str(self._notice[self.get_type()]['config']['auth'].get('pass'))
-			new_thread = RequestThread(self._migration_id, url, auth = auth)
+			new_thread = RequestThread(self._migration_id, url, auth=auth)
 			new_thread.start()
 		return response_success()
 
@@ -4587,8 +4702,11 @@ class LeBasecart(LeMigration):
 		}
 		self.insert_obj(TABLE_MIGRATION_HISTORY, migration_history_data)
 
-	def check_url(self, url, timeout = False, proxies = None):
-		if self._type and self._notice[self._type]['cart_type'] in ['wix','bigcommerce', 'squarespace', 'neto', 'shopify', 'smartweb', 'etsy', 'customapi', 'customfile', 'vend'] and self._notice[self._type]['cart_url'] == url:
+	def check_url(self, url, timeout=False, proxies=None):
+		if self._type and self._notice[self._type]['cart_type'] in ['wix', 'bigcommerce', 'squarespace', 'neto',
+																	'shopify', 'smartweb', 'etsy', 'customapi',
+																	'customfile', 'vend'] and self._notice[self._type][
+			'cart_url'] == url:
 			return response_success()
 		if self._notice[self._type]['cart_type'] == 'bigcartel':
 			url = to_str(url).replace('products.json', '')
@@ -4626,7 +4744,9 @@ class LeBasecart(LeMigration):
 			if location:
 				format_origin_url = self.format_url(url)
 				format_redirect_url = self.format_url(location)
-				if format_origin_url != format_redirect_url and format_origin_url.replace('https', '').replace('http', '') == format_redirect_url.replace('https', '').replace('http', ''):
+				if format_origin_url != format_redirect_url and format_origin_url.replace('https', '').replace('http',
+																											   '') == format_redirect_url.replace(
+					'https', '').replace('http', ''):
 					redirect_location = self.format_url(location)
 					self._notice[self.get_type()]['cart_url'] = redirect_location
 					return self.check_url(location)
@@ -4655,11 +4775,13 @@ class LeBasecart(LeMigration):
 					res = ''
 			if status == 403:
 				for l in line_head:
-					if 'Server' in to_str(l) and 'nginx' in to_str(l) and self.get_type() and self._notice[self.get_type()].get('setup_type') == 'connector':
+					if 'Server' in to_str(l) and 'nginx' in to_str(l) and self.get_type() and self._notice[
+						self.get_type()].get('setup_type') == 'connector':
 						return create_response('nginx')
 				if not use_proxy:
 					return self.check_url(url, timeout, self.PROXY_HOST)
-			if status == 401 and self.get_type() and self._notice[self.get_type()].get('setup_type') in ['connector', 'module_connector']:
+			if status == 401 and self.get_type() and self._notice[self.get_type()].get('setup_type') in ['connector',
+																										 'module_connector']:
 				return create_response('auth')
 			msg_log = dict()
 			msg_log['method'] = 'GET'
@@ -4692,7 +4814,7 @@ class LeBasecart(LeMigration):
 				result[model_name] = label
 		return result
 
-	def strip_html_tag(self, html, none_check = False):
+	def strip_html_tag(self, html, none_check=False):
 		if not html:
 			return ''
 		if not self._notice['config'].get('strip_html') and not none_check:
@@ -4708,7 +4830,7 @@ class LeBasecart(LeMigration):
 		s.feed(to_str(html))
 		return s.get_data()
 
-	def create_sku_by_name(self, name, char = 32):
+	def create_sku_by_name(self, name, char=32):
 		sku = self.convert_attribute_code(name)
 		if char and not isinstance(char, int):
 			char = 32
@@ -4778,7 +4900,7 @@ class LeBasecart(LeMigration):
 				children_data[code] = value
 		return children_data
 
-	def get_price_children(self, price, addition_price, price_prefix = '+'):
+	def get_price_children(self, price, addition_price, price_prefix='+'):
 		if price_prefix == '-':
 			new_price = to_decimal(price) - to_decimal(addition_price)
 			return new_price if new_price > 0 else 0
@@ -4807,7 +4929,8 @@ class LeBasecart(LeMigration):
 			return variants
 		options_src = dict()
 		for option in options:
-			if option['option_type'] not in ['select', 'drop_down', 'dropdown', self.OPTION_RADIO, self.OPTION_CHECKBOX, 'multiple', 'multiswatch', self.OPTION_MULTISELECT]:
+			if option['option_type'] not in ['select', 'drop_down', 'dropdown', self.OPTION_RADIO, self.OPTION_CHECKBOX,
+											 'multiple', 'multiswatch', self.OPTION_MULTISELECT]:
 				continue
 			values = list()
 			key_option = get_value_by_key_in_dict(option, 'id', option['option_code'])
@@ -4863,11 +4986,14 @@ class LeBasecart(LeMigration):
 				attribute_data['option_value_languages'] = attribute['option_value_languages']
 				attribute_data['option_value_code'] = attribute['option_value_code']
 				attribute_data['option_value_code_save'] = attribute['option_value_name']
-				children_data['price'] = self.get_price_children(children_data['price'], attribute['price'], attribute['price_prefix'])
-				children_data['weight'] = self.get_price_children(children_data['weight'], attribute['weight'], attribute['weight_prefix'])
+				children_data['price'] = self.get_price_children(children_data['price'], attribute['price'],
+																 attribute['price_prefix'])
+				children_data['weight'] = self.get_price_children(children_data['weight'], attribute['weight'],
+																  attribute['weight_prefix'])
 				# children_data['weight'] = to_decimal(children_data['weight']) + to_decimal(attribute['weight_prefix'])
 				if children_data['special_price']['price']:
-					children_data['special_price']['price'] = self.get_price_children(children_data['special_price']['price'], attribute['price'], attribute['price_prefix'])
+					children_data['special_price']['price'] = self.get_price_children(
+						children_data['special_price']['price'], attribute['price'], attribute['price_prefix'])
 				attribute_data['option_value_price'] = to_decimal(attribute['price'])
 				attribute_data['price_prefix'] = '+'
 				children_data['attributes'].append(attribute_data)
@@ -4930,7 +5056,9 @@ class LeBasecart(LeMigration):
 				option_data['option_value_name'] = attribute['option_value_name']
 				option_data['option_value_code'] = attribute['option_value_code']
 				option_data['option_value_languages'] = attribute['option_value_languages']
-				option_data['option_value_price'] = attribute['price'] if attribute['price'] and to_int(attribute['price']) > 0 else (children['price'] if to_len(children['attributes']) < 2 and to_int(children['price']) > 0 else 0)
+				option_data['option_value_price'] = attribute['price'] if attribute['price'] and to_int(
+					attribute['price']) > 0 else (
+					children['price'] if to_len(children['attributes']) < 2 and to_int(children['price']) > 0 else 0)
 				option_data['price_prefix'] = attribute['price_prefix']
 				languages[attribute['option_name']] = attribute['option_languages']
 				options[attribute['option_name']][attribute['option_value_name']] = option_data
@@ -4961,7 +5089,8 @@ class LeBasecart(LeMigration):
 	def get_migrate_product_extend_config(self):
 		if self.migrate_product_extend_config is not None:
 			return self.migrate_product_extend_config
-		if to_int(self._notice['mode']) == MIGRATION_FULL or not self._notice['config'].get('app_mode') or self._notice['target']['cart_type'] == 'prestashop':
+		if to_int(self._notice['mode']) == MIGRATION_FULL or not self._notice['config'].get('app_mode') or \
+				self._notice['target']['cart_type'] == 'prestashop':
 			self.migrate_product_extend_config = True
 			return True
 		limit_app_mode = self.get_app_mode_limit()
@@ -4973,18 +5102,20 @@ class LeBasecart(LeMigration):
 		if to_str(entity_limit) != 'unlimited':
 			self.migrate_product_extend_config = True
 			return True
-		if to_str(limit_app_mode_data['entities']) == 'all' or (isinstance(limit_app_mode_data['entities'], list) and 'products' in limit_app_mode_data['entities']):
+		if to_str(limit_app_mode_data['entities']) == 'all' or (
+				isinstance(limit_app_mode_data['entities'], list) and 'products' in limit_app_mode_data['entities']):
 			self.migrate_product_extend_config = False
 			return False
 		self.migrate_product_extend_config = True
 		return True
 
-	def delete_map_demo(self, entity_type, entity_ids, field = 'id_desc'):
+	def delete_map_demo(self, entity_type, entity_ids, field='id_desc'):
 		where = {
 			'migration_id': self._migration_id,
 			'type': entity_type
 		}
-		query_delete = "DELETE FROM " + TABLE_MAP + " WHERE " + self.dict_to_where_condition(where) + ' AND ' + field + " IN " + self.list_to_in_condition(entity_ids)
+		query_delete = "DELETE FROM " + TABLE_MAP + " WHERE " + self.dict_to_where_condition(
+			where) + ' AND ' + field + " IN " + self.list_to_in_condition(entity_ids)
 		self.query_raw(query_delete)
 		return response_success()
 
@@ -5005,7 +5136,8 @@ class LeBasecart(LeMigration):
 			for entity_type, data in recent_data['process'].items():
 				if entity_type not in self._notice['process']:
 					continue
-				if self._notice['config'].get('update_latest_data') and self._notice['target']['config'].get('entity_update', dict()).get(entity_type):
+				if self._notice['config'].get('update_latest_data') and self._notice['target']['config'].get(
+						'entity_update', dict()).get(entity_type):
 					self._notice['process'][entity_type]['total_update'] = data['total']
 				self._notice['process'][entity_type]['id_src'] = data['id_src']
 				self._notice['process'][entity_type]['total'] = 0
@@ -5014,7 +5146,7 @@ class LeBasecart(LeMigration):
 				self._notice['process'][entity_type]['time_finish'] = 0
 				self._notice['process'][entity_type]['finish'] = False
 
-	def create_async_request_data(self, url, data = None, method = 'POST'):
+	def create_async_request_data(self, url, data=None, method='POST'):
 		if to_str(method).lower() not in ['post', 'delete', 'get', 'put']:
 			method = 'get'
 		return {
@@ -5023,14 +5155,16 @@ class LeBasecart(LeMigration):
 			'method': method.lower()
 		}
 
-	def async_request_by_method(self, data, custom_headers = None):
+	def async_request_by_method(self, data, custom_headers=None):
 		if not data:
 			return True
 		if not custom_headers:
 			custom_headers = dict()
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 		elif isinstance(custom_headers, dict) and not custom_headers.get('User-Agent'):
-			custom_headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
+			custom_headers[
+				'User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64;en; rv:5.0) Gecko/20110619 Firefox/5.0'
 		retry = 0
 		requests_extend_data = list()
 		retry_data = list()
@@ -5043,7 +5177,9 @@ class LeBasecart(LeMigration):
 				retry += 1
 				all_data = retry_data
 				retry_data = list()
-			all_request = [getattr(grequests, row['method'].lower())(row['url'], data = row['data'], headers = custom_headers) for row in all_data]
+			all_request = [
+				getattr(grequests, row['method'].lower())(row['url'], data=row['data'], headers=custom_headers) for row
+				in all_data]
 			all_import = grequests.map(all_request)
 			status_code = [row.status_code for row in all_import]
 			text = [json_decode(row.text) for row in all_import]
@@ -5087,7 +5223,7 @@ class LeBasecart(LeMigration):
 			self.log_traceback()
 			return ''
 
-	def sleep_time(self, value, status = 200, warning = False, resume_action = False, msg = ''):
+	def sleep_time(self, value, status=200, warning=False, resume_action=False, msg=''):
 		if self._notice and self._notice['running']:
 			if status not in [200, 201, 204]:
 				self._clear_entity_warning = False
@@ -5138,7 +5274,7 @@ class LeBasecart(LeMigration):
 		res = self.replace_url(res)
 		return res
 
-	def nl2br(self, string, is_xhtml = True):
+	def nl2br(self, string, is_xhtml=True):
 		string = to_str(string)
 		if not string:
 			return ''
@@ -5181,8 +5317,10 @@ class LeBasecart(LeMigration):
 
 	def get_link_change_token(self):
 		return ''
+
 	def get_summary_demo_by_type(self, entity_type):
-		summary = self.select_page(TABLE_MAP, {'type': entity_type, 'migration_id': self._migration_id}, limit = 20, order_by = 'id_src')
+		summary = self.select_page(TABLE_MAP, {'type': entity_type, 'migration_id': self._migration_id}, limit=20,
+								   order_by='id_src')
 		if summary['result'] != 'success' or not summary['data']:
 			return list()
 		return summary['data']
@@ -5338,40 +5476,58 @@ class LeBasecart(LeMigration):
 		html = to_str(html)
 		if not html:
 			return 0
-		if html.find('This website is using a security service to protect itself from online attacks') >=0 and html.find('StackPath') >=0:
+		if html.find(
+				'This website is using a security service to protect itself from online attacks') >= 0 and html.find(
+			'StackPath') >= 0:
 			return self.FW_STACKPATH
-		if html.find('Sorry, this is not allowed') >=0 and html.find('getastra.com') >=0:
+		if html.find('Sorry, this is not allowed') >= 0 and html.find('getastra.com') >= 0:
 			return self.FW_ASTRA
-		if html.find('R0lGODlhlgAoALMAAPHw8Dw8PNLS06mqqpSVlvRvJvqaZfu2j3V1doSEhuHh4rm6uv3Uv8TFxWVmaP///yH5BAAAAAAALAAAAACWACgAAAT/8MlJKSAuo1XnRdoAdMLQSYojTAlxKgToIIQiLbNbJeBINbkfgnZ68BLFGMI3GSwGuqLUk1k0FhhkBecgDAaJzIoicHA6qcbEoaUMMolv2PxIZZj1DJ0iO0vmDngTIAhFc4ICV1FTUkMVCiZuDiIUCmFqE3ZjlQ6YDwhtEhiUFBh/VZJwFnqcepEVIKGldx2CjEWdjGWvO4GZejacnqAUOH6PI1yhgL43GYtveoUdYbITGM232hSTjI5SXb8NYXhpg6FstwB6PnZ6fnObn2zY8hKxSbTb+w8Y9sJTTKFwYCMDwHttyvw7ge0Mlxjp8swgg+oZtYgdsNniF/BZA0FA/4IVCTmQQ4o25u5FebOxA5CIhzQ+4MJL5iFYGCvI5LhPADY2InG0lEAyD6YyOlJ+avNmH6sHFrlwmCMSasSXx4zknJWN5z4AC0AEK1pE6EBPQEwoJeZsqE4xZXLZIbBu4gSsAADYkYWPoT6vPL+t43VRnKQVuRD+yiolboKbWmlkiATgQIHLmDMbMMDg3tZrfwHzw8HCQeM9Rt/iGLYIxD4ZFp3p8WUgs+3aRAZ9FmVQ9BTGWqlMe5RTaWkV5zgtKoYnmhgqepBYtl2As4SnpxAo0KtAJLbu27f75oZ8wupWHyUAeLPkIM5NbO/OkCfAdavex3NRP1Ah2rDZemDy0/9shIlmCRx91MJMbJwAt44fdpEhwxAaVOVZOMWw80BtmNlS13AAvnNKiMuNBwkBXlhYCRZObATJQg8IsIkTRZSA4gAwljCAhevR+AADmHV2whOkEEnkF2N94YSSMI7n5JNQdsChW1FWaeWV49VmAJZcduklT5bx9+WYZJb5YwFimqnmmlEeICSbcMYp55x01mnnnXjmqeeefPbp55+ABirooGvmReg2VHq1wDENNDleGEWAlaKTF6jIyAKWMhJHP45+hUAAwxQIZQy4EFDCcL516lIA1tyyqQCJarNOAgH4gICoDzQQgG88nKArlxto81itHG1apQq9fhKJTzjm+mn/DZE0esMIzGLSKI6mQCKSAAHsWAkUaHmxwgIjrFdHAw2IsCN7OGKiQFYK7IqhAuh6Ue6OKAbjxUw2nEhurunWoB4U/56oxjqw0nHrA28kEgCsAwTQHbEBLJECwyoAwQEIH/EQL2ERB+BLCgvs0g9BAywx8q661gCAxLvQ64uxa7igazLdllBrvAkk0s2mCn+EolU+53WrAAlgasYuCOcqMdAffeD0dYveAcYDD0vArbKiiJzjHQQkkBcQ64hUdh21/iqBxJ9wgPDZmUg8QrczNcPGyz6UYYQJdJQRQMWfuFA2adeIDQDZ5c0hwgw8DK32ArQymwvbaLfdNWon1EoA4augJJACE59X3sA0L9sQbD8EjL4DKJ2bFhYL2u2qtWn7ghrvCkBYDtWppXD+2O6D0J1sAmqo/bJp3MqeLDEICLgE3fKNgAEAZYzwBVSFQAKVGpuDNRzbe8SLOdwPlK4rB9wKEK8OxEAdb0GFnK5CvGqUXD3DfG/yciSbB6DDOqDiGlT+1z8tEE8UhdifB2jFqmAs4G/NYKALkre5XLWBbbqSnQOI1QTTUKAFXPjbCtb3Nx3sKxchS5kRMIGAEUKwfhCM1aFcVaKyoKpyM/wT3rahukrILod82hyufCWLeI0pAgA7') >=0 and html.find('Web Site Blocked') >=0:
+		if html.find(
+				'R0lGODlhlgAoALMAAPHw8Dw8PNLS06mqqpSVlvRvJvqaZfu2j3V1doSEhuHh4rm6uv3Uv8TFxWVmaP///yH5BAAAAAAALAAAAACWACgAAAT/8MlJKSAuo1XnRdoAdMLQSYojTAlxKgToIIQiLbNbJeBINbkfgnZ68BLFGMI3GSwGuqLUk1k0FhhkBecgDAaJzIoicHA6qcbEoaUMMolv2PxIZZj1DJ0iO0vmDngTIAhFc4ICV1FTUkMVCiZuDiIUCmFqE3ZjlQ6YDwhtEhiUFBh/VZJwFnqcepEVIKGldx2CjEWdjGWvO4GZejacnqAUOH6PI1yhgL43GYtveoUdYbITGM232hSTjI5SXb8NYXhpg6FstwB6PnZ6fnObn2zY8hKxSbTb+w8Y9sJTTKFwYCMDwHttyvw7ge0Mlxjp8swgg+oZtYgdsNniF/BZA0FA/4IVCTmQQ4o25u5FebOxA5CIhzQ+4MJL5iFYGCvI5LhPADY2InG0lEAyD6YyOlJ+avNmH6sHFrlwmCMSasSXx4zknJWN5z4AC0AEK1pE6EBPQEwoJeZsqE4xZXLZIbBu4gSsAADYkYWPoT6vPL+t43VRnKQVuRD+yiolboKbWmlkiATgQIHLmDMbMMDg3tZrfwHzw8HCQeM9Rt/iGLYIxD4ZFp3p8WUgs+3aRAZ9FmVQ9BTGWqlMe5RTaWkV5zgtKoYnmhgqepBYtl2As4SnpxAo0KtAJLbu27f75oZ8wupWHyUAeLPkIM5NbO/OkCfAdavex3NRP1Ah2rDZemDy0/9shIlmCRx91MJMbJwAt44fdpEhwxAaVOVZOMWw80BtmNlS13AAvnNKiMuNBwkBXlhYCRZObATJQg8IsIkTRZSA4gAwljCAhevR+AADmHV2whOkEEnkF2N94YSSMI7n5JNQdsChW1FWaeWV49VmAJZcduklT5bx9+WYZJb5YwFimqnmmlEeICSbcMYp55x01mnnnXjmqeeefPbp55+ABirooGvmReg2VHq1wDENNDleGEWAlaKTF6jIyAKWMhJHP45+hUAAwxQIZQy4EFDCcL516lIA1tyyqQCJarNOAgH4gICoDzQQgG88nKArlxto81itHG1apQq9fhKJTzjm+mn/DZE0esMIzGLSKI6mQCKSAAHsWAkUaHmxwgIjrFdHAw2IsCN7OGKiQFYK7IqhAuh6Ue6OKAbjxUw2nEhurunWoB4U/56oxjqw0nHrA28kEgCsAwTQHbEBLJECwyoAwQEIH/EQL2ERB+BLCgvs0g9BAywx8q661gCAxLvQ64uxa7igazLdllBrvAkk0s2mCn+EolU+53WrAAlgasYuCOcqMdAffeD0dYveAcYDD0vArbKiiJzjHQQkkBcQ64hUdh21/iqBxJ9wgPDZmUg8QrczNcPGyz6UYYQJdJQRQMWfuFA2adeIDQDZ5c0hwgw8DK32ArQymwvbaLfdNWon1EoA4augJJACE59X3sA0L9sQbD8EjL4DKJ2bFhYL2u2qtWn7ghrvCkBYDtWppXD+2O6D0J1sAmqo/bJp3MqeLDEICLgE3fKNgAEAZYzwBVSFQAKVGpuDNRzbe8SLOdwPlK4rB9wKEK8OxEAdb0GFnK5CvGqUXD3DfG/yciSbB6DDOqDiGlT+1z8tEE8UhdifB2jFqmAs4G/NYKALkre5XLWBbbqSnQOI1QTTUKAFXPjbCtb3Nx3sKxchS5kRMIGAEUKwfhCM1aFcVaKyoKpyM/wT3rahukrILod82hyufCWLeI0pAgA7') >= 0 and html.find(
+			'Web Site Blocked') >= 0:
 			return self.FW_SONICWALL
-		if html.find('_Incapsula_Resource') >=0:
+		if html.find('_Incapsula_Resource') >= 0:
 			return self.FW_SITELOCK
 		return 0
 
 	def get_firewall_msg(self, code):
 		if to_int(code) == self.FW_STACKPATH:
-			return ('StackPath Firewall', 'We detect this website is under StackPath Firewall. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.')
+			return ('StackPath Firewall',
+					'We detect this website is under StackPath Firewall. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.')
 		if to_int(code) == self.FW_ASTRA:
-			return ('Astra Firewall', 'We detect this website is under Astra Firewall. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.')
+			return ('Astra Firewall',
+					'We detect this website is under Astra Firewall. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.')
 		if to_int(code) == self.FW_SONICWALL:
-			return ('Sonicwall', 'We detect this website is under Sonicwall. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.')
+			return ('Sonicwall',
+					'We detect this website is under Sonicwall. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.')
 		if to_int(code) == self.FW_SITELOCK:
-			return ('Sitelock', 'We detect this website is under {}. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.'.format(url_to_link('https://www.sitelock.com/', 'Sitelock')))
+			return ('Sitelock',
+					'We detect this website is under {}. Please temporarily turn off the firewall for the connector to work properly, or contact us for more solutions.'.format(
+						url_to_link('https://www.sitelock.com/', 'Sitelock')))
 
 		return ()
 
 	def get_msg_by_result(self, result):
 		if result['result'] == 'auth':
-			desc = 'Please enter Basic Auth User and Password to continue. {}'.format(url_to_link('https://litextension.com/faq/docs/userguide-demo/what-is-basic-authentication/', 'More details!'))
+			desc = 'Please enter Basic Auth User and Password to continue. {}'.format(
+				url_to_link('https://litextension.com/faq/docs/userguide-demo/what-is-basic-authentication/',
+							'More details!'))
 			if self._notice['src']['config'].get('auth', dict()).get('user'):
-				desc = 'Authentication failed, please check Auth User and Password and retry. {}'.format(url_to_link('https://litextension.com/faq/docs/userguide-demo/what-is-basic-authentication/', 'More details!'))
+				desc = 'Authentication failed, please check Auth User and Password and retry. {}'.format(
+					url_to_link('https://litextension.com/faq/docs/userguide-demo/what-is-basic-authentication/',
+								'More details!'))
 			return ('HTTP Basic Auth Required', desc)
 		if result['result'] == 'nginx':
-			return ('Can not reach connector', 'We detect you are running Nginx. Please {} to install connector on Nginx. If you have any difficulties, please contact us for assistance.'.format(url_to_link('https://litextension.com/faq/docs/general-questions/connector-isssues/what-are-the-connector-files-and-how-to-download-them', 'follow this guide')))
+			return ('Can not reach connector',
+					'We detect you are running Nginx. Please {} to install connector on Nginx. If you have any difficulties, please contact us for assistance.'.format(
+						url_to_link(
+							'https://litextension.com/faq/docs/general-questions/connector-isssues/what-are-the-connector-files-and-how-to-download-them',
+							'follow this guide')))
 		if result['result'] == 'firewall' and result.get('code'):
 			return self.get_firewall_msg(result['code'])
 		if result['result'] == 'carttype' and result.get('cart_type'):
-			msg = "Can’t connect to source store currently. Your url looks like a {} but your selected cart type is {}. Please check and try again".format(to_str(result['data']).capitalize(), to_str(result['cart_type']).capitalize)
+			msg = "Can’t connect to source store currently. Your url looks like a {} but your selected cart type is {}. Please check and try again".format(
+				to_str(result['data']).capitalize(), to_str(result['cart_type']).capitalize)
 			return ('Source Connection Error', msg)
 		if result['result'] == 'root_url' and self.error_root_url(result['data']):
 			return ('Source Connection Error', self.error_root_url(result['data']))
@@ -5384,7 +5540,7 @@ class LeBasecart(LeMigration):
 	def error_root_url(self, root_url):
 		return ''
 
-	def is_module_connector(self, request = None):
+	def is_module_connector(self, request=None):
 		if not self._type:
 			return False
 		if self._notice[self._type]['config'].get('type_upload') == 'api':
@@ -5396,5 +5552,6 @@ class LeBasecart(LeMigration):
 		return False
 
 	def backup_table_map(self):
-		query = "CREATE TABLE `migration_map_{}` AS SELECT * FROM migration_map".format(get_current_time("%Y-%m-%d_%H-%M-%S"))
+		query = "CREATE TABLE `migration_map_{}` AS SELECT * FROM migration_map".format(
+			get_current_time("%Y-%m-%d_%H-%M-%S"))
 		return self.query_raw(query)

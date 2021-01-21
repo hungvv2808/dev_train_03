@@ -1,8 +1,9 @@
-import hmac
+from werkzeug.wrappers import Response
 
-from werkzeug.wrappers import Request, Response, ResponseStream
-from cartmigration.libs.utils import *
-class Auth():
+from v32.cartmigration.libs.utils import *
+
+
+class Auth:
 	def __init__(self, app):
 		self.app = app
 
@@ -22,9 +23,8 @@ class Auth():
 			res = Response(json_encode(response_error('Authorization failed.')), mimetype = 'text/plain', status = 401)
 			return res(environ, start_response)
 		time_request = to_str(authorization_path[0])
-		# if to_int(time.time()) - to_int(time_request) > 30:
-		# 	res = Response(json_encode(response_error('Authorization failed, request is expired')), mimetype = 'text/plain', status = 401)
-		# 	return res(environ, start_response)
+		# if to_int(time.time()) - to_int(time_request) > 30: res = Response(json_encode(response_error('Authorization
+		# failed, request is expired')), mimetype = 'text/plain', status = 401) return res(environ, start_response)
 		hmac = authorization_path[1]
 		if not self.authorize(time_request, hmac):
 			res = Response(json_encode(response_error('Authorization failed.')), mimetype = 'text/plain', status = 401)

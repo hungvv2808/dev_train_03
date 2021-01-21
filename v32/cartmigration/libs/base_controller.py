@@ -1,9 +1,11 @@
 import math
-from datetime import datetime
+
 import psutil
-from cartmigration.libs.utils import *
 import sendgrid
 from sendgrid.helpers.mail import *
+
+from v32.cartmigration.libs.utils import *
+
 
 class BaseController:
 	NEW = 1
@@ -17,7 +19,7 @@ class BaseController:
 	ACTION_APP_MODE = 3
 	ACTION_DEMO_ERROR = 4
 
-	def __init__(self,  data = None):
+	def __init__(self, data=None):
 		self._migration_id = data.get('migration_id') if isinstance(data, dict) else None
 		self.data = data
 		self.pid = None
@@ -39,7 +41,7 @@ class BaseController:
 	def get_notice(self):
 		return self._notice
 
-	def init_cart(self, new = False):
+	def init_cart(self, new=False):
 		if self._notice and self.router:
 			return self
 		self.router = get_model('basecart')
@@ -64,9 +66,9 @@ class BaseController:
 			self._notice = None
 		return delete
 
-	def update_notice(self, _migration_id, notice = None, pid = None, mode = None, status = None, finish = False):
+	def update_notice(self, _migration_id, notice=None, pid=None, mode=None, status=None, finish=False):
 		# router = get_model('migration')
-		return getattr(self.get_router(), 'update_notice')(_migration_id, notice, pid , mode, status, finish)
+		return getattr(self.get_router(), 'update_notice')(_migration_id, notice, pid, mode, status, finish)
 
 	def get_router(self):
 		if self.router:
@@ -143,7 +145,7 @@ class BaseController:
 		cart_name = getattr(self.get_router(), 'get_cart')(source_cart_type, cart_version, check)
 		return cart_name
 
-	def save_notice(self, status = None, sv_pid = True, pid = None, clear_entity_warning = False):
+	def save_notice(self, status=None, sv_pid=True, pid=None, clear_entity_warning=False):
 		notice = self._notice
 		demo = None
 		# if 'demo' in notice and notice['demo']:
@@ -152,10 +154,11 @@ class BaseController:
 			process_id = pid if pid else self.pid
 		else:
 			process_id = None
-		res = getattr(self.get_router(), 'save_user_notice')(self._migration_id, notice, process_id, demo, status, clear_entity_warning = clear_entity_warning)
+		res = getattr(self.get_router(), 'save_user_notice')(self._migration_id, notice, process_id, demo, status,
+															 clear_entity_warning=clear_entity_warning)
 		return res
 
-	def save_migration(self, after_kill = False, kill_all = False, extend_data = dict):
+	def save_migration(self, after_kill=False, kill_all=False, extend_data=dict):
 		notice = self._notice
 		data = {
 			'notice': notice,
@@ -204,7 +207,6 @@ class BaseController:
 		notice = getattr(self.get_router(), 'get_migration_notice')(notice['setting']['migration_id'])
 		send_data_socket(notice, con)
 
-
 	def get_info_migration_id(self, user_migration_id):
 		# cart = get_model('basecart')
 		return getattr(self.get_router(), 'get_info_migration')(user_migration_id)
@@ -216,24 +218,24 @@ class BaseController:
 			return response_error()
 		return check_migration_id
 
-	def log(self, msg, type_log = 'exceptions'):
+	def log(self, msg, type_log='exceptions'):
 		log(msg, self._migration_id, type_log)
 		if type_log not in ['process', 'time_requests', 'time_images']:
 			path = BASE_DIR + '/log'
 			if self._migration_id:
 				migration_id = to_str(self._migration_id)
 				path = DIR_PROCESS + migration_id + '/' + path
-			if os.path.isfile(path+'/exceptions_top.log'):
-				os.remove(path+'/exceptions_top.log')
+			if os.path.isfile(path + '/exceptions_top.log'):
+				os.remove(path + '/exceptions_top.log')
 			log(msg, self._migration_id, 'exceptions_top')
 
-	def log_traceback(self, type_error = 'exceptions', entity_id = None):
+	def log_traceback(self, type_error='exceptions', entity_id=None):
 		error = traceback.format_exc()
 		if entity_id:
 			error = type_error + ' ' + to_str(entity_id) + ': ' + error
 		self.log(error, type_error)
 
-	def setup_source_cart(self, cart_type = None):
+	def setup_source_cart(self, cart_type=None):
 		# cart = get_model('basecart')
 		if not cart_type:
 			cart_type = self.get_first_source_cart_type()
@@ -247,7 +249,7 @@ class BaseController:
 			'info': support_info,
 		}
 
-	def setup_target_cart(self, cart_type = None):
+	def setup_target_cart(self, cart_type=None):
 		# cart = get_model('basecart')
 		if not cart_type:
 			cart_type = self.get_first_target_cart_type()
@@ -306,7 +308,7 @@ class BaseController:
 				if filter_key in self._notice:
 					self._notice[filter_key] = data[filter_key]
 				extend_data[filter_key] = data[filter_key]
-		update = self.save_migration(extend_data = extend_data)
+		update = self.save_migration(extend_data=extend_data)
 		return update
 
 	def get_migration_history(self, data):
@@ -315,7 +317,7 @@ class BaseController:
 		response_from_subprocess(history)
 		return
 
-	def get_file(self, migration_id, path_file = 'exceptions_top', is_limit = True, limit_line = None):
+	def get_file(self, migration_id, path_file='exceptions_top', is_limit=True, limit_line=None):
 		if migration_id:
 			log_file = get_pub_path() + '/log/' + to_str(migration_id) + '/' + path_file + '.log'
 		else:
@@ -429,7 +431,6 @@ class BaseController:
 		# self.save_notice(None, False)
 		return config
 
-
 	def kill_end_loop_migration(self, data):
 		migration_id = data.get('migration_id')
 		self.init_cart()
@@ -470,8 +471,7 @@ class BaseController:
 				getattr(migration_model, 'set_status_migration')(migration['migration_id'], STATUS_KILL)
 		response_from_subprocess(True)
 
-
-	def kill_migration(self, data, conn = True):
+	def kill_migration(self, data, conn=True):
 		# cart = get_model('basecart')
 		info_migration_id = getattr(self.get_router(), 'get_info_migration')(data['migration_id'])
 		if not info_migration_id or not info_migration_id['pid']:
@@ -501,7 +501,7 @@ class BaseController:
 		else:
 			return response_success()
 
-	def check_run(self, data, conn = True):
+	def check_run(self, data, conn=True):
 		cart = get_model('basecart')
 		info_migration_id = getattr(cart, 'get_info_migration')(data['migration_id'])
 		if not info_migration_id or not info_migration_id['pid']:
@@ -552,7 +552,7 @@ class BaseController:
 		writeio_mps = []
 		new_info = 0
 		for x in range(10):
-			cpu_percent.append(psutil.cpu_percent(interval = 0.2))
+			cpu_percent.append(psutil.cpu_percent(interval=0.2))
 			memory_percent.append(psutil.virtual_memory().percent)
 			disk_usage_percent.append(psutil.disk_usage('/')[3])
 			if x == 0:
@@ -565,23 +565,24 @@ class BaseController:
 				w = round((new_info.write_bytes - old_info.write_bytes) / 1024 ** 2, 1)
 				writeio_mps.append(w)
 		status = {
-			"cpu_percent"       : self.get_average(cpu_percent),
-			"memory_percent"    : self.get_average(memory_percent),
+			"cpu_percent": self.get_average(cpu_percent),
+			"memory_percent": self.get_average(memory_percent),
 			"disk_usage_percent": self.get_average(disk_usage_percent),
-			"readio_mps"        : self.get_average(readio_mps),
-			"writeio_mps"       : self.get_average(writeio_mps)
+			"readio_mps": self.get_average(readio_mps),
+			"writeio_mps": self.get_average(writeio_mps)
 		}
 
-		#get migrations info
+		# get migrations info
 		migrations = []
 		for proc in psutil.process_iter():
 			proc_cmd = proc.cmdline()
 			if not proc_cmd or 'python' not in proc_cmd[0]:
 				continue
-			if len(proc_cmd) > 2 and proc_cmd[0] and proc_cmd[0] == "python3" and proc_cmd[1] and "bootstrap.py" in proc_cmd[1]:
+			if len(proc_cmd) > 2 and proc_cmd[0] and proc_cmd[0] == "python3" and proc_cmd[1] and "bootstrap.py" in \
+					proc_cmd[1]:
 				proc_status = {
 					"pid": proc.pid,
-					"cpu_percent": proc.cpu_percent(interval = 0.2),
+					"cpu_percent": proc.cpu_percent(interval=0.2),
 					"memory_info": str(math.ceil(proc.memory_info().rss / (1024 * 1024))) + "M",
 					"create_time": datetime.fromtimestamp(proc.create_time()).strftime("%Y-%m-%d %H:%M:%S"),
 					"path": proc_cmd[1],
@@ -602,7 +603,6 @@ class BaseController:
 
 		response_from_subprocess(status)
 		return
-
 
 	def restart_migration(self, data):
 		self.kill_migration(data, False)
@@ -716,15 +716,14 @@ class BaseController:
 			clear_log(migration_id)
 		return response_success()
 
-	def clear_previous_data(self, data, conn = True):
+	def clear_previous_data(self, data, conn=True):
 		migration_id = data.get('migration_id')
 		if not migration_id:
 			return response_success()
 		clear_log(migration_id)
 		route = get_model('migration')
-		getattr(route, 'clear_previous_data')(migration_id, test = data.get('test'))
+		getattr(route, 'clear_previous_data')(migration_id, test=data.get('test'))
 		return response_from_subprocess(response_success(), conn)
-
 
 	def start_autotest(self, old_migration_id):
 		cart = get_model('basecart')
@@ -739,7 +738,7 @@ class BaseController:
 			else:
 				getattr(auto_test, 'set_status_auto_test')(auto_test_id, getattr(auto_test, 'STATUS_STOP'))
 
-	def get_content_mail_to_dev(self, action = 0, file_log = 'exceptions_top'):
+	def get_content_mail_to_dev(self, action=0, file_log='exceptions_top'):
 		try:
 			server = socket.gethostbyname(socket.gethostname())  # Default to any avialable network interface
 		except Exception:
@@ -773,14 +772,14 @@ class BaseController:
 			lines = list(lines + error_log)
 		return lines
 
-
-	def send_email_to_dev(self, check_dev = True, msg = None):
+	def send_email_to_dev(self, check_dev=True, msg=None):
 		migration_model = get_model('migration')
 		migration = getattr(migration_model, 'get_info_migration')(self._migration_id)
 		if not migration:
 			return
 		if check_dev:
-			if migration['on_error'] != getattr(migration_model, 'ERROR_STOP') or migration['dev_notification'] != getattr(migration_model, 'DEV_NOTIFY'):
+			if migration['on_error'] != getattr(migration_model, 'ERROR_STOP') or migration[
+				'dev_notification'] != getattr(migration_model, 'DEV_NOTIFY'):
 				return
 			dev_emails = migration['dev_emails']
 			if not dev_emails:
@@ -796,7 +795,7 @@ class BaseController:
 				self.send_email(dev_email, '\n'.join(email_content), email_content[0])
 		return
 
-	def send_email(self, to_email, content_mail, subject = None, from_email = None):
+	def send_email(self, to_email, content_mail, subject=None, from_email=None):
 		content_mail = to_str(content_mail).replace('https://', 'ht_tps://').replace('http://', 'ht_tp://')
 		api_key = self.get_config_ini('sendgrid', 'api_key')
 		if not from_email:
@@ -808,11 +807,11 @@ class BaseController:
 		mail_content = Content("text/plain", content_mail)
 		send_mail = Mail(from_email, subject, to_email, mail_content)
 		try:
-			sg.client.mail.send.post(request_body = send_mail.get())
+			sg.client.mail.send.post(request_body=send_mail.get())
 		except Exception:
 			self.log_traceback('sendgrid')
 
-	def get_config_ini(self, section, key, default = None):
+	def get_config_ini(self, section, key, default=None):
 		return get_config_ini(section, key, default, self._migration_id)
 
 	def get_file_host(self):
@@ -824,14 +823,13 @@ class BaseController:
 		line_lists = list(filter(lambda x: to_len(to_str(x)) > 0, line_lists))
 		return line_lists
 
-	def get_host(self, request = None):
+	def get_host(self, request=None):
 		file_host = get_config_ini('local', 'host_file', '/etc/hosts')
 		if not os.path.isfile(file_host):
 			response_from_subprocess(response_success())
 			return
 		response_from_subprocess(response_success("\n".join(self.get_file_host())))
 		return
-
 
 	def add_host(self, request):
 		file_host = get_config_ini('local', 'host_file', '/etc/hosts')

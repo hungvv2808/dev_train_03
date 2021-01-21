@@ -1,16 +1,17 @@
-from cartmigration.libs.base_model import BaseModel
-from cartmigration.libs.utils import *
-from cartmigration.models.setup import Setup
+from v32.cartmigration.libs.base_model import BaseModel
+from v32.cartmigration.libs.utils import *
+from v32.cartmigration.models.setup import Setup
+
 
 class LeMigration(BaseModel):
-	MIGRATION_FULL = 2
-	MIGRATION_DEMO = 1
-	GROUP_USER = 1
-	GROUP_TEST = 2
-	ERROR_CONTINUE = 1
-	ERROR_STOP = 2
-	DEV_NOTIFY = 1
-	DEV_NO_NOTIFY = 2
+    MIGRATION_FULL = 2
+    MIGRATION_DEMO = 1
+    GROUP_USER = 1
+    GROUP_TEST = 2
+    ERROR_CONTINUE = 1
+    ERROR_STOP = 2
+    DEV_NOTIFY = 1
+    DEV_NO_NOTIFY = 2
 	DEMO_INIT = 1
 	DEMO_SKIP = 2
 	DEMO_SUCCESS = 3

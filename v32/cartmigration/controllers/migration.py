@@ -1,17 +1,18 @@
 import copy
 
-from cartmigration.libs.base_controller import BaseController
-from cartmigration.libs.utils import *
+from v32.cartmigration.libs.base_controller import BaseController
+from v32.cartmigration.libs.utils import *
+
 
 class Migration(BaseController):
-	_db = None
-	_import_action = (
-		'taxes',
-		'manufacturers',
-		'categories',
-		'attributes',
-		'products',
-		'customers',
+    _db = None
+    _import_action = (
+        'taxes',
+        'manufacturers',
+        'categories',
+        'attributes',
+        'products',
+        'customers',
 		'orders',
 		'reviews',
 		'pages',

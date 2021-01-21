@@ -1,23 +1,23 @@
-import html
-import unicodedata
-from bs4 import BeautifulSoup
-
+import mimetypes
 from urllib.request import Request, urlopen
 
 import requests
 from PIL import ImageFile
-from cartmigration.models.basecart import LeBasecart
-from cartmigration.libs.utils import *
-import mimetypes
+from bs4 import BeautifulSoup
+
+from v32.cartmigration.libs.utils import *
+from v32.cartmigration.models.basecart import LeBasecart
 
 try:
-	import chardet
+    import chardet
 except:
-	pass
+    pass
+
 
 class LeCartWordpress(LeBasecart):
-	WP_IMAGE = 'wp_image'
-	def __init__(self, data = None):
+    WP_IMAGE = 'wp_image'
+
+    def __init__(self, data=None):
 		super().__init__(data)
 		self.blog_running = False
 		self.image_size = None

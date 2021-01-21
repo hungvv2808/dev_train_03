@@ -1,15 +1,17 @@
-from cartmigration.models.abs_migration.abstract_migration import LeAbstractMigration
-from cartmigration.libs.utils import *
+from v32.cartmigration.libs.utils import *
+from v32.cartmigration.models.abs_migration.abstract_migration import LeAbstractMigration
+
+
 class LeTestMigration(LeAbstractMigration):
-	def get_migration_notice(self, migration_id):
-		info_migration_id = self.get_info_migration(migration_id)
-		if info_migration_id:
-			try:
-				notice_data = info_migration_id['notice']
-				notice_data = json_decode(notice_data)
-				return notice_data
-			except Exception as e:
-				return None
+    def get_migration_notice(self, migration_id):
+        info_migration_id = self.get_info_migration(migration_id)
+        if info_migration_id:
+            try:
+                notice_data = info_migration_id['notice']
+                notice_data = json_decode(notice_data)
+                return notice_data
+            except Exception as e:
+                return None
 		return None
 
 	def delete_migration_notice(self, migration_id):

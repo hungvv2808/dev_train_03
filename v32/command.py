@@ -1,9 +1,11 @@
-import requests
-
-from cartmigration.libs.utils import *
 import optparse
 
-from cartmigration.models.basecart import LeBasecart
+import requests
+
+from v32.cartmigration.libs.utils import *
+from v32.cartmigration.models.basecart import LeBasecart
+
+
 class Command():
 	def __init__(self, action):
 		self._action = action

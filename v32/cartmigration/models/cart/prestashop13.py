@@ -1,15 +1,16 @@
-from cartmigration.models.basecart import LeBasecart
-from cartmigration.libs.utils import *
+from v32.cartmigration.libs.utils import *
+from v32.cartmigration.models.basecart import LeBasecart
+
 
 class LeCartPrestashop13(LeBasecart):
 
-	# TODO: DISPLAY
-	def display_config_source(self):
-		parent = super().display_config_source()
-		if parent['result'] != 'success':
-			return parent
-		default_queries = {
-			'languages': {
+    # TODO: DISPLAY
+    def display_config_source(self):
+        parent = super().display_config_source()
+        if parent['result'] != 'success':
+            return parent
+        default_queries = {
+            'languages': {
 				'type': 'select',
 				'query': "SELECT cfg.*, lg.* FROM _DBPRF_lang AS lg LEFT JOIN _DBPRF_configuration AS cfg ON lg.id_lang = cfg.value WHERE cfg.name = 'PS_LANG_DEFAULT'"
 			},

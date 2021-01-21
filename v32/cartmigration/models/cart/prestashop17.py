@@ -1,15 +1,15 @@
-from cartmigration.models.basecart import LeBasecart
-from cartmigration.libs.utils import *
-import requests
+from v32.cartmigration.libs.utils import *
+from v32.cartmigration.models.basecart import LeBasecart
+
 
 class LeCartPrestashop17(LeBasecart):
 
-	def __init__(self, data = None):
-		super().__init__(data)
-		self.product_relates = list()
+    def __init__(self, data=None):
+        super().__init__(data)
+        self.product_relates = list()
 
-	# TODO: DISPLAY
-	def display_config_source(self):
+    # TODO: DISPLAY
+    def display_config_source(self):
 		parent = super().display_config_source()
 		if parent['result'] != 'success':
 			return parent
