@@ -1,0 +1,27 @@
+2021/01/21 10:36:54 : Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 665, in storage_data
+    getattr(self.get_source_cart(), 'finish_storage_data')()
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 3929, in finish_storage_data
+    folder_upload = self.get_folder_upload(self._migration_id)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 3941, in get_folder_upload
+    folder_upload = root_path + '/' + DIR_UPLOAD + '/' + get_config_ini('src', 'file', file = 'test.ini')
+TypeError: can only concatenate str (not "NoneType") to str
+
+2021/01/21 10:42:28 : customer id 10 import failed. Error: email: has already been taken
+2021/01/21 10:42:29 : customer id 11 import failed. Error: email: has already been taken
+2021/01/21 10:42:31 : customer id 12 import failed. Error: email: has already been taken
+2021/01/21 10:42:56 : order id 5 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:00 : order id 6 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:02 : order id 7 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:05 : order id 8 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:09 : order id 9 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:12 : order id 10 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:15 : order id 11 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:18 : order id 12 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:23 : order id 13 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:25 : order id 14 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:28 : order id 15 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:31 : order id 16 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:36 : order id 17 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:39 : order id 18 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
+2021/01/21 10:43:42 : order id 19 import failed. Error: Exceeded  API rate limit, please try again in a minute. Upgrade to a paid account to remove this limit.
