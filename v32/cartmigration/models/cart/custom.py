@@ -1,4 +1,6 @@
+import datetime
 import html
+import json
 import math
 
 from v32.cartmigration.models.basecart import LeBasecart
@@ -55,37 +57,25 @@ class LeCartCustom(LeBasecart):
                     self._notice['process'][_type]['imported'] = 0
                     self._notice['process'][_type]['error'] = 0
         queries = {
-            'taxes': {
-                'type': 'select',
-                'query': "SELECT COUNT(1) AS count FROM  _DBPRF_StateTaxStates WHERE id > " + to_str(
-                    self._notice['process']['taxes']['id_src']),
-            },
-            # 'manufacturers': { 'type': 'select', 'query': "SELECT COUNT(1) AS count  FROM _DBPRF_manufacturers WHERE
-            # manufacturers_id > " + to_str(self._notice['process']['manufacturers']['id_src']), },
             'categories': {
                 'type': 'select',
-                'query': "SELECT COUNT(1) AS count FROM  _DBPRF_Categories WHERE id > " + to_str(
+                'query': "SELECT COUNT(1) AS count FROM _DBPRF_categories WHERE categories_id > " + to_str(
                     self._notice['process']['categories']['id_src']),
             },
             'products': {
                 'type': 'select',
-                'query': "SELECT COUNT(1) AS count FROM  _DBPRF_Products WHERE id > " + to_str(
+                'query': "SELECT COUNT(1) AS count FROM _DBPRF_products WHERE products_id > " + to_str(
                     self._notice['process']['products']['id_src']),
             },
             'customers': {
                 'type': 'select',
-                'query': "SELECT COUNT(1) AS count FROM  _DBPRF_Customers WHERE id > " + to_str(
+                'query': "SELECT COUNT(1) AS count FROM _DBPRF_customers WHERE customers_id > " + to_str(
                     self._notice['process']['customers']['id_src']),
             },
             'orders': {
                 'type': 'select',
-                'query': "SELECT COUNT(1) AS count FROM  _DBPRF_Orders WHERE  id > " + to_str(
+                'query': "SELECT COUNT(1) AS count FROM _DBPRF_orders WHERE orders_id > " + to_str(
                     self._notice['process']['orders']['id_src']),
-            },
-            'reviews': {
-                'type': 'select',
-                'query': "SELECT COUNT(1) AS count FROM _DBPRF_reviews WHERE reviews_id > " + to_str(
-                    self._notice['process']['reviews']['id_src']),
             },
         }
         count = self.select_multiple_data_connector(queries)
@@ -258,77 +248,6 @@ class LeCartCustom(LeBasecart):
     def addition_tax_import(self, convert, tax, taxes_ext):
         return response_success()
 
-    # TODO: MANUFACTURER
-    def prepare_manufacturers_import(self):
-        return self
-
-    def prepare_manufacturers_export(self):
-        return self
-
-    def get_manufacturers_main_export(self):
-        id_src = self._notice['process']['manufacturers']['id_src']
-        limit = self._notice['setting']['manufacturers']
-        query = {
-            'type': 'select',
-            'query': "SELECT * FROM _DBPRF_manufacturers WHERE manufacturers_id > " + to_str(
-                id_src) + " ORDER BY manufacturers_id ASC LIMIT " + to_str(limit)
-        }
-        manufacturers = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
-        if not manufacturers or manufacturers['result'] != 'success':
-            return response_error('could not get manufacturers main to export')
-        return manufacturers
-
-    def get_manufacturers_ext_export(self, manufacturers):
-        url_query = self.get_connector_url('query')
-        manufacturer_ids = duplicate_field_value_from_list(manufacturers['data'], 'manufacturer_id')
-        manufacturers_ext_queries = {
-            'manufacturers_info': {
-                'type': 'select',
-                'query': "SELECT * FROM _DBPRF_manufacturers_info WHERE manufacturers_id IN " + self.list_to_in_condition(
-                    manufacturer_ids)
-            }
-        }
-        manufacturers_ext = self.get_connector_data(url_query,
-                                                    {'serialize': True, 'query': json.dumps(manufacturers_ext_queries)})
-        if not manufacturers_ext or manufacturers_ext['result'] != 'success':
-            return response_error()
-        return manufacturers_ext
-
-    def convert_manufacturer_export(self, manufacturer, manufacturers_ext):
-        manufacturer_data = self.construct_manufacturer()
-        manufacturer_data['id'] = manufacturer['manufacturers_id']
-        manufacturer_data['name'] = manufacturer['manufacturers_name']
-        manufacturer_data['thumb_image']['url'] = self.get_url_suffix(
-            self._notice['src']['config']['image_manufacturer'])
-        manufacturer_data['thumb_image']['path'] = manufacturer['manufacturers_image']
-
-        for language_id, language_label in self._notice['src']['languages'].items():
-            manufacturer_language_data = dict()
-            manufacturer_language_data['name'] = manufacturer['manufacturers_name']
-            manufacturer_data['languages'][language_id] = manufacturer_language_data
-        return response_success(manufacturer_data)
-
-    def get_manufacturer_id_import(self, convert, manufacturer, manufacturers_ext):
-        return manufacturer['manufacturers_id']
-
-    def check_manufacturer_import(self, convert, manufacturer, manufacturers_ext):
-        return True if self.get_map_field_by_src(self.TYPE_MANUFACTURER, convert['id']) else False
-
-    def router_manufacturer_import(self, convert, manufacturer, manufacturers_ext):
-        return response_success('manufacturer_import')
-
-    def before_manufacturer_import(self, convert, manufacturer, manufacturers_ext):
-        return response_success()
-
-    def manufacturer_import(self, convert, manufacturer, manufacturers_ext):
-        return response_success(0)
-
-    def after_manufacturer_import(self, manufacturer_id, convert, manufacturer, manufacturers_ext):
-        return response_success()
-
-    def addition_manufacturer_import(self, convert, manufacturer, manufacturers_ext):
-        return response_success()
-
     # TODO: CATEGORY
     def prepare_categories_import(self):
         return self
@@ -341,8 +260,8 @@ class LeCartCustom(LeBasecart):
         limit = self._notice['setting']['categories']
         query = {
             'type': 'select',
-            'query': "SELECT * FROM  _DBPRF_Categories WHERE id > " + to_str(
-                id_src) + " ORDER BY id ASC LIMIT " + to_str(limit)
+            'query': "SELECT * FROM _DBPRF_categories WHERE categories_id > " + to_str(
+                id_src) + " ORDER BY categories_id ASC LIMIT " + to_str(limit)
         }
         categories = self.select_data_connector(query)
         if not categories or categories['result'] != 'success':
@@ -351,21 +270,17 @@ class LeCartCustom(LeBasecart):
 
     def get_categories_ext_export(self, categories):
         url_query = self.get_connector_url('query')
-        category_ids = duplicate_field_value_from_list(categories['data'], 'id')
+        category_ids = duplicate_field_value_from_list(categories['data'], 'categories_id')
         categories_ext_queries = {
-            'categories_metakeys': {
+            'categories_description': {
                 'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_METACategories WHERE cat_id IN " + self.list_to_in_condition(
-                    category_ids)
+                'query': "SELECT * FROM _DBPRF_categories c INNER JOIN _DBPRF_categories_description cd ON c.categories_id = cd.categories_id WHERE c.categories_id IN "
+                         + self.list_to_in_condition(category_ids)
             },
-            'URIs': {
+            'products_to_categories': {
                 'type': 'select',
-                'query': "SELECT * FROM URIs WHERE cat_id IN " + self.list_to_in_condition(category_ids)
-            },
-            'cate_imgs': {
-                'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_CSSUI_CatTree WHERE cat_id IN " + self.list_to_in_condition(
-                    category_ids)
+                'query': "SELECT * FROM _DBPRF_categories c INNER JOIN _DBPRF_products_to_categories p ON c.categories_id = p.categories_id WHERE c.categories_id IN "
+                         + self.list_to_in_condition(category_ids)
             },
         }
         categories_ext = self.select_multiple_data_connector(categories_ext_queries)
@@ -382,40 +297,30 @@ class LeCartCustom(LeBasecart):
             parent_data = self.get_category_parent(category['parent_id'])
             if parent_data['result'] == 'success':
                 parent = parent_data['data']
-        category_data['id'] = category['id']
-        category_data['parent'] = parent
-        category_data['active'] = True if category['active'] == '1' else False
-        img = get_row_from_list_by_field(categories_ext['data']['cate_imgs'], 'cat_id', category['id'])
-        if img and img['image'] != '':
-            category_data['thumb_image']['url'] = 'http://www.iemotorsport.com/mm5/'
-            category_data['thumb_image']['path'] = img['image']
-        category_data['sort_order'] = category['disp_order']
-        category_data['created_at'] = datetime.fromtimestamp(to_int(category['dt_created'])) if category[
-            'dt_created'] else '0000-00-00 00:00:00'
-        category_data['updated_at'] = datetime.fromtimestamp(to_int(category['dt_updated'])) if category[
-            'dt_updated'] else '0000-00-00 00:00:00'
-        category_description = get_row_from_list_by_field(categories_ext['data']['categories_metakeys'], 'cat_id',
-                                                          category['id'])
-        # category_data['meta_description'] = self.strip_html_tag(category['page_title'])
-        if category_description:
-            category_data['description'] = category_description['value'] if category_description['value'] != '' else \
-                category_description['value_long']
-        else:
-            category_data['description'] = ''
-        category_data['name'] = category['name']
-        category_data['meta_title'] = category['page_title']
-        category_data['meta_keyword'] = category['code']
-        # meta_description
 
+        # set data from get to base form
+        category_data['id'] = category['categories_id']
+        category_data['parent'] = parent
+        img = get_row_from_list_by_field(category['categories_image'] if category['categories_image'] is not None else 'Demo', category['categories_image'], category['categories_image'])
+        if img and img['image'] != '':
+            category_data['thumb_image']['label'] = img['image']
+            category_data['thumb_image']['url'] = 'https://unsplash.com/photos/KVyc-zNT8hE'
+            category_data['thumb_image']['path'] = img['image']
+        category_data['name'] = get_row_from_list_by_field(categories_ext['data']['categories_description'], 'categories_id', category['categories_id'])
+        category_data['sort_order'] = category['sort_order']
+        category_data['created_at'] = datetime.fromtimestamp(to_int(category['date_added'])) if category['dt_created'] else '0000-00-00 00:00:00'
+        # meta_description
         category_data['category'] = category
         category_data['categories_ext'] = categories_ext
+
         if self._notice['config']['seo_301']:
             detect_seo = self.detect_seo()
             category_data['seo'] = getattr(self, 'categories_' + detect_seo)(category, categories_ext)
+
         return response_success(category_data)
 
     def get_category_id_import(self, convert, category, categories_ext):
-        return category['id']
+        return category['categories_id']
 
     def check_category_import(self, convert, category, categories_ext):
         id_imported = self.get_map_field_by_src(self.TYPE_CATEGORY, convert['id'], convert['code'])
@@ -448,10 +353,9 @@ class LeCartCustom(LeBasecart):
         limit = 4
         query = {
             'type': 'select',
-            'query': "SELECT * FROM  _DBPRF_Products WHERE id > " + to_str(id_src) + " ORDER BY id ASC LIMIT " + to_str(
-                limit)
+            'query': "SELECT * FROM _DBPRF_products WHERE products_id > " + to_str(id_src)
+                     + " ORDER BY products_id ASC LIMIT " + to_str(limit)
         }
-
         products = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
         if not products or products['result'] != 'success':
             return response_error()
@@ -462,64 +366,21 @@ class LeCartCustom(LeBasecart):
         product_ids = duplicate_field_value_from_list(products['data'], 'id')
         product_id_con = self.list_to_in_condition(product_ids)
         product_id_query = self.product_to_in_condition_seourl(product_ids)
-        manufacturer_id = duplicate_field_value_from_list(products['data'], 'manufacturers_id')
-        manufacturer_id_con = self.list_to_in_condition(manufacturer_id)
         product_ext_queries = {
-            'product_category': {
+            'products_description': {
                 'type': "select",
-                'query': "SELECT * FROM  _DBPRF_CategoryXProduct WHERE product_id IN " + product_id_con,
+                'query': "SELECT * FROM _DBPRF_products p INNER JOIN _DBPRF_products_description pd ON p.products_id = pd.products_id WHERE p.products_id IN " + product_id_con,
             },
-            'products_images': {
-                'type': "select",
-                'query': "SELECT * FROM  _DBPRF_ProductImages WHERE product_id IN  " + product_id_con + " ORDER BY disp_order",
+            'products_to_categories': {
+                'type': 'select',
+                'query': "SELECT * FROM _DBPRF_products p INNER JOIN _DBPRF_products_to_categories ptc ON p.products_id = ptc.products_id WHERE p.products_id IN " + product_id_con,
             },
-            'products_meta': {
-                'type': "select",
-                'query': "SELECT * FROM  _DBPRF_METAProducts WHERE product_id IN  " + product_id_con,
-            },
-            'URIs': {
-                'type': "select",
-                'query': "SELECT * FROM URIs WHERE product_id IN " + product_id_con,
-            },
-            # 'specials': {
-            # 	'type': "select",
-            # 	'query': "SELECT * FROM _DBPRF_specials WHERE products_id IN  " + product_id_con,
-            # },
-            #
-            # 'products_to_categories': { 'type': 'select', 'query': "SELECT * FROM _DBPRF_products_to_categories
-            # WHERE products_id IN " + product_id_con, }, 'manufacturers': { 'type': 'select', 'query': "SELECT
-            # manufacturers_id, manufacturers_name FROM _DBPRF_manufacturers WHERE manufacturers_id IN " +
-            # manufacturer_id_con, },
-
         }
-
         product_ext = self.get_connector_data(url_query, {
             'serialize': True, 'query': json.dumps(product_ext_queries)
         })
         if (not product_ext) or product_ext['result'] != 'success':
             return response_error()
-        image_ids = duplicate_field_value_from_list(product_ext['data']['products_images'], 'image_id')
-        image_id_con = self.list_to_in_condition(image_ids)
-        # product_option_ids = duplicate_field_value_from_list(product_ext['data']['products_attributes'], 'options_id')
-        # option_value_ids = duplicate_field_value_from_list(product_ext['data']['products_attributes'], 'options_values_id')
-        # option_ids_con = self.list_to_in_condition(product_option_ids)
-        # option_value_ids_con = self.list_to_in_condition(option_value_ids)
-
-        product_ext_rel_queries = {
-            'images': {
-                'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_Images WHERE id IN " + image_id_con,
-            },
-            # 'products_options_values': { 'type': 'select', 'query': "SELECT * FROM `_DBPRF_products_options_values`
-            # WHERE products_options_values_id IN " + option_value_ids_con, },
-        }
-
-        product_ext_rel = self.get_connector_data(url_query, {
-            'serialize': True, 'query': json.dumps(product_ext_rel_queries),
-        })
-        if (not product_ext_rel) or (product_ext_rel['result'] != 'success'):
-            return response_error()
-        product_ext = self.sync_connector_object(product_ext, product_ext_rel)
 
         return product_ext
 
@@ -805,7 +666,7 @@ class LeCartCustom(LeBasecart):
     def prepare_customers_import(self):
         query = {
             'type': 'query',
-            'query': "ALTER TABLE _DBPRF_customer MODIFY COLUMN password varchar(255)"
+            'query': "ALTER TABLE _DBPRF_customers MODIFY COLUMN customers_password varchar(255)"
         }
         self.import_data_connector(query, 'customer')
         return self
@@ -818,8 +679,8 @@ class LeCartCustom(LeBasecart):
         limit = self._notice['setting']['customers']
         query = {
             'type': 'select',
-            'query': "SELECT * FROM  _DBPRF_Customers WHERE id > " + to_str(
-                id_src) + " ORDER BY id ASC LIMIT " + to_str(limit)
+            'query': "SELECT * FROM _DBPRF_customers WHERE customers_id > " + to_str(
+                id_src) + " ORDER BY customers_id ASC LIMIT " + to_str(limit)
         }
 
         customers = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
@@ -833,9 +694,9 @@ class LeCartCustom(LeBasecart):
         customer_ext_queries = {
             'address_book': {
                 'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_CustomerAddresses WHERE cust_id IN " + self.list_to_in_condition(
+                'query': "SELECT * FROM _DBPRF_customers c INNER JOIN _DBPRF_address_book a ON c.customers_id = a.customers_id WHERE customers_id IN " + self.list_to_in_condition(
                     customers_ids),
-            }
+            },
         }
         customers_ext = self.get_connector_data(url_query,
                                                 {'serialize': True, 'query': json.dumps(customer_ext_queries)})
@@ -846,12 +707,8 @@ class LeCartCustom(LeBasecart):
         customers_ext_rel_queries = {
             'countries': {
                 'type': 'select',
-                'query': "SELECT * FROM Countries WHERE alpha IN  " + self.list_to_in_condition(country_ids),
+                'query': "SELECT * FROM _DBPRF_countries WHERE countries_id IN  " + self.list_to_in_condition(country_ids),
             },
-            'states': {
-                'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_States WHERE code IN " + self.list_to_in_condition(zone_ids),
-            }
         }
         customers_ext_rel = self.get_connector_data(url_query,
                                                     {'serialize': True, 'query': json.dumps(customers_ext_rel_queries)})
@@ -862,13 +719,33 @@ class LeCartCustom(LeBasecart):
 
     def convert_customer_export(self, customer, customers_ext):
         # customer_data = self.construct_customer()
-        customer_data = {'phone': '', 'id': customer['id'], 'code': None, 'site_id': '', 'group_id': '',
-                         'language_id': '', 'username': customer['login'], 'email': customer['pw_email'],
-                         'password': customer['password'], 'first_name': customer['ship_fname'], 'middle_name': '',
-                         'last_name': customer['ship_lname'], 'gender': 'Male', 'dob': '', 'is_subscribed': False,
-                         'active': True, 'capabilities': list(), 'created_at': None, 'updated_at': get_current_time(),
-                         'address': list(), 'groups': list(), 'balance': 0.00, 'user_url': '',
-                         'telephone': customer['bill_phone'], 'fax': customer['bill_fax']}
+        customer_data = {
+            'phone': '',
+            'id': customer['id'],
+            'code': None,
+            'site_id': '',
+            'group_id': '',
+            'language_id': '',
+            'username': customer['login'],
+            'email': customer['pw_email'],
+            'password': customer['password'],
+            'first_name': customer['ship_fname'],
+            'middle_name': '',
+            'last_name': customer['ship_lname'],
+            'gender': 'Male',
+            'dob': '',
+            'is_subscribed': False,
+            'active': True,
+            'capabilities': list(),
+            'created_at': None,
+            'updated_at': get_current_time(),
+            'address': list(),
+            'groups': list(),
+            'balance': 0.00,
+            'user_url': '',
+            'telephone': customer['bill_phone'],
+            'fax': customer['bill_fax']
+        }
         # customer_data['group_id'] = customer['customer_group_id']
         # customer_data['dob'] = customer['customers_dob']
         # customer_data['is_subscribed'] = customer['customers_newsletter']
@@ -950,8 +827,8 @@ class LeCartCustom(LeBasecart):
         limit = self._notice['setting']['orders']
         query = {
             'type': 'select',
-            'query': "SELECT * FROM  _DBPRF_Orders WHERE id > " + to_str(
-                id_src) + " ORDER BY id ASC LIMIT " + to_str(limit)
+            'query': "SELECT * FROM _DBPRF_orders WHERE orders_id > " + to_str(
+                id_src) + " ORDER BY orders_id ASC LIMIT " + to_str(limit)
         }
         orders = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
         if not orders or orders['result'] != 'success':
@@ -971,38 +848,14 @@ class LeCartCustom(LeBasecart):
         state_ids = set(payment_zone + shipping_zone)
         cus_ids = duplicate_field_value_from_list(orders['data'], 'cust_id')
         orders_ext_queries = {
-            'order_items': {
+            'orders_products': {
                 'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_OrderItems WHERE order_id IN " + self.list_to_in_condition(order_ids)
+                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_products op ON o.orders_id = op.orders_id WHERE orders_id IN " + self.list_to_in_condition(order_ids)
             },
-            'orders_customer': {
+            'orders_total': {
                 'type': 'select',
-                'query': "SELECT * FROM ` _DBPRF_CustomerAddresses` WHERE cust_id IN " + self.list_to_in_condition(
-                    cus_ids)
+                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_total ot ON o.orders_id = ot.orders_id WHERE orders_id IN " + self.list_to_in_condition(order_ids)
             },
-            'orders_payment': {
-                'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_OrderPayments WHERE order_id  IN " + self.list_to_in_condition(
-                    order_ids)
-            },
-            # 'orders_status_history': {
-            # 	'type': 'select',
-            # 	'query': "SELECT * FROM _DBPRF_orders_status_history"
-            # },
-            # 'orders_status_history': {
-            # 	'type': 'select',
-            # 	'query': "SELECT *  FROM _DBPRF_orders_status_history WHERE orders_id IN  " + self.list_to_in_condition(
-            # 		order_ids) + " ORDER BY orders_status_history_id DESC"
-            # },
-            'countries': {
-                'type': 'select',
-                'query': "SELECT * FROM Countries WHERE alpha IN " + self.list_to_in_condition(country_ids)
-            },
-
-            'zones': {
-                'type': 'select',
-                'query': "SELECT * FROM  _DBPRF_States WHERE code IN " + self.list_to_in_condition(state_ids)
-            }
         }
         orders_ext = self.get_connector_data(url_query, {'serialize': True, 'query': json.dumps(orders_ext_queries)})
         if not orders_ext or orders_ext['result'] != 'success':
@@ -1203,138 +1056,6 @@ class LeCartCustom(LeBasecart):
     def addition_order_import(self, convert, order, orders_ext):
         return response_success()
 
-    # TODO: REVIEW
-    def prepare_reviews_import(self):
-        return self
-
-    def prepare_reviews_export(self):
-        return self
-
-    def get_reviews_main_export(self):
-        id_src = self._notice['process']['reviews']['id_src']
-        limit = self._notice['setting']['reviews']
-        query = {
-            'type': 'select',
-            'query': "SELECT * FROM _DBPRF_reviews WHERE reviews_id > " + to_str(
-                id_src) + " ORDER BY reviews_id ASC LIMIT " + to_str(limit)
-        }
-        reviews = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
-        if not reviews or reviews['result'] != 'success':
-            return response_error('could not get manufacturers main to export')
-        return reviews
-
-    def get_reviews_ext_export(self, reviews):
-        url_query = self.get_connector_url('query')
-        reviews_id = duplicate_field_value_from_list(reviews['data'], 'reviews_id')
-        product_ids = duplicate_field_value_from_list(reviews['data'], 'products_id')
-        reviews_ext_queries = {
-            'products_description': {
-                'type': 'select',
-                'query': "SELECT products_id, language_id, products_name FROM _DBPRF_products_description WHERE products_id IN " + self.list_to_in_condition(
-                    product_ids)
-            },
-            'reviews_description': {
-                'type': 'select',
-                'query': "SELECT * FROM _DBPRF_reviews_description WHERE reviews_id IN " + self.list_to_in_condition(
-                    reviews_id)
-            },
-        }
-        reviews_ext = self.get_connector_data(url_query, {
-            'serialize': True,
-            'query': json.dumps(reviews_ext_queries)
-        })
-
-        if not reviews_ext or reviews_ext['result'] != 'success':
-            return response_warning()
-        return reviews_ext
-
-    def convert_review_export(self, review, reviews_ext):
-        review_data = self.construct_review()
-        default_language = self._notice['src']['language_default']
-        review_data['id'] = review['reviews_id']
-        review_data['language_id'] = default_language
-        review_description = get_row_from_list_by_field(reviews_ext['data']['reviews_description'], 'reviews_id',
-                                                        review['reviews_id'])
-        if not review_description:
-            return response_warning(
-                self.warning_import_entity('Review', review['reviews_id'], None, 'Review data not exists.'))
-        language_id = review_description['languages_id'] if review_description['languages_id'] else default_language
-        product_descriptions = get_list_from_list_by_field(reviews_ext['data']['products_description'], 'products_id',
-                                                           review['products_id'])
-        product_description = get_row_from_list_by_field(product_descriptions, 'language_id', language_id)
-        if not product_description:
-            product_description = get_row_from_list_by_field(product_descriptions, 'language_id', default_language)
-        rv_status = {
-            0: 2,  # pedding
-            1: 1,  # approved
-            3: 2  # not approved
-        }
-        review_data['language_id'] = language_id
-        review_data['product']['id'] = review['products_id']
-        review_data['product']['name'] = product_description['products_name'] if product_description else ' '
-        review_data['customer']['id'] = review['customers_id']
-        review_data['customer']['name'] = review['customers_name']
-        review_data['title'] = ' '
-        review_data['content'] = review_description['reviews_text']
-        review_data['status'] = get_value_by_key_in_dict(rv_status, to_int(review['reviews_status']),
-                                                         1) if 'reviews_status' in review else 1
-        review_data['created_at'] = review['date_added']
-        review_data['updated_at'] = review['last_modified']
-
-        rating = self.construct_review_rating()
-        rating['rate_code'] = 'default'
-        rating['rate'] = review['reviews_rating']
-        review_data['rating'].append(rating)
-        return response_success(review_data)
-
-    def get_review_id_import(self, convert, review, reviews_ext):
-        return review['reviews_id']
-
-    def check_review_import(self, convert, review, reviews_ext):
-        return True if self.get_map_field_by_src(self.TYPE_REVIEW, convert['id'], convert['code']) else False
-
-    def router_review_import(self, convert, review, reviews_ext):
-        return response_success('review_import')
-
-    def before_review_import(self, convert, review, reviews_ext):
-        return response_success()
-
-    def review_import(self, convert, review, reviews_ext):
-        product_id = False
-        if convert['product']['id'] or convert['product']['code']:
-            product_id = self.get_map_field_by_src(self.TYPE_PRODUCT, convert['product']['id'],
-                                                   convert['product']['code'])
-        if not product_id:
-            response_warning('Review ' + to_str(convert['id']) + ' import false. Product does not exist!')
-        customer_id = 0
-        if convert['customer']['id'] or convert['customer']['code']:
-            customer_id = self.get_map_field_by_src(self.TYPE_CUSTOMER, convert['customer']['id'],
-                                                    convert['customer']['code'])
-            if not customer_id:
-                customer_id = 0
-        review_data = {
-            'product_id': product_id,
-            'customer_id': customer_id,
-            'author': convert['customer']['name'] if convert['customer']['name'] else '',
-            'rating': self.calculate_average_rating(convert['rating']),
-            'date_added': convert['created_at'],
-            'date_modified': convert['updated_at'],
-            'status': 1 if convert['status'] else 0,
-            'text': convert['content']
-        }
-        review_id = self.import_review_data_connector(self.create_insert_query_connector('review', review_data), True,
-                                                      convert['id'])
-        if not review_id:
-            response_warning('review id ' + to_str(convert['id']) + ' import false.')
-            self.insert_map(self.TYPE_REVIEW, convert['id'], review_id, convert['code'])
-        return response_success(review_id)
-
-    def after_review_import(self, review_id, convert, review, reviews_ext):
-        return response_success()
-
-    def addition_review_import(self, convert, review, reviews_ext):
-        return response_success()
-
     # TODO: PAGE
     def prepare_pages_import(self):
         return self
@@ -1434,7 +1155,7 @@ class LeCartCustom(LeBasecart):
     def get_category_parent(self, category_id):
         query = {
             'type': 'select',
-            'query': "SELECT * FROM  _DBPRF_Categories WHERE id = " + to_str(category_id)
+            'query': "SELECT * FROM _DBPRF_categories WHERE categories_id = " + to_str(category_id)
         }
         categories = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
         if not categories or categories['result'] != 'success':
@@ -1463,11 +1184,11 @@ class LeCartCustom(LeBasecart):
             return string.replace('\n', '<br>\n')
 
     def get_country_id(self, code, name):
-        query = 'SELECT country_id FROM `_DBPRF_country` '
+        query = 'SELECT countries_id FROM _DBPRF_countries '
         if code:
-            query = query + ' WHERE iso_code_2 = "' + to_str(code) + '"'
+            query = query + ' WHERE countries_iso_code_2 = "' + to_str(code) + '"'
         elif name:
-            query = query + ' WHERE name = "' + to_str(name) + '"'
+            query = query + ' WHERE countries_name = "' + to_str(name) + '"'
         countries_query = {
             'type': 'select',
             'query': query
@@ -1478,11 +1199,11 @@ class LeCartCustom(LeBasecart):
         return countries['data'][0]['country_id']
 
     def get_state_id(self, code, name):
-        query = 'SELECT zone_id FROM `_DBPRF_zone` '
+        query = 'SELECT zone_id FROM _DBPRF_zones '
         if code:
-            query = query + ' WHERE code = "' + to_str(code) + '"'
+            query = query + ' WHERE zone_code = "' + to_str(code) + '"'
         elif name:
-            query = query + ' WHERE name = "' + to_str(name) + '"'
+            query = query + ' WHERE zone_name = "' + to_str(name) + '"'
         zones_query = {
             'type': 'select',
             'query': query
@@ -1549,7 +1270,7 @@ class LeCartCustom(LeBasecart):
     def categories_default_seo(self, category, categories_ext):
         result = list()
         type_seo = self.SEO_301
-        category_url = get_list_from_list_by_field(categories_ext['data']['URIs'], 'cat_id', category['id'])
+        category_url = get_list_from_list_by_field(categories_ext['data']['URIs'], 'cat_id', category['categories_id'])
         seo_cate = self.construct_seo_category()
         if category_url:
             for cate_url in category_url:

@@ -1,8 +1,7 @@
-import re
 import urllib.parse
-
-
+import re
 class LeFile:
+
 	def strip_domain_from_url(self, url):
 		parse = urllib.parse.urlparse(url)
 		path_url = parse.path
@@ -11,7 +10,7 @@ class LeFile:
 		if query:
 			path_url += '?' + query
 		if fragment:
-			path_url += '#' + fragment
+			path_url += '#'+fragment
 		return path_url
 
 	def join_url_path(self, url, path_url):
@@ -24,3 +23,4 @@ class LeFile:
 		pattern = '%[0-9A-F]{2}'
 		matches = re.search(pattern, path_url)
 		return True if matches else False
+

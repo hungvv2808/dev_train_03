@@ -1,26 +1,26 @@
 import csv
-import io
 import math
-from io import BytesIO
-from urllib.request import Request, urlopen
-
 import requests
-from PIL import Image
+import shutil
+from urllib.request import Request, urlopen
+from io import BytesIO
 from PIL import ImageFile
-
-from v32.cartmigration.libs.utils import *
-from v32.cartmigration.models.basecart import LeBasecart
-
+from PIL import Image
+import io
+import os
+import base64
+from cartmigration.libs.utils import *
+from cartmigration.models.basecart import LeBasecart
 
 class LeCartShopify(LeBasecart):
-    FORMAT_DATETIME = 'y-m-d h:i:s'
-    TABLE_SHOPIFY_REVIEW = 'shopify_review'
-    SP_MANU = 'manufacturers_table_construct'
-    API_VERSION = '2020-01'
-    TYPE_SMART_COLLECTION = 'smart'
-    TYPE_CUSTOM_COLLECTION = 'custom'
+	FORMAT_DATETIME = 'y-m-d h:i:s'
+	TABLE_SHOPIFY_REVIEW = 'shopify_review'
+	SP_MANU = 'manufacturers_table_construct'
+	API_VERSION = '2020-01'
+	TYPE_SMART_COLLECTION = 'smart'
+	TYPE_CUSTOM_COLLECTION = 'custom'
 
-    def __init__(self):
+	def __init__(self):
 		super().__init__()
 		self._api_url = None
 		self._location_id = None

@@ -1,3 +1,0 @@
-2021/01/21 10:36:36 : Changing sql mode 'NO_AUTO_CREATE_USER' is deprecated. It will be removed in a future release.
-2021/01/21 10:37:02 : DELETE FROM `shopify_review` WHERE `migration_id` = 2: Table 'cartmigration_ver3_test_2.shopify_review' doesn't exist
-2021/01/21 10:43:45 : DELETE FROM `shopify_review` WHERE `migration_id` = 2: Table 'cartmigration_ver3_test_2.shopify_review' doesn't exist

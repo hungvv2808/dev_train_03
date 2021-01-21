@@ -1,6 +1,9 @@
-# from v32.cartmigration.libs.base_controller import BaseController, BASE_DIR, shutil
+import os
 
-from v32.cartmigration.libs.utils import *
+# from cartmigration.libs.base_controller import BaseController, BASE_DIR, shutil
+import shutil
+
+from cartmigration.libs.utils import *
 
 BASE_DIR = 'cartmigration'
 

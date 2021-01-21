@@ -1,10 +1,8 @@
 import copy
+
+from cartmigration.libs.base_model import BaseModel
 from abc import abstractmethod
-
-from v32.cartmigration.libs.base_model import BaseModel
-from v32.cartmigration.libs.utils import *
-
-
+from cartmigration.libs.utils import *
 class LeAbstractMigration(BaseModel):
 	DEMO_INIT = 1
 	DEMO_SKIP = 2
@@ -12,7 +10,7 @@ class LeAbstractMigration(BaseModel):
 	MODE_LIVE = 'live'
 	MODE_TEST = 'test'
 
-	def __init__(self, data=None):
+	def __init__(self, data = None):
 		super().__init__()
 		self._migration_id = data.get('migration_id') if isinstance(data, dict) else None
 		self._notice = None
@@ -27,8 +25,7 @@ class LeAbstractMigration(BaseModel):
 		pass
 
 	@abstractmethod
-	def update_notice(self, _migration_id, notice=None, pid=None, mode=None, status=None, finish=False,
-					  clear_entity_warning=False):
+	def update_notice(self, _migration_id, notice = None, pid = None, mode = None, status = None, finish = False, clear_entity_warning = False):
 		pass
 
 	@abstractmethod
@@ -36,7 +33,7 @@ class LeAbstractMigration(BaseModel):
 		pass
 
 	@abstractmethod
-	def save_migration(self, migration_id, data):
+	def save_migration(self,migration_id, data):
 		pass
 
 	@abstractmethod
@@ -213,9 +210,9 @@ class LeAbstractMigration(BaseModel):
 					'msg': '',
 				},
 				'clear_demo': {
-					'result': 'process',
-					'function': 'no_clear_demo',
-					'msg': '',
+					'result'     : 'process',
+					'function'   : 'no_clear_demo',
+					'msg'        : '',
 				},
 				'support': {
 					'languages_select': False,
@@ -423,7 +420,7 @@ class LeAbstractMigration(BaseModel):
 				'clear': False,
 
 			},
-			'mode': MIGRATION_DEMO,
+			'mode' : MIGRATION_DEMO,
 			'log_start': False,
 			'version': '2.1.0'
 		}
@@ -471,8 +468,7 @@ class LeAbstractMigration(BaseModel):
 		return default_setting
 
 	def before_save_migration(self, data):
-		fields = ['user_id', 'pid', 'notice', 'src_cart_url', 'src_cart_type', 'src_token', 'target_cart_url',
-				  'target_cart_type', 'target_token', 'status', 'mode']
+		fields = ['user_id', 'pid', 'notice', 'src_cart_url', 'src_cart_type', 'src_token', 'target_cart_url', 'target_cart_type', 'target_token', 'status', 'mode']
 		migration_data = dict()
 		if self._mode == self.MODE_TEST:
 			for field in fields:
@@ -481,9 +477,7 @@ class LeAbstractMigration(BaseModel):
 		else:
 			migration_data = copy.deepcopy(data)
 		if migration_data.get('notice'):
-			migration_data['notice'] = json_encode(migration_data['notice']) if isinstance(migration_data['notice'],
-																						   dict) else migration_data[
-				'notice']
+			migration_data['notice'] = json_encode(migration_data['notice']) if isinstance(migration_data['notice'], dict) else migration_data['notice']
 		if data.get('notice') and self._mode == self.MODE_LIVE:
 			notice = data.get('notice')
 			if isinstance(notice, str):
@@ -496,8 +490,7 @@ class LeAbstractMigration(BaseModel):
 			migration_data['target_token'] = notice['target']['config']['token']
 		return migration_data
 
-	def before_update_notice(self, _migration_id, notice=None, pid=None, mode=None, status=None, finish=False,
-							 clear_entity_warning=False):
+	def before_update_notice(self, _migration_id, notice = None, pid = None, mode = None, status = None, finish = False, clear_entity_warning = False):
 		if isinstance(notice, str):
 			notice = json_decode(notice)
 
@@ -520,19 +513,18 @@ class LeAbstractMigration(BaseModel):
 				if to_int(status) == STATUS_COMPLETED:
 					update['last_full_mig_notice'] = json_encode(notice) if isinstance(notice, dict) else notice
 		else:
-			update['status'] = self.get_status(
-				notice['resume']['process'] if isinstance(notice, dict) else json_decode(notice)['resume']['process'])
+			update['status'] = self.get_status(notice['resume']['process'] if isinstance(notice, dict) else json_decode(notice)['resume']['process'])
 		if clear_entity_warning:
 			update['entity_warning'] = None
 		if notice:
 			update['notice'] = json_encode(notice) if isinstance(notice, dict) else notice
 		return update
 
-	def log(self, msg, type_log='exceptions', is_log=True):
+	def log(self, msg, type_log = 'exceptions', is_log = True):
 		if is_log:
 			log(msg, self._migration_id, type_log)
 
-	def get_status(self, process=None, status=None):
+	def get_status(self, process = None, status = None):
 		process_status = {
 			'new': STATUS_NEW,
 			'configuring': STATUS_CONFIGURING,
@@ -546,7 +538,7 @@ class LeAbstractMigration(BaseModel):
 		if process:
 			return process_status.get(process, STATUS_NEW)
 		elif status:
-			for key_status, value_status in process_status.items():
+			for key_status , value_status in process_status.items():
 				if status == value_status:
 					return key_status
 		return ''

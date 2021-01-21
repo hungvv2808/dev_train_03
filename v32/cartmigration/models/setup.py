@@ -1,16 +1,18 @@
-from v32.cartmigration.libs.base_model import BaseModel
-from v32.cartmigration.libs.mysql import Mysql
-from v32.cartmigration.libs.utils import *
+import configparser
+
+from cartmigration.libs.base_model import BaseModel
+from cartmigration.libs.mysql import Mysql
+from cartmigration.libs.utils import *
 
 
 class Setup(BaseModel):
-    _table_flag_stop = {
-        'table': TABLE_FLAG_STOP,
-        'rows': {
-            'id': "BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY",
-            'migration_id': "INT(11) NOT NULL",
-            'flag': "TINYINT(2) NOT NULL DEFAULT 1",
-        },
+	_table_flag_stop = {
+		'table': TABLE_FLAG_STOP,
+		'rows': {
+			'id': "BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY",
+			'migration_id': "INT(11) NOT NULL",
+			'flag': "TINYINT(2) NOT NULL DEFAULT 1",
+		},
 		'unique': [
 			['migration_id']
 		]

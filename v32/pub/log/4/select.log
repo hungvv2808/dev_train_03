@@ -1,0 +1,6 @@
+2021/01/21 15:43:54 : SELECT COUNT(1) AS count FROM  _DBPRF_StateTaxStates WHERE id > 0: <span class="message-alert-error">SQLSTATE[42S02]: Base table or view not found: 1146 Table 'customcart.StateTaxStates' doesn't exist</span>
+2021/01/21 15:43:54 : SELECT COUNT(1) AS count FROM  _DBPRF_Categories WHERE id > 0: <span class="message-alert-error">SQLSTATE[42S02]: Base table or view not found: 1146 Table 'customcart.Categories' doesn't exist</span>
+2021/01/21 15:43:54 : SELECT COUNT(1) AS count FROM  _DBPRF_Products WHERE id > 0: <span class="message-alert-error">SQLSTATE[42S02]: Base table or view not found: 1146 Table 'customcart.Products' doesn't exist</span>
+2021/01/21 15:43:54 : SELECT COUNT(1) AS count FROM  _DBPRF_Customers WHERE id > 0: <span class="message-alert-error">SQLSTATE[42S02]: Base table or view not found: 1146 Table 'customcart.Customers' doesn't exist</span>
+2021/01/21 15:43:54 : SELECT COUNT(1) AS count FROM  _DBPRF_Orders WHERE  id > 0: <span class="message-alert-error">SQLSTATE[42S02]: Base table or view not found: 1146 Table 'customcart.Orders' doesn't exist</span>
+2021/01/21 15:43:54 : SELECT COUNT(1) AS count FROM _DBPRF_reviews WHERE reviews_id > 0: <span class="message-alert-error">SQLSTATE[42S02]: Base table or view not found: 1146 Table 'customcart.reviews' doesn't exist</span>

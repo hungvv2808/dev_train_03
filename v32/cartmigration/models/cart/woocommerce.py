@@ -1,22 +1,23 @@
 import copy
 import csv
+import re
+from collections import defaultdict
 from urllib.parse import unquote
 
 import chardet
 
-from v32.cartmigration.libs.utils import *
-from v32.cartmigration.models.cart.wordpress import LeCartWordpress
-
+from cartmigration.libs.utils import *
+from cartmigration.models.cart.wordpress import LeCartWordpress
 
 # tested with woocommerce335
 
 class LeCartWoocommerce(LeCartWordpress):
-    WARNING_VARIANT_LIMIT = 100
+	WARNING_VARIANT_LIMIT = 100
 
-    def __init__(self, data=None):
-        super().__init__(data)
-        self.product_types = dict()
-        self.is_variant_limit = False
+	def __init__(self, data = None):
+		super().__init__(data)
+		self.product_types = dict()
+		self.is_variant_limit = False
 
 	def display_config_source(self):
 		parent = super().display_config_source()

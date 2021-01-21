@@ -1,6 +1,6 @@
 from flask import Blueprint, request as flask_request, jsonify
 
-from v32.cartmigration.libs.utils import *
+from cartmigration.libs.utils import *
 
 route_path = Blueprint('route_path', __name__)
 
