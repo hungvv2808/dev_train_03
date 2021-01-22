@@ -1,1 +1,0 @@
-2021/01/21 15:52:27 : SELECT * FROM  _DBPRF_Categories WHERE id > 0 ORDER BY id ASC LIMIT 4: <span class="message-alert-error">SQLSTATE[42S02]: Base table or view not found: 1146 Table 'customcart.Categories' doesn't exist</span>

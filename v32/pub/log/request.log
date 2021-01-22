@@ -1,0 +1,11 @@
+2021/01/22 13:37:15 : Url: http://127.0.0.1/customcart/le_connector/connector.php
+Method: GET
+Status: 403
+Header: HTTP/1.1 403 Forbidden
+X-Luminati-Error: Forbidden: You tried to target undefined but got blocked, please contact your account manager for further assistance
+Date: Fri, 22 Jan 2021 06:37:15 GMT
+Connection: keep-alive
+Transfer-Encoding: chunked
+
+
+Error: Forbidden: You tried to target undefined but got blocked, please contact your account manager for further assistance

@@ -1,12 +1,10 @@
 import datetime
 import html
-import json
 import math
 
-from v32.cartmigration.models.basecart import LeBasecart
 from v32.cartmigration.libs.utils import *
-
 from v32.cartmigration.libs.utils import to_str, response_error, response_success
+from v32.cartmigration.models.basecart import LeBasecart
 
 
 class LeCartCustom(LeBasecart):
@@ -274,7 +272,12 @@ class LeCartCustom(LeBasecart):
         categories_ext_queries = {
             'categories_description': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_categories c INNER JOIN _DBPRF_categories_description cd ON c.categories_id = cd.categories_id WHERE c.categories_id IN "
+                'query': "SELECT * FROM _DBPRF_categories c INNER JOIN "
+                         + " (SELECT * "
+                         + " FROM _DBPRF_categories_description cd "
+                         + " INNER JOIN _DBPRF_languages l on cd.language_id = l.languages_id) tmp "
+                         + " ON tmp.categories_id = c.categories_id "
+                         + " WHERE c.categories_id IN "
                          + self.list_to_in_condition(category_ids)
             },
             'products_to_categories': {
@@ -301,14 +304,28 @@ class LeCartCustom(LeBasecart):
         # set data from get to base form
         category_data['id'] = category['categories_id']
         category_data['parent'] = parent
-        img = get_row_from_list_by_field(category['categories_image'] if category['categories_image'] is not None else 'Demo', category['categories_image'], category['categories_image'])
+        img = get_row_from_list_by_field(
+            category['categories_image'] if category['categories_image'] is not None else 'Demo',
+            category['categories_image'], category['categories_image'])
         if img and img['image'] != '':
             category_data['thumb_image']['label'] = img['image']
             category_data['thumb_image']['url'] = 'https://unsplash.com/photos/KVyc-zNT8hE'
             category_data['thumb_image']['path'] = img['image']
-        category_data['name'] = get_row_from_list_by_field(categories_ext['data']['categories_description'], 'categories_id', category['categories_id'])
+
+        categories_description = get_row_from_list_by_field(categories_ext['data']['categories_description'],
+                                                            'categories_id', category['categories_id'])
+        category_data['name'] = categories_description['categories_name']
+        category_data['description'] = categories_description['categories_name']
+        category_data['short_description'] = categories_description['categories_name']
         category_data['sort_order'] = category['sort_order']
-        category_data['created_at'] = datetime.fromtimestamp(to_int(category['date_added'])) if category['dt_created'] else '0000-00-00 00:00:00'
+        category_data['created_at'] = category['date_added'] if category['date_added'] else get_current_time()
+        category_data['updated_at'] = category['last_modified'] if category['last_modified'] else get_current_time()
+
+        for language in self._notice['src']['languages_select']:
+            cl = self.construct_category_lang()
+            cl['name'] = category_data['name']
+        category_data['languages'][categories_description['language_id']] = cl
+
         # meta_description
         category_data['category'] = category
         category_data['categories_ext'] = categories_ext
@@ -363,17 +380,24 @@ class LeCartCustom(LeBasecart):
 
     def get_products_ext_export(self, products):
         url_query = self.get_connector_url('query')
-        product_ids = duplicate_field_value_from_list(products['data'], 'id')
+        product_ids = duplicate_field_value_from_list(products['data'], 'products_id')
         product_id_con = self.list_to_in_condition(product_ids)
         product_id_query = self.product_to_in_condition_seourl(product_ids)
         product_ext_queries = {
             'products_description': {
-                'type': "select",
-                'query': "SELECT * FROM _DBPRF_products p INNER JOIN _DBPRF_products_description pd ON p.products_id = pd.products_id WHERE p.products_id IN " + product_id_con,
+                'type': 'select',
+                'query': "SELECT * FROM _DBPRF_products p INNER JOIN "
+                         + " (SELECT * "
+                         + "FROM _DBPRF_products_description pd INNER JOIN _DBPRF_languages l "
+                         + "ON pd.language_id = l.languages_id) tmp ON tmp.products_id = p.products_id "
+                         + " WHERE p.products_id IN "
+                         + product_id_con,
             },
             'products_to_categories': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_products p INNER JOIN _DBPRF_products_to_categories ptc ON p.products_id = ptc.products_id WHERE p.products_id IN " + product_id_con,
+                'query': "SELECT * FROM _DBPRF_products p INNER JOIN _DBPRF_products_to_categories ptc "
+                         + " ON p.products_id = ptc.products_id WHERE p.products_id IN "
+                         + product_id_con,
             },
         }
         product_ext = self.get_connector_data(url_query, {
@@ -387,254 +411,56 @@ class LeCartCustom(LeBasecart):
     def convert_product_export(self, product, products_ext):
         products_ext_data = products_ext['data']
         product_data = self.construct_product()
-        product_data['id'] = product['id']
-        product_data['sku'] = product['code']
-        product_data['price'] = product['price']
-        product_data['weight'] = product['weight']
-        if to_int(product['active']) > 0:
-            status = True
-        else:
-            status = False
-        product_data['status'] = status
+
+        product_description = get_row_from_list_by_field(products_ext['data']['products_description'], 'products_id',
+                                                         product['products_id'])
+        products_to_categories = get_row_from_list_by_field(products_ext['data']['products_to_categories'],
+                                                            'products_id',
+                                                            product['products_id'])
+
+        product_data['id'] = product['products_id']
+
+        if product['products_image']:
+            product_data['thumb_image']['label'] = product['products_image']
+            product_data['thumb_image']['url'] = 'http://www.iemotorsport.com/mm5/'
+            product_data['thumb_image']['path'] = product['products_image']
+
+        product_data['name'] = product_description['products_name']
+        product_data['sku'] = product['products_upc_code']
+        product_data['barcode'] = product['products_upc_code']
+        product_data['url_key'] = product_description['products_url']
+        product_data['description'] = html.unescape(product_description['products_description'])
+        product_data['short_description'] = html.unescape(product_description['products_description'])
+        product_data['price'] = product['products_price']
+        product_data['cost'] = product['products_cost']
+        product_data['weight'] = product['products_weight']
+        product_data['length'] = to_decimal(product['products_length'])
+        product_data['width'] = to_decimal(product['products_width'])
+        product_data['height'] = to_decimal(product['products_height'])
+        product_data['status'] = True if to_int(product['products_status']) > 0 else False
+        product_data['qty'] = product['products_quantity']
         product_data['manage_stock'] = True
-        product_data['qty'] = 9999
-        # product_data['length'] = to_decimal(product['length'])
-        # product_data['width'] = to_decimal(product['width'])
-        # product_data['height'] = to_decimal(product['height'])
-        # product_data['date_available'] = product['date_available']
-        product_data['created_at'] = datetime.fromtimestamp(to_int(product['dt_created'])) if product[
-            'dt_created'] else get_current_time()
-        product_data['updated_at'] = datetime.fromtimestamp(to_int(product['dt_updated'])) if to_int(
-            product['dt_updated']) else product_data['created_at']
-        product_data['name'] = html.unescape(product['name'])
-        product_data['description'] = html.unescape(product['descrip'])
-        product_description = get_list_from_list_by_field(products_ext_data['products_meta'], 'product_id',
-                                                          product['id'])
-        # product_data['short_description'] = html.unescape(product_description_def['short_description'])
+        product_data['tax']['id'] = product['products_tax_class_id']
+        product_data['manufacturer']['id'] = product['manufacturers_id']
+        product_data['created_at'] = product['products_date_added'] if product[
+            'products_date_added'] else get_current_time()
+        product_data['updated_at'] = product['products_last_modified'] if product['products_last_modified'] else \
+            product_data['created_at']
+        product_data['date_available'] = product['products_date_available']
 
-        if product_description:
-            meta_keywords = get_row_from_list_by_field(product_description, 'name_id', 1)
-            meta_description = get_row_from_list_by_field(product_description, 'name_id', 2)
-            meta_title = get_row_from_list_by_field(product_description, 'name_id', 3)
-            if meta_keywords:
-                product_data['meta_keyword'] = meta_keywords['value']
-            else:
-                product_data['meta_keyword'] = ''
-            if meta_description:
-                product_data['meta_keyword'] = meta_description['value']
-            else:
-                product_data['meta_keyword'] = ''
-            if meta_title:
-                product_data['meta_keyword'] = meta_title['value']
-            else:
-                product_data['meta_keyword'] = ''
+        if products_to_categories['categories_id']:
+            for ptc in products_to_categories['categories_id']:
+                ptc_d = self.construct_product_category()
+                ptc_d['id'] = ptc
+                product_data['categories'].append(ptc_d)
 
-        # product_data['meta_title'] = self.strip_html_tag(html.unescape(product_description_def['meta_title']))
-        # product_data['meta_description'] = product_description_def['meta_description']
-        # product_data['tags'] = product_description_def['tag']
-        # product_data['short_description'] = html.unescape(product_description_def['short_description'])
-        # product_data['meta_title'] = html.unescape(product_description_def['meta_title'])
-        # product_data['meta_description'] = product_description_def['meta_description']
-        # product_data['meta_keyword'] = product_description_def['meta_keyword']
-        # product_data['tags'] = product_description_def['tag']
-        url_product_image = 'http://www.iemotorsport.com/mm5/'
-        check_thumbnail = False
-        if product['thumbnail'] != '':
-            check_thumbnail = True
-            product_data['thumb_image']['url'] = url_product_image
-            product_data['thumb_image']['path'] = product['thumbnail']
-
-        product_images = get_list_from_list_by_field(products_ext_data['products_images'], 'product_id', product['id'])
-        if product_images:
-            if check_thumbnail:
-                for product_image in product_images:
-                    image_data = get_row_from_list_by_field(products_ext_data['images'], 'id',
-                                                            product_image['image_id'])
-                    product_image_data = self.construct_product_image()
-                    if image_data:
-                        product_image_data['url'] = url_product_image
-                        product_image_data['path'] = image_data['image']
-                        product_data['images'].append(product_image_data)
-
-            else:
-                i = 0
-                for product_image in product_images:
-                    if i == 0:
-                        image_data = get_row_from_list_by_field(products_ext_data['images'], 'id',
-                                                                product_image['image_id'])
-                        product_data['thumb_image']['url'] = url_product_image
-                        product_data['thumb_image']['path'] = image_data['image']
-                        i = 1
-                    else:
-                        image_data = get_row_from_list_by_field(products_ext_data['images'], 'id',
-                                                                product_image['image_id'])
-                        product_image_data = self.construct_product_image()
-                        if image_data:
-                            product_image_data['url'] = url_product_image
-                            product_image_data['path'] = image_data['image']
-                            product_data['images'].append(product_image_data)
-        # special = get_row_from_list_by_field(products_ext_data['specials'], 'products_id', product['products_id'])
-        # if special:
-        # 	product_data['special_price']['price'] = special['specials_new_products_price']
-        # 	product_data['special_price']['start_date'] = special['specials_date_added']
-        # 	product_data['special_price']['end_date'] = special['expires_date']
-
-        #
-        # product_data['tax']['id'] = product['products_tax_class_id']
-        # if product['manufacturers_id']:
-        # 	product_data['manufacturer']['id'] = product['manufacturers_id']
-        # 	manufacturer = get_row_from_list_by_field(products_ext_data['manufacturers'], 'manufacturers_id',
-        # 	                                          product['manufacturers_id'])
-        # 	if manufacturer:
-        # 		product_data['manufacturer']['name'] = manufacturer['manufacturers_name']
-
-        product_categories = get_list_from_list_by_field(products_ext_data['product_category'], 'product_id',
-                                                         product['id'])
-        if product_categories:
-            for product_category in product_categories:
-                product_category_data = self.construct_product_category()
-                product_category_data['id'] = product_category['cat_id']
-                product_data['categories'].append(product_category_data)
-
-        # for language_id in self._notice['src']['languages_select']:
-        # 	product_description_lang = get_row_from_list_by_field(product_description, 'language_id', language_id)
-        # 	product_language_data = self.construct_product_lang()
-        # 	product_language_data['name'] = html.unescape(product_description_lang['products_name'])
-        # 	product_language_data['description'] = html.unescape(product_description_lang['products_description'])
-        # 	product_language_data['short_description'] = html.unescape(product_description_lang['products_description'])
-        # product_language_data['meta_title'] = html.unescape(product_description_lang['meta_title'])
-        # product_language_data['meta_description'] = product_description_lang['meta_description']
-        # product_language_data['meta_keyword'] = product_description_lang['meta_keyword']
-        # product_data['languages'][product_description_lang['language_id']] = product_language_data
-
-        # product_options = get_list_from_list_by_field(products_ext_data['products_attributes'], 'products_id',
-        # product['products_id']) if product_options: childrent = list() childs_data = list() comb =
-        # self.construct_product_childrent() comb['name'] = product_data['name'] comb['qty'] = product_data['qty']
-        # comb['sku'] = product_data['sku'] comb['price'] = product_data['price'] comb['languages'] = product_data[
-        # 'languages'] childs_data.append(comb) all_product_option_values = get_list_from_list_by_field(
-        # products_ext_data['products_attributes'], 'products_id', product['products_id']) check_value_exist = list()
-        # for option in product_options: option_data = self.construct_product_option() option_data['id'] = option[
-        # 'options_id'] product_option_desc = get_list_from_list_by_field(products_ext_data['products_options'],
-        # 'products_options_id', option['options_id']) if not product_option_desc: continue product_option_def =
-        # get_row_from_list_by_field(product_option_desc, 'language_id', language_default)
-        #
-        # 		if not product_option_def:
-        # 			product_option_def = product_option_desc[0]
-        # 		option_data['option_name'] = product_option_def['products_options_name']
-        # 		option_data['option_type'] = 'select'
-        # 		#option_data['required'] = option['required']
-        #
-        # 		for product_option in product_option_desc:
-        # 			option_language_data = self.construct_product_option_lang()
-        # 			option_language_data['option_name'] = product_option['products_options_name']
-        # 			option_data['option_languages'][product_option['language_id']] = option_language_data
-        #
-        # 		product_option_values = get_list_from_list_by_field(all_product_option_values, 'options_id',
-        # 		                                                    option['options_id'])
-        # 		new_childs = list()
-        #
-        # 		for option_value in product_option_values:
-        # 			if option_value['options_values_id'] in check_value_exist:
-        # 				continue
-        # 			check_value_exist.append(option_value['options_values_id'])
-        # 			option_value_data = self.construct_product_option_value()
-        # 			option_value_data['id'] = option_value['options_values_id']
-        # 			product_option_value_description = get_list_from_list_by_field(
-        # 				products_ext_data['products_options_values'], 'products_options_values_id',
-        # 				option_value['options_values_id'])
-        # 			if not product_option_value_description:
-        # 				continue
-        # 			product_option_value_def = get_row_from_list_by_field(product_option_value_description,
-        # 			                                                      'language_id', language_default)
-        # 			if not product_option_value_def:
-        # 				product_option_value_def = product_option_value_description[0]
-        # 			option_value_data['option_value_name'] = product_option_value_def['products_options_values_name']
-        #
-        # for product_option_value in product_option_value_description: option_value_language_data = dict()
-        # option_value_language_data['option_value_name'] = product_option_value['products_options_values_name']
-        # language_id = product_option_value['language_id'] option_value_data['option_value_languages'][language_id] =
-        # option_value_language_data product_attribute = get_row_from_list_by_field(product_option_values,
-        # 'options_values_id', option_value['options_values_id']) option_value_data['option_value_price'] =
-        # product_attribute['options_values_price'] option_value_data['price_prefix'] = product_attribute[
-        # 'price_prefix']
-        #
-        # 			for child_data in childs_data:
-        # 				child = self.construct_product_childrent()
-        # 				child_attr = self.construct_product_child_attribute()
-        # 				child_attr['option_id'] = option['options_id']
-        # 				child_attr['option_type'] = 'select'
-        # 				child_attr['option_name'] = html.unescape(product_option_def['products_options_name'])
-        #
-        # 				child_attr['option_languages'] = option_data['option_languages']
-        #
-        # 				child_attr['option_value_id'] = option_value['options_values_id']
-        #
-        # child_attr['option_value_name'] = product_option_value_def['products_options_values_name'] child_attr[
-        # 'option_value_languages'] = option_value_data['option_value_languages'] child_attr['option_value_price'] =
-        # product_attribute['options_values_price'] child_attr['price_prefix'] = product_attribute['price_prefix']
-        # child['name'] = child_data['name'] + ' - ' + option_value_data['option_value_name'] child['sku'] =
-        # child_data['sku'] + '-' + self.join_text_to_key( option_value_data['option_value_name']) child['qty'] =
-        # child_data['qty'] if option_value_data['price_prefix'] == '-': child['price'] = to_decimal(product_data[
-        # 'price']) - to_decimal(product_attribute['options_values_price']) else: child['price'] = to_decimal(
-        # product_data['price']) + to_decimal(product_attribute['options_values_price']) for lang_id, lang_data in
-        # child_data['languages'].items(): child_language_data = dict() child_language_data['name'] = html.unescape(
-        # lang_data['name']) child_language_data['description'] = html.unescape(lang_data['description'])
-        # child_language_data['short_description'] = html.unescape(lang_data['short_description']) #
-        # child_language_data['meta_title'] = html.unescape(lang_data['meta_title']) # child_data['meta_description']
-        # = lang_data.get('meta_description', '') # child_data['meta_keyword'] = lang_data.get('meta_keyword') child[
-        # 'languages'][lang_id] = child_language_data #child['attributes'] = child_data['attributes'] child[
-        # 'attributes'].append(child_attr) del child_attr new_childs.append(child) option_data['values'].append(
-        # option_value_data) childs_data = new_childs del new_childs if to_len(option_data['values']) >0:
-        # product_data['options'].append(option_data) #product_data['children'] = childs_data
-        #
-        # options_src = dict()
-        # for option_each_data in product_data['options']:
-        # 	values = list()
-        # 	if option_each_data['values']:
-        # 		for value in option_each_data['values']:
-        # 			values.append(value['option_value_name'])
-        #
-        # 			opt_val = {
-        # 				'option_name': option_each_data['option_name'],
-        # 				'option_value_name': value['option_value_name'],
-        # 				'price': value['option_value_price'],
-        # 				'price_prefix': value['price_prefix'],
-        # 				'value_id': value['id'],
-        # 				'optionid': option_each_data['id'],
-        # 				'option_id': option_each_data['id']
-        # 			}
-        # 			if option_each_data['id'] not in options_src:
-        # 				options_src[option_each_data['id']] = list()
-        # 			options_src[option_each_data['id']].append(opt_val)
-        # combination = self.combination_from_multi_dict(options_src)
-        # children_base_data = copy.deepcopy(product_data)
-        # for children in combination:
-        # 	children_data = copy.deepcopy(children_base_data)
-        #
-        # 	sku = product_data['name']
-        # 	identifier_options = dict()
-        # 	for attribute in children:
-        # 		attribute_data = self.construct_product_child_attribute()
-        # 		attribute_data['option_name'] = attribute['option_name']
-        # 		attribute_data['option_code'] = attribute['option_name']
-        # 		attribute_data['option_value_name'] = attribute['option_value_name']
-        # 		attribute_data['option_value_code'] = attribute['option_value_name']
-        #
-        # 		attribute_data['price'] = attribute['price']
-        # 		attribute_data['price_prefix'] = attribute['price_prefix']
-        # 		if attribute_data['price_prefix'] == '-':
-        # 			children_data['price'] = to_decimal(product_data['price']) - to_decimal(attribute_data['price'])
-        # 		else:
-        # 			children_data['price'] = to_decimal(product_data['price']) + to_decimal(attribute_data['price'])
-        #
-        #
-        # 		children_data['attributes'].append(attribute_data)
-        # 		children_data['sku']=sku + '-'+attribute['option_value_name']
-        # 		children_data['sku']=children_data['sku'][:63]
-        # 	product_data['children'].append(children_data)
-        #
-        # if product_data['children']:
-        # 	product_data['type']='simple'
+        for language in self._notice['src']['languages_select']:
+            pl = self.construct_product_lang()
+            pl['name'] = product_data['name']
+            pl['description'] = product_data['description']
+            pl['short_description'] = product_data['description']
+            pl['price'] = product_data['price']
+        product_data['languages'][product_description['language_id']] = pl
 
         if self._notice['config']['seo_301']:
             detect_seo = self.detect_seo()
@@ -642,7 +468,7 @@ class LeCartCustom(LeBasecart):
         return response_success(product_data)
 
     def get_product_id_import(self, convert, product, products_ext):
-        return product['id']
+        return product['products_id']
 
     def check_product_import(self, convert, product, products_ext):
         return True if self.get_map_field_by_src(self.TYPE_PRODUCT, convert['id'], convert['code']) else False
@@ -707,7 +533,8 @@ class LeCartCustom(LeBasecart):
         customers_ext_rel_queries = {
             'countries': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_countries WHERE countries_id IN  " + self.list_to_in_condition(country_ids),
+                'query': "SELECT * FROM _DBPRF_countries WHERE countries_id IN  " + self.list_to_in_condition(
+                    country_ids),
             },
         }
         customers_ext_rel = self.get_connector_data(url_query,
@@ -850,11 +677,13 @@ class LeCartCustom(LeBasecart):
         orders_ext_queries = {
             'orders_products': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_products op ON o.orders_id = op.orders_id WHERE orders_id IN " + self.list_to_in_condition(order_ids)
+                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_products op ON o.orders_id = op.orders_id WHERE orders_id IN " + self.list_to_in_condition(
+                    order_ids)
             },
             'orders_total': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_total ot ON o.orders_id = ot.orders_id WHERE orders_id IN " + self.list_to_in_condition(order_ids)
+                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_total ot ON o.orders_id = ot.orders_id WHERE orders_id IN " + self.list_to_in_condition(
+                    order_ids)
             },
         }
         orders_ext = self.get_connector_data(url_query, {'serialize': True, 'query': json.dumps(orders_ext_queries)})
@@ -1284,7 +1113,7 @@ class LeCartCustom(LeBasecart):
     def products_default_seo(self, product, products_ext):
         result = list()
         type_seo = self.SEO_301
-        category_url = get_list_from_list_by_field(products_ext['data']['URIs'], 'cat_id', product['id'])
+        category_url = get_list_from_list_by_field(products_ext['data']['URIs'], 'cat_id', product['products_id'])
         seo_cate = self.construct_seo_product()
         if category_url:
             for cate_url in category_url:
