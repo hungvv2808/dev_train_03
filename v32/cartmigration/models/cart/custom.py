@@ -1,4 +1,3 @@
-import datetime
 import html
 import math
 
@@ -99,22 +98,6 @@ class LeCartCustom(LeBasecart):
 
     # TODO: CLEAR
 
-    def clear_target_taxes(self):
-        next_clear = {
-            'result': 'process',
-            'function': 'clear_target_manufacturers',
-        }
-        self._notice['target']['clear'] = next_clear
-        return next_clear
-
-    def clear_target_manufacturers(self):
-        next_clear = {
-            'result': 'process',
-            'function': 'clear_target_categories',
-        }
-        self._notice['target']['clear'] = next_clear
-        return next_clear
-
     def clear_target_categories(self):
         next_clear = {
             'result': 'process',
@@ -150,101 +133,6 @@ class LeCartCustom(LeBasecart):
 
         self._notice['target']['clear'] = next_clear
         return self._notice['target']['clear']
-
-    def clear_target_reviews(self):
-        next_clear = {
-            'result': 'process',
-            'function': 'clear_target_pages',
-        }
-
-        self._notice['target']['clear'] = next_clear
-        return self._notice['target']['clear']
-
-    # TODO: TAX
-    def prepare_taxes_import(self):
-        return self
-
-    def prepare_taxes_export(self):
-        return self
-
-    def get_taxes_main_export(self):
-        id_src = self._notice['process']['taxes']['id_src']
-        limit = self._notice['setting']['taxes']
-        query = {
-            'type': 'select',
-            'query': "SELECT * FROM _DBPRF_StateTaxStates WHERE id > " + to_str(
-                id_src) + " ORDER BY id ASC LIMIT " + to_str(limit)
-        }
-        taxes = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
-        if not taxes or taxes['result'] != 'success':
-            return response_error('could not get taxes main to export')
-        return taxes
-
-    def get_taxes_ext_export(self, taxes):
-        return response_success()
-
-    def convert_tax_export(self, tax, taxes_ext):
-        tax_product = list()
-        tax_customer = list()
-        tax_zone = list()
-        tax_product_data = self.construct_tax_product()
-        tax_product_data['id'] = 1
-        tax_product_data['code'] = None
-        tax_product_data['name'] = 'Product Tax Class Shopify'
-        tax_product.append(tax_product_data)
-
-        tax_zone_state = self.construct_tax_zone_state()
-
-        tax_zone_country = self.construct_tax_zone_country()
-        tax_zone_country['id'] = 'US'
-        tax_zone_country['name'] = 'United States'
-        tax_zone_country['country_code'] = 'US'
-
-        tax_zone_rate = self.construct_tax_zone_rate()
-        tax_zone_rate['id'] = None
-        tax_zone_rate['name'] = tax['state'] + ' ' + tax['rate']
-        tax_zone_rate['rate'] = tax['rate']
-
-        tax_zone_data = self.construct_tax_zone()
-        tax_zone_data['id'] = None
-        tax_zone_data['name'] = 'United States'
-        tax_zone_data['country'] = tax_zone_country
-        tax_zone_state = self.construct_tax_zone_state()
-        tax_zone_state['id'] = 'TX'
-        tax_zone_state['name'] = 'Texas'
-        tax_zone_state['state_code'] = 'TX'
-
-        tax_zone_data['state'] = tax_zone_state
-        tax_zone_data['rate'] = tax_zone_rate
-        tax_zone.append(tax_zone_data)
-
-        tax_data = self.construct_tax()
-        tax_data['id'] = tax['id']
-        tax_data['name'] = tax['state'] + ' ' + tax['rate']
-        tax_data['tax_products'] = tax_product
-        tax_data['tax_zones'] = tax_zone
-        return response_success(tax_data)
-
-    def get_tax_id_import(self, convert, tax, taxes_ext):
-        return tax['id']
-
-    def check_tax_import(self, convert, tax, taxes_ext):
-        return True if self.get_map_field_by_src(self.TYPE_TAX, convert['id']) else False
-
-    def router_tax_import(self, convert, tax, taxes_ext):
-        return response_success('tax_import')
-
-    def before_tax_import(self, convert, tax, taxes_ext):
-        return response_success()
-
-    def tax_import(self, convert, tax, taxes_ext):
-        return response_success(0)
-
-    def after_tax_import(self, tax_id, convert, tax, taxes_ext):
-        return response_success()
-
-    def addition_tax_import(self, convert, tax, taxes_ext):
-        return response_success()
 
     # TODO: CATEGORY
     def prepare_categories_import(self):
@@ -382,7 +270,6 @@ class LeCartCustom(LeBasecart):
         url_query = self.get_connector_url('query')
         product_ids = duplicate_field_value_from_list(products['data'], 'products_id')
         product_id_con = self.list_to_in_condition(product_ids)
-        product_id_query = self.product_to_in_condition_seourl(product_ids)
         product_ext_queries = {
             'products_description': {
                 'type': 'select',
@@ -409,14 +296,18 @@ class LeCartCustom(LeBasecart):
         return product_ext
 
     def convert_product_export(self, product, products_ext):
-        products_ext_data = products_ext['data']
         product_data = self.construct_product()
 
-        product_description = get_row_from_list_by_field(products_ext['data']['products_description'], 'products_id',
-                                                         product['products_id'])
-        products_to_categories = get_row_from_list_by_field(products_ext['data']['products_to_categories'],
-                                                            'products_id',
-                                                            product['products_id'])
+        product_description = get_row_from_list_by_field(
+            products_ext['data']['products_description'],
+            'products_id',
+            product['products_id']
+        )
+        products_to_categories = get_row_from_list_by_field(
+            products_ext['data']['products_to_categories'],
+            'products_id',
+            product['products_id']
+        )
 
         product_data['id'] = product['products_id']
 
@@ -505,8 +396,8 @@ class LeCartCustom(LeBasecart):
         limit = self._notice['setting']['customers']
         query = {
             'type': 'select',
-            'query': "SELECT * FROM _DBPRF_customers WHERE customers_id > " + to_str(
-                id_src) + " ORDER BY customers_id ASC LIMIT " + to_str(limit)
+            'query': "SELECT * FROM _DBPRF_customers WHERE customers_id > "
+                     + to_str(id_src) + " ORDER BY customers_id ASC LIMIT " + to_str(limit)
         }
 
         customers = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
@@ -516,113 +407,103 @@ class LeCartCustom(LeBasecart):
 
     def get_customers_ext_export(self, customers):
         url_query = self.get_connector_url('query')
-        customers_ids = duplicate_field_value_from_list(customers['data'], 'id')
+        customers_ids = duplicate_field_value_from_list(customers['data'], 'customers_id')
         customer_ext_queries = {
             'address_book': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_customers c INNER JOIN _DBPRF_address_book a ON c.customers_id = a.customers_id WHERE customers_id IN " + self.list_to_in_condition(
-                    customers_ids),
+                'query': "SELECT * FROM _DBPRF_customers c INNER JOIN "
+                         + "(SELECT * FROM _DBPRF_address_book a "
+                         + " LEFT JOIN _DBPRF_countries ct ON a.entry_country_id = ct.countries_id "
+                         + " LEFT JOIN _DBPRF_zones z ON a.entry_zone_id = z.zone_id) tmp "
+                         + " ON tmp.customers_id = c.customers_id "
+                         + " WHERE c.customers_id IN "
+                         + self.list_to_in_condition(customers_ids),
+            },
+            'customers_info': {
+                'type': 'select',
+                'query': "SELECT * FROM _DBPRF_customers c INNER JOIN "
+                         + " _DBPRF_customers_info ci ON c.customers_id = ci.customers_info_id "
+                         + " WHERE c.customers_id IN "
+                         + self.list_to_in_condition(customers_ids),
             },
         }
         customers_ext = self.get_connector_data(url_query,
                                                 {'serialize': True, 'query': json.dumps(customer_ext_queries)})
         if not customers_ext or customers_ext['result'] != 'success':
             return response_error()
-        country_ids = duplicate_field_value_from_list(customers_ext['data']['address_book'], 'cntry')
-        zone_ids = duplicate_field_value_from_list(customers_ext['data']['address_book'], 'state')
-        customers_ext_rel_queries = {
-            'countries': {
-                'type': 'select',
-                'query': "SELECT * FROM _DBPRF_countries WHERE countries_id IN  " + self.list_to_in_condition(
-                    country_ids),
-            },
-        }
-        customers_ext_rel = self.get_connector_data(url_query,
-                                                    {'serialize': True, 'query': json.dumps(customers_ext_rel_queries)})
-        if not customers_ext_rel or customers_ext_rel['result'] != 'success':
-            return response_error()
-        customers_ext = self.sync_connector_object(customers_ext, customers_ext_rel)
         return customers_ext
 
     def convert_customer_export(self, customer, customers_ext):
-        # customer_data = self.construct_customer()
-        customer_data = {
-            'phone': '',
-            'id': customer['id'],
-            'code': None,
-            'site_id': '',
-            'group_id': '',
-            'language_id': '',
-            'username': customer['login'],
-            'email': customer['pw_email'],
-            'password': customer['password'],
-            'first_name': customer['ship_fname'],
-            'middle_name': '',
-            'last_name': customer['ship_lname'],
-            'gender': 'Male',
-            'dob': '',
-            'is_subscribed': False,
-            'active': True,
-            'capabilities': list(),
-            'created_at': None,
-            'updated_at': get_current_time(),
-            'address': list(),
-            'groups': list(),
-            'balance': 0.00,
-            'user_url': '',
-            'telephone': customer['bill_phone'],
-            'fax': customer['bill_fax']
-        }
-        # customer_data['group_id'] = customer['customer_group_id']
-        # customer_data['dob'] = customer['customers_dob']
-        # customer_data['is_subscribed'] = customer['customers_newsletter']
+        customer_data = self.construct_customer()
 
-        # customer_info = get_row_from_list_by_field(customers_ext['data']['customers_info'], 'customers_info_id',
-        # customer['customers_id']) if customer_info: customer_data['created_at'] = customer_info[
-        # 'customers_info_date_account_created'] customer_data['updated_at'] = customer_info[
-        # 'customers_info_date_account_last_modified'] if customer_data['dob'] == '0000-00-00 00:00:00' :
-        # customer_data['dob']=customer_data['created_at']
-        address_books = get_list_from_list_by_field(customers_ext['data']['address_book'], 'cust_id', customer['id'])
-        if address_books:
-            for address_book in address_books:
-                address_data = self.construct_customer_address()
-                address_data['id'] = address_book['id']
-                address_data['first_name'] = address_book['fname']
-                address_data['last_name'] = address_book['lname']
-                # address_data['gender'] = address_book['entry_gender']
-                address_data['address_1'] = get_value_by_key_in_dict(address_book, 'addr', '')
-                address_data['address_2'] = get_value_by_key_in_dict(address_book, 'add2', '')
-                address_data['city'] = address_book['city']
-                address_data['postcode'] = address_book['zip']
-                address_data['telephone'] = customer['bill_phone']
-                address_data['company'] = address_book['comp']
-                address_data['fax'] = customer['bill_fax']
-                country = get_row_from_list_by_field(customers_ext['data']['countries'], 'alpha', address_book['cntry'])
-                if country:
-                    address_data['country']['id'] = country['id']
-                    address_data['country']['country_code'] = country['alpha']
-                    address_data['country']['name'] = country['name']
+        customers_info = get_row_from_list_by_field(
+            customers_ext['data']['customers_info'],
+            'customers_id',
+            customer['customers_id']
+        )
+        address_book = get_list_from_list_by_field(
+            customers_ext['data']['address_book'],
+            'customers_id',
+            customer['customers_id']
+        )
+
+        customer_data['phone'] = customer['customers_telephone']
+        customer_data['id'] = customer['customers_id']
+        customer_data['code'] = 'US'
+        customer_data['username'] = customer['customers_email_address']
+        customer_data['email'] = customer['customers_email_address']
+        customer_data['password'] = customer['customers_password']
+        customer_data['first_name'] = customer['customers_firstname']
+        customer_data['last_name'] = customer['customers_lastname']
+        customer_data['gender'] = customer['customers_gender']
+        customer_data['dob'] = customer['customers_dob']
+        customer_data['created_at'] = customers_info['customers_info_date_account_created']
+        customer_data['updated_at'] = customers_info['customers_info_date_account_last_modified']
+
+        if address_book:
+            for ab in address_book:
+                ab_d = self.construct_customer_address()
+                ab_d['id'] = ab['address_book_id']
+                ab_d['code'] = ab['entry_postcode']
+                ab_d['first_name'] = ab['entry_firstname']
+                ab_d['last_name'] = ab['entry_lastname']
+                ab_d['gender'] = ab['entry_gender']
+                ab_d['address_1'] = ab['entry_street_address']
+                ab_d['address_2'] = '%s/%s' % (ab['entry_city'], ab['entry_state'])
+                ab_d['city'] = ab['entry_city']
+                ab_d['country'] = {
+                    'id': ab['countries_id'],
+                    'code': '%s/%s' % (ab['countries_iso_code_2'], ab['countries_iso_code_3']),
+                    'country_code': ab['countries_iso_code_2'],
+                    'name': ab['countries_name'],
+                }
+                ab_d['state'] = {
+                    'id': ab['zone_id'],
+                    'code': ab['zone_country_id'],
+                    'state_code': ab['zone_code'],
+                    'name': ab['zone_name'],
+                }
+                ab_d['postcode'] = ab['entry_postcode']
+                ab_d['telephone'] = customer['customers_telephone']
+                ab_d['company'] = ab['entry_company']
+                ab_d['fax'] = customer['customers_fax']
+                ab_d['default'] = {
+                    'billing': True,
+                    'shipping': True,
+                }
+                ab_d['billing'] = True
+                ab_d['shipping'] = True
+                ab_d['created_at'] = customers_info['customers_info_date_account_created']
+                ab_d['updated_at'] = customers_info['customers_info_date_account_last_modified']
+                if customer['customers_id'] == ab['customers_id']:
+                    customer_data['address'].append(ab_d)
                 else:
-                    address_data['country']['id'] = address_book['cntry']
-                state_id = address_book['state']
-                if state_id:
-                    state = get_row_from_list_by_field(customers_ext['data']['states'], 'code', state_id)
-                    if state:
-                        address_data['state']['id'] = state['code']
-                        address_data['state']['state_code'] = state['code']
-                        address_data['state']['name'] = state['name']
-                    else:
-                        address_data['state']['id'] = state_id
-                else:
-                    address_data['state']['name'] = 'AL'
-                # if address_book['address_book_id'] == customer['customers_default_address_id']:
-                address_data['default']['billing'] = True
-                address_data['default']['shipping'] = True
-                customer_data['address'].append(address_data)
+                    customer_data['address'].insert(0, ab_d)
+
         return response_success(customer_data)
 
     def get_customer_id_import(self, convert, customer, customers_ext):
-        return customer['id']
+        return customer['customers_id']
 
     def check_customer_import(self, convert, customer, customers_ext):
         return True if self.get_map_field_by_src(self.TYPE_CUSTOMER, convert['id'], convert['code']) else False
@@ -654,8 +535,8 @@ class LeCartCustom(LeBasecart):
         limit = self._notice['setting']['orders']
         query = {
             'type': 'select',
-            'query': "SELECT * FROM _DBPRF_orders WHERE orders_id > " + to_str(
-                id_src) + " ORDER BY orders_id ASC LIMIT " + to_str(limit)
+            'query': "SELECT * FROM _DBPRF_orders WHERE orders_id > "
+                     + to_str(id_src) + " ORDER BY orders_id ASC LIMIT " + to_str(limit)
         }
         orders = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
         if not orders or orders['result'] != 'success':
@@ -664,27 +545,40 @@ class LeCartCustom(LeBasecart):
 
     def get_orders_ext_export(self, orders):
         url_query = self.get_connector_url('query')
-        order_ids = duplicate_field_value_from_list(orders['data'], 'id')
-        bil_country = duplicate_field_value_from_list(orders['data'], 'bill_cntry')
-        delivery_country = duplicate_field_value_from_list(orders['data'], 'ship_cntry')
+        order_ids = duplicate_field_value_from_list(orders['data'], 'orders_id')
+        bil_country = duplicate_field_value_from_list(orders['data'], 'billing_country')
+        delivery_country = duplicate_field_value_from_list(orders['data'], 'delivery_country')
+        # countries - countries_name
         country_ids = set(bil_country + delivery_country)
-
-        payment_zone = duplicate_field_value_from_list(orders['data'], 'bill_state')
-        shipping_zone = duplicate_field_value_from_list(orders['data'], 'ship_state')
-        # cus_zone = duplicate_field_value_from_list(orders['data'], 'customers_state')
+        payment_zone = duplicate_field_value_from_list(orders['data'], 'billing_state')
+        shipping_zone = duplicate_field_value_from_list(orders['data'], 'delivery_state')
+        # zones - zone_code
         state_ids = set(payment_zone + shipping_zone)
-        cus_ids = duplicate_field_value_from_list(orders['data'], 'cust_id')
+
         orders_ext_queries = {
-            'orders_products': {
+            'orders_customers_products_total': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_products op ON o.orders_id = op.orders_id WHERE orders_id IN " + self.list_to_in_condition(
-                    order_ids)
+                'query': "SELECT * FROM _DBPRF_orders o "
+                         + " INNER JOIN _DBPRF_orders_products op ON o.orders_id = op.orders_id "
+                         + " INNER JOIN _DBPRF_orders_total ot ON o.orders_id = ot.orders_id "
+                         + " INNER JOIN _DBPRF_customers c ON o.client_customers_id = c.customers_id "
+                         + " INNER JOIN _DBPRF_customers_info ci ON c.customers_id = ci.customers_info_id "
+                         + " INNER JOIN _DBPRF_address_book ab ON c.customers_id = ab.customers_id "
+                         + " WHERE o.orders_id IN "
+                         + self.list_to_in_condition(order_ids)
             },
-            'orders_total': {
+            'orders_countries': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_orders o INNER JOIN _DBPRF_orders_total ot ON o.orders_id = ot.orders_id WHERE orders_id IN " + self.list_to_in_condition(
-                    order_ids)
+                'query': "SELECT * FROM _DBPRF_countries c WHERE c.countries_name LIKE '"
+                         + self.list_to_in_condition(country_ids)
+                         + "'",
             },
+            'orders_zones': {
+                'type': 'select',
+                'query': "SELECT * FROM _DBPRF_zones z WHERE z.zone_code LIKE '"
+                         + self.list_to_in_condition(state_ids)
+                         + "'",
+            }
         }
         orders_ext = self.get_connector_data(url_query, {'serialize': True, 'query': json.dumps(orders_ext_queries)})
         if not orders_ext or orders_ext['result'] != 'success':
@@ -693,179 +587,70 @@ class LeCartCustom(LeBasecart):
 
     def convert_order_export(self, order, orders_ext):
         order_data = self.construct_order()
-        order_data['id'] = order['id']
-        order_data['status'] = order['status']
 
-        # order_total = get_list_from_list_by_field(orders_ext['data']['orders_total'], 'orders_id', order[
-        # 	'orders_id'])
-        # ot_tax = get_row_from_list_by_field(order_total, 'class', 'ot_tax')
-        # ot_shipping = get_row_from_list_by_field(order_total, 'class', 'ot_shipping')
-        # ot_subtotal = get_row_from_list_by_field(order_total, 'class', 'ot_subtotal')
-        # ot_total = get_row_from_list_by_field(order_total, 'class', 'ot_total')
-        # if ot_tax:
-        # 	order_data['tax']['title'] = ot_tax['title']
-        # 	order_data['tax']['amount'] = ot_tax['value']
-        # 	if ot_subtotal:
-        # 		order_data['tax']['percent'] = to_decimal(ot_tax['value']) / to_decimal(ot_subtotal['value'])
-        order_data['tax']['title'] = 'Tax'
-        order_data['tax']['amount'] = get_value_by_key_in_dict(order, 'total_tax', 0.0000)
-        order_data['shipping']['title'] = 'Shipping'
-        order_data['shipping']['amount'] = get_value_by_key_in_dict(order, 'total_ship', 0.0000)
-        order_data['discount']['title'] = 'Discount'
-        order_data['discount']['amount'] = 0.0000
-        order_data['total']['title'] = 'Total'
-        order_data['total']['amount'] = get_value_by_key_in_dict(order, 'total', 0.0000)
-        order_data['subtotal']['title'] = 'Total products'
-        order_data['subtotal']['amount'] = get_value_by_key_in_dict(order, 'total', 0.0000)
-        order_data['currency'] = ''
-        order_data['created_at'] = datetime.fromtimestamp(
-            to_int(get_value_by_key_in_dict(order, 'orderdate', 0))).strftime('%Y-%m-%d %H:%M:%S')
-        order_data['updated_at'] = get_current_time()
+        orders_customers_products_total = get_list_from_list_by_field(
+            orders_ext['data']['orders_customers_products_total'],
+            'orders_id',
+            order['orders_id']
+        )
+        orders_countries = get_row_from_list_by_field(
+            orders_ext['data']['orders_countries'],
+            'orders_id',
+            order['orders_id']
+        )
+        orders_zones = get_row_from_list_by_field(
+            orders_ext['data']['orders_zones'],
+            'orders_id',
+            order['orders_id']
+        )
 
-        # currency = get_row_value_from_list_by_field(orders_ext['data']['currencies'], 'code', order['currency'],
-        # 'currencies_id') order_data['currency'] = order['currency'] order_data['currency_value'] = order[
-        # 'currency_value'] order_data['created_at'] = order['date_purchased'] order_data['updated_at'] = order[
-        # 'last_modified']
+        order_data['id'] = order['orders_id']
+        order_data['order_number'] = order['number']
+        order_data['status'] = order['orders_status']
 
-        order_customer = self.construct_order_customer()
-        # order_customer = self.add_c(order_customer)
-        order_customer['id'] = order['cust_id']
-        order_customer['email'] = order['ship_email']
-        customer_name = order['ship_fname'] + ' ' + order['ship_lname']
-        order_customer['first_name'] = order['ship_fname']
-        order_customer['last_name'] = order['ship_lname']
-        order_data['customer'] = order_customer
+        type_class = orders_customers_products_total['class']
+        if type_class == 'ot_tax':
+            order_data['tax'] = self.set_type_order_total(orders_customers_products_total)
+        elif type_class == 'ot_discount':
+            order_data['discount'] = self.set_type_order_total(orders_customers_products_total)
+        elif type_class == 'ot_shipping':
+            order_data['shipping'] = self.set_type_order_total(orders_customers_products_total)
+        elif type_class == 'ot_subtotal':
+            order_data['subtotal'] = self.set_type_order_total(orders_customers_products_total)
+        else:
+            order_data['total'] = self.set_type_order_total(orders_customers_products_total)
 
-        customer_address = self.construct_order_address()
-        # customer_address = self.addConstructDefault(customer_address)
-        customer_address['first_name'] = order['ship_fname']
-        customer_address['last_name'] = order['ship_lname']
-        customer_address['address_1'] = order['ship_addr']
-        customer_address['address_2'] = order['ship_addr2']
-        customer_address['city'] = order['ship_city']
-        customer_address['postcode'] = order['ship_zip']
-        customer_address['telephone'] = order['ship_phone']
-        customer_address['company'] = order['ship_comp']
+        order_data['currency'] = orders_customers_products_total['currency']
+        order_data['created_at'] = orders_customers_products_total['date_purchased']
 
-        customer_country = get_row_from_list_by_field(orders_ext['data']['countries'], 'alpha', order['bill_cntry'])
-        if customer_country:
-            customer_address['country']['id'] = customer_country['id']
-            customer_address['country']['country_code'] = customer_country['alpha']
-            customer_address['country']['name'] = customer_country['name']
+        order_data['customer'] = {
+            'phone': orders_customers_products_total['customers_telephone'],
+            'id': orders_customers_products_total['customers_id'],
+            'username': orders_customers_products_total['customers_email_address'],
+            'email': orders_customers_products_total['customers_email_address'],
+            'password': orders_customers_products_total['customers_password'],
+            'first_name': orders_customers_products_total['customers_firstname'],
+            'last_name': orders_customers_products_total['customers_lastname'],
+            'gender': orders_customers_products_total['customers_gender'],
+            'dob': orders_customers_products_total['customers_dob'],
+            'is_subscribed': True,
+            'active': True,
+            'created_at': None,
+            'updated_at': get_current_time(),
+            'address': list(),
+        }
 
-        customer_state = get_row_from_list_by_field(orders_ext['data']['zones'], 'code', order['ship_state'])
-        if customer_state:
-            customer_address['state']['id'] = customer_state['code']
-            customer_address['state']['state_code'] = customer_state['code']
-            customer_address['state']['name'] = customer_state['name']
-
-        order_data['customer_address'] = customer_address
-
-        order_billing = self.construct_order_address()
-        # order_billing = this->addConstructDefault(order_billing)
-        billing_name = self.get_name_from_string(order['bill_fname'] + ' ' + order['bill_lname'])
-        order_billing['first_name'] = order['bill_fname']
-        order_billing['last_name'] = order['bill_lname']
-        order_billing['address_1'] = order['bill_addr']
-        order_billing['address_2'] = order['bill_addr2']
-        order_billing['city'] = order['bill_city']
-        order_billing['postcode'] = order['bill_zip']
-        order_billing['telephone'] = order['bill_phone']
-        order_billing['company'] = order['bill_comp']
-        billing_country = get_row_from_list_by_field(orders_ext['data']['countries'], 'alpha', order['bill_cntry'])
-        if billing_country:
-            order_billing['country']['id'] = billing_country['id']
-            order_billing['country']['code'] = billing_country['alpha']
-            order_billing['country']['country_code'] = billing_country['alpha']
-            order_billing['country']['name'] = billing_country['name']
-
-        billing_state = get_row_from_list_by_field(orders_ext['data']['zones'], 'code', order[
-            'bill_state'])
-        if billing_state:
-            order_billing['state']['id'] = billing_state['code']
-            order_billing['state']['state_code'] = billing_state['code']
-            order_billing['state']['name'] = billing_state['name']
-        order_data['billing_address'] = order_billing
-
-        order_delivery = self.construct_order_address()
-        # order_delivery = self.addConstructDefault(order_delivery)
-        delivery_name = self.get_name_from_string(order['ship_fname'] + ' ' + order['ship_lname'])
-        order_delivery['first_name'] = order['ship_fname']
-        order_delivery['last_name'] = order['ship_lname']
-        order_delivery['address_1'] = order['ship_addr']
-        order_delivery['address_2'] = order['ship_addr2']
-        order_delivery['city'] = order['ship_city']
-        order_delivery['postcode'] = order['ship_zip']
-        order_delivery['telephone'] = order['ship_phone']
-        order_delivery['company'] = order['ship_comp']
-
-        delivery_country = get_row_from_list_by_field(orders_ext['data']['countries'], 'alpha', order['ship_cntry'])
-        if delivery_country:
-            order_delivery['country']['id'] = delivery_country['id']
-            order_delivery['country']['code'] = delivery_country['alpha']
-            order_delivery['country']['country_code'] = delivery_country['alpha']
-            order_delivery['country']['name'] = delivery_country['name']
-        delivery_state = get_row_from_list_by_field(orders_ext['data']['zones'], 'code', order['ship_state'])
-        if delivery_state:
-            order_delivery['state']['id'] = delivery_state['code']
-            order_delivery['state']['state_code'] = delivery_state['code']
-            order_delivery['state']['name'] = delivery_state['name']
-
-        order_delivery = self._cook_shipping_address_by_billing(order_delivery, order_billing)
-        order_data['shipping_address'] = order_delivery
-        payments = get_row_from_list_by_field(orders_ext['data']['orders_payment'], 'order_id', order['id'])
-        order_payment = self.construct_order_payment()
-        order_payment['title'] = 'Payment'
-        order_data['payment'] = order_payment
-
-        order_products = get_list_from_list_by_field(orders_ext['data']['order_items'], 'order_id', order['id'])
-        # order_product_attributes = get_list_from_list_by_field(orders_ext['data']['orders_products_attributes'],
-        # 'orders_id', order['orders_id'])
-        order_items = list()
-        for order_product in order_products:
-            order_item_subtotal = to_decimal(order_product['price']) * to_decimal(order_product['quantity'])
-            order_item_tax = to_decimal(order_item_subtotal) * to_decimal(8.250) / 100
-            order_item_total = to_decimal(order_item_subtotal) + to_decimal(order_item_tax)
-            order_item = self.construct_order_item()
-            # order_item = self.addConstructDefault(order_item)
-            order_item['id'] = order_product['line_id']
-            order_item['product']['id'] = order_product['product_id']
-            order_item['product']['name'] = order_product['name']
-            order_item['product']['sku'] = order_product['code']
-            order_item['qty'] = order_product['quantity']
-            order_item['price'] = order_product['price']
-            order_item['original_price'] = order_product['base_price']
-            # order_item['tax_amount'] = order_item_tax
-            # order_item['tax_percent'] = order_product['products_tax']
-            order_item['discount_amount'] = '0.0000'
-            order_item['discount_percent'] = '0.0000'
-            order_item['subtotal'] = order_item_subtotal
-            order_item['total'] = order_item_subtotal
-            # order_item_attributes = get_list_from_list_by_field(order_product_attributes, 'orders_products_id',
-            # order_product['orders_products_id']) if order_item_attributes: order_item_options = list() for
-            # order_product_attribute in order_item_attributes: order_item_option = self.construct_order_item_option()
-            # order_item_option['option_name'] = order_product_attribute['products_options'] order_item_option[
-            # 'option_value_name'] = order_product_attribute['products_options_values'] order_item_option['price'] =
-            # order_product_attribute['options_values_price'] order_item_option['price_prefix'] =
-            # order_product_attribute['price_prefix'] order_item_options.append(order_item_option)
-            #
-            # 	order_item['options'] = order_item_options
-
-            order_items.append(order_item)
-        order_data['items'] = order_items
-
-        # order_status_history = get_list_from_list_by_field(orders_ext['data']['orders_status_history'],
-        # 'orders_id', order['orders_id']) order_history = list() for orders_status_history in order_status_history:
-        # order_history = self.construct_order_history() order_history['id'] = orders_status_history[
-        # 'orders_status_history_id'] order_history['status'] = orders_status_history['orders_status_id']
-        # order_history['comment'] = orders_status_history['comments'] order_history['notified'] =
-        # orders_status_history['customer_notified'] order_history['created_at'] = orders_status_history['date_added']
-        # order_data['history'].append(order_history)
-        #
         return response_success(order_data)
 
+    def set_type_order_total(self, data):
+        return {
+            'title': data['title'],
+            'amount': data['products_tax'],
+            'percent': data['value'],
+        }
+
     def get_order_id_import(self, convert, order, orders_ext):
-        return order['id']
+        return order['orders_id']
 
     def check_order_import(self, convert, order, orders_ext):
         return True if self.get_map_field_by_src(self.TYPE_ORDER, convert['id'], convert['code']) else False
@@ -883,80 +668,6 @@ class LeCartCustom(LeBasecart):
         return response_success()
 
     def addition_order_import(self, convert, order, orders_ext):
-        return response_success()
-
-    # TODO: PAGE
-    def prepare_pages_import(self):
-        return self
-
-    def prepare_pages_export(self):
-        return self
-
-    def get_pages_main_export(self):
-        return response_success()
-
-    def get_pages_ext_export(self, pages):
-        return response_success()
-
-    def convert_page_export(self, page, pages_ext):
-        return response_success()
-
-    def get_page_id_import(self, convert, page, pages_ext):
-        return False
-
-    def check_page_import(self, convert, page, pages_ext):
-        return False
-
-    def router_page_import(self, convert, page, pages_ext):
-        return response_success('page_import')
-
-    def before_page_import(self, convert, page, pages_ext):
-        return response_success()
-
-    def page_import(self, convert, page, pages_ext):
-        return response_success(0)
-
-    def after_page_import(self, page_id, convert, page, pages_ext):
-        return response_success()
-
-    def addition_page_import(self, convert, page, pages_ext):
-        return response_success()
-
-    # TODO: BLOCK
-    def prepare_blogs_import(self):
-        return response_success()
-
-    def prepare_blogs_export(self):
-        return self
-
-    def get_blogs_main_export(self):
-        return self
-
-    def get_blogs_ext_export(self, blocks):
-        return response_success()
-
-    def convert_blog_export(self, block, blocks_ext):
-        return response_success()
-
-    def get_blog_id_import(self, convert, block, blocks_ext):
-        return False
-
-    def check_blog_import(self, convert, block, blocks_ext):
-        return False
-
-    def router_blog_import(self, convert, block, blocks_ext):
-        return response_success('block_import')
-
-    def before_blog_import(self, convert, block, blocks_ext):
-        return response_success()
-
-    def blog_import(self, convert, block, blocks_ext):
-        return response_success(0)
-
-    def after_blog_import(self, block_id, convert, block, blocks_ext):
-        return response_success()
-
-    def addition_blog_import(self, convert, block, blocks_ext):
         return response_success()
 
     # todo: code opencart

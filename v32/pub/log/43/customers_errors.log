@@ -1,0 +1,14 @@
+2021/01/23 10:05:48 : customers_errors 1: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1036, in migration
+    convert = fn_convert_export(main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/custom.py", line 467, in convert_customer_export
+    ab_d['id'] = ab['address_book_id']
+TypeError: string indices must be integers
+
+2021/01/23 10:05:48 : customers_errors 3: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1036, in migration
+    convert = fn_convert_export(main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/custom.py", line 467, in convert_customer_export
+    ab_d['id'] = ab['address_book_id']
+TypeError: string indices must be integers
+

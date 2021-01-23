@@ -1,0 +1,24 @@
+2021/01/23 10:09:31 : Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 665, in storage_data
+    getattr(self.get_source_cart(), 'finish_storage_data')()
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 4043, in finish_storage_data
+    folder_upload = self.get_folder_upload(self._migration_id)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 4055, in get_folder_upload
+    folder_upload = root_path + '/' + DIR_UPLOAD + '/' + get_config_ini('src', 'file', file='test.ini')
+TypeError: can only concatenate str (not "NoneType") to str
+
+2021/01/23 10:09:36 : Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/bootstrap.py", line 20, in <module>
+    getattr(controller, action_name)(data)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 86, in start
+    self.run()
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 132, in run
+    result = getattr(self, action)()
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1377, in finish_migration
+    self.notify_error(entity)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1403, in notify_error
+    getattr(self.get_router(), 'create_demo_error')(self._notice)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/migration.py", line 315, in create_demo_error
+    'user_id': migration['user_id'],
+KeyError: 'user_id'
+
