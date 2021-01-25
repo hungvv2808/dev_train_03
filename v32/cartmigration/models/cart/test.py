@@ -83,43 +83,53 @@
 #     'entry_zone_id': '57'
 # }
 
-temp_address = {
-    'id': 'address_book_id',
-    'code': 'entry_postcode',
-    'first_name': 'entry_firstname',
-    'last_name': 'entry_lastname',
-    'address_1': 'entry_street_address',
-    'address_2': '%s/%s' % ('entry_city', 'entry_state'),
-    'city': 'entry_city',
-    'country': {
-        'id': 'countries_id',
-        'code': '%s/%s' % ('countries_iso_code_2', 'countries_iso_code_3'),
-        'country_code': 'countries_iso_code_2',
-        'name': 'countries_name',
-    },
-    'state': {
-        'id': 'zone_id',
-        'code': 'zone_country_id',
-        'state_code': 'zone_code',
-        'name': 'zone_name',
-    },
-    'postcode': 'entry_postcode',
-    'telephone': 'customers_telephone',
-    'company': 'entry_company',
-    'fax': 'customers_fax',
-}
+# temp_address = {
+#     'id': 'address_book_id',
+#     'code': 'entry_postcode',
+#     'first_name': 'entry_firstname',
+#     'last_name': 'entry_lastname',
+#     'address_1': 'entry_street_address',
+#     'address_2': '%s/%s' % ('entry_city', 'entry_state'),
+#     'city': 'entry_city',
+#     'country': {
+#         'id': 'countries_id',
+#         'code': '%s/%s' % ('countries_iso_code_2', 'countries_iso_code_3'),
+#         'country_code': 'countries_iso_code_2',
+#         'name': 'countries_name',
+#     },
+#     'state': {
+#         'id': 'zone_id',
+#         'code': 'zone_country_id',
+#         'state_code': 'zone_code',
+#         'name': 'zone_name',
+#     },
+#     'postcode': 'entry_postcode',
+#     'telephone': 'customers_telephone',
+#     'company': 'entry_company',
+#     'fax': 'customers_fax',
+# }
+#
+# customer_address = {
+#     'gender': 'entry_gender',
+#     'default': {
+#         'billing': True,
+#         'shipping': True,
+#     },
+#     'billing': True,
+#     'shipping': True,
+#     'created_at': 'customers_info_date_account_created',
+# }
+#
+# temp_address.update(customer_address)
+# print(temp_address)
 
-customer_address = {
-    'gender': 'entry_gender',
-    'default': {
-        'billing': True,
-        'shipping': True,
-    },
-    'billing': True,
-    'shipping': True,
-    'created_at': 'customers_info_date_account_created',
+a = {
+    'id': None,
+    'code': None,
+    'method': 'post'
 }
-
-r = temp_address
-r.update(customer_address)
-print(r)
+a = {
+    'id': 1,
+    'code': 2,
+}
+print(a)

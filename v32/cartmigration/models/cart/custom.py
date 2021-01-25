@@ -565,8 +565,8 @@ class LeCartCustom(LeBasecart):
                          + " INNER JOIN _DBPRF_orders_products op ON o.orders_id = op.orders_id "
                          + " INNER JOIN _DBPRF_orders_total ot ON o.orders_id = ot.orders_id "
                          + " INNER JOIN _DBPRF_customers c ON o.client_customers_id = c.customers_id "
-                         + " INNER JOIN _DBPRF_customers_info ci ON c.customers_id = ci.customers_info_id "
-                         + " INNER JOIN _DBPRF_address_book ab ON c.customers_id = ab.customers_id "
+                         + " LEFT JOIN _DBPRF_customers_info ci ON c.customers_id = ci.customers_info_id "
+                         + " LEFT JOIN _DBPRF_address_book ab ON c.customers_id = ab.customers_id "
                          + " WHERE o.orders_id IN "
                          + self.list_to_in_condition(order_ids)
             },
@@ -587,6 +587,7 @@ class LeCartCustom(LeBasecart):
         return orders_ext
 
     def convert_order_export(self, order, orders_ext):
+        global order_items
         order_data = self.construct_order()
 
         orders_customers_products_total = get_list_from_list_by_field(
@@ -595,10 +596,11 @@ class LeCartCustom(LeBasecart):
             order['orders_id']
         )
 
+        order_data['id'] = order['orders_id']
+        order_data['order_number'] = order['order_number']
+        order_data['status'] = order['orders_status']
         for ocpt in orders_customers_products_total:
-            order_data['id'] = order['orders_id']
-            order_data['order_number'] = order['order_number']
-            order_data['status'] = order['orders_status']
+            order_data['code'] = ocpt['delivery_postcode'] if ocpt['delivery_postcode'] else ocpt['billing_postcode'],
 
             type_class = ocpt['class']
             if type_class == 'ot_tax':
@@ -627,21 +629,32 @@ class LeCartCustom(LeBasecart):
                 'billing': True,
                 'shipping': True,
                 'created_at': ocpt['customers_info_date_account_created'],
+                'update_at': get_current_time(),
             }
+            tmp_address_c.update(customer_address)
+
             order_data['customer'] = {
                 'phone': ocpt['customers_telephone'],
                 'id': ocpt['customers_id'],
+                'code': ocpt['entry_postcode'],
+                'note': '',
+                'group_id': '',
                 'username': ocpt['customers_email_address'],
                 'email': ocpt['customers_email_address'],
                 'password': ocpt['customers_password'],
                 'first_name': ocpt['customers_firstname'],
+                'middle_name': '',
                 'last_name': ocpt['customers_lastname'],
                 'gender': ocpt['customers_gender'],
                 'dob': ocpt['customers_dob'],
                 'is_subscribed': True,
                 'active': True,
+                'capabilities': list(),
                 'created_at': ocpt['customers_info_date_account_created'],
-                'address': tmp_address_c.update(customer_address),
+                'update_at': get_current_time(),
+                'address': tmp_address_c,
+                'groups': list(),
+                'balance': 0.00
             }
 
             order_data['customer_address'] = {
@@ -650,6 +663,7 @@ class LeCartCustom(LeBasecart):
                 'username': ocpt['customers_email_address'],
                 'email': ocpt['customers_email_address'],
                 'first_name': ocpt['entry_firstname'],
+                'middle_name': '',
                 'last_name': ocpt['entry_lastname'],
             }
 
@@ -682,9 +696,40 @@ class LeCartCustom(LeBasecart):
             order_data['shipping_address'] = tmp_address_s
 
             order_data['payment'] = {
+                'id': None,
+                'code': None,
                 'method': ocpt['payment_method'],
                 'title': 'Payment Infor',
             }
+
+            order_items = list()
+            order_item_subtotal = to_decimal(ocpt['products_price']) * to_decimal(ocpt['products_quantity'])
+            order_item_tax = to_decimal(ocpt['products_tax']) * to_decimal(ocpt['products_quantity'])
+            order_item_total = to_decimal(order_item_subtotal) + to_decimal(order_item_tax)
+            item = {
+                'id': ocpt['orders_products_id'],
+                'code': None,
+                'product': {
+                    'id': None,
+                    'code': None,
+                    'name': ocpt['products_name'],
+                    'sku': '',
+                },
+                'qty': ocpt['products_quantity'],
+                'price': ocpt['final_price'],
+                'original_price': ocpt['products_price'],
+                'tax_amount': order_item_tax,
+                'tax_percent': (order_item_tax / order_item_subtotal) * 100 if order_item_subtotal != 0 else 0.0,
+                'discount_amount': 0.0000,
+                'discount_percent': 0.0000,
+                'subtotal': order_item_subtotal,
+                'total': order_item_total,
+                'options': list(),
+                'created_at': order['date_purchased'] if order['date_purchased'] else get_current_time(),
+                'updated_at': get_current_time(),
+            }
+            order_items.append(item)
+        order_data['items'] = order_items
 
         return response_success(order_data)
 
@@ -696,19 +741,21 @@ class LeCartCustom(LeBasecart):
         }
 
     def set_tmp_address(self, data, country, state, type_d=None):
+        if 'zone_id' not in state:
+            pass
         tmp = {
-            'id': data['address_book_id'],
+            'id': data.get('address_book_id', None),
             'country': {
-                'id': country['countries_id'],
-                'code': '%s/%s' % (country['countries_iso_code_2'], country['countries_iso_code_3']),
-                'country_code': country['countries_iso_code_2'],
-                'name': country['countries_name'],
+                'id': country.get('countries_id', None),
+                'code': '%s/%s' % (country.get('countries_iso_code_2', 'VN'), country.get('countries_iso_code_3', 'vn')),
+                'country_code': country.get('countries_iso_code_2', 'VN'),
+                'name': country.get('countries_name', 'Vie'),
             },
             'state': {
-                'id': state['zone_id'],
-                'code': state['zone_country_id'],
-                'state_code': state['zone_code'],
-                'name': state['zone_name'],
+                'id': state.get('zone_id', None),
+                'code': state.get('zone_code', None),
+                'state_code': state.get('zone_code', ''),
+                'name': state.get('zone_name', ''),
             },
             'telephone': data['customers_telephone'],
             'fax': data['customers_fax'],
@@ -719,6 +766,7 @@ class LeCartCustom(LeBasecart):
             ext = {
                 'code': data['entry_postcode'],
                 'first_name': data['entry_firstname'],
+                'middle_name': '',
                 'last_name': data['entry_lastname'],
                 'address_1': data['entry_street_address'],
                 'address_2': '%s/%s' % (data['entry_city'], data['entry_state']),
@@ -731,6 +779,7 @@ class LeCartCustom(LeBasecart):
             ext = {
                 'code': data['delivery_postcode'] if data['delivery_postcode'] else data['entry_postcode'],
                 'first_name': data['delivery_name'].split(' ')[0] if data['delivery_name'] else data['entry_firstname'],
+                'middle_name': '',
                 'last_name': data['delivery_name'].split(' ')[1] if data['delivery_name'] else data['entry_firstname'],
                 'address_1': data['delivery_address1'] if data['delivery_address1'] else data['entry_street_address'],
                 'address_2': data['delivery_address2'] if data['delivery_address2'] else '%s/%s' % (data['entry_city'], data['entry_state']),
@@ -743,6 +792,7 @@ class LeCartCustom(LeBasecart):
             ext = {
                 'code': data['billing_postcode'] if data['billing_postcode'] else data['entry_postcode'],
                 'first_name': data['billing_name'].split(' ')[0] if data['billing_name'] else data['entry_firstname'],
+                'middle_name': '',
                 'last_name': data['billing_name'].split(' ')[1] if data['billing_name'] else data['entry_firstname'],
                 'address_1': data['billing_address1'] if data['billing_address1'] else data['entry_street_address'],
                 'address_2': data['billing_address2'] if data['billing_address2'] else '%s/%s' % (data['entry_city'], data['entry_state']),
