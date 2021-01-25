@@ -1,0 +1,359 @@
+2021/01/25 14:25:16 : Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 665, in storage_data
+    getattr(self.get_source_cart(), 'finish_storage_data')()
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 4043, in finish_storage_data
+    folder_upload = self.get_folder_upload(self._migration_id)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 4055, in get_folder_upload
+    folder_upload = root_path + '/' + DIR_UPLOAD + '/' + get_config_ini('src', 'file', file='test.ini')
+TypeError: can only concatenate str (not "NoneType") to str
+
+2021/01/25 14:25:18 : categories_errors 2: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:18 : categories_errors 3: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:18 : categories_errors 4: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:18 : categories_errors 5: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:18 : categories_errors 6: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:18 : categories_errors 7: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 8: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 9: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 10: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 11: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 12: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 13: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 14: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 15: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 16: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 17: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 19: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 20: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 22: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:19 : categories_errors 23: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 2252, in category_import
+    return response_success(category_term_import)
+NameError: name 'category_term_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 9: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 10: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 16: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 17: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 18: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 19: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 20: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 22: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 23: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 24: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 25: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 37: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 39: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 41: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 42: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 43: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 44: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 47: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 48: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:20 : products_errors 49: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3398, in product_import
+    return response_success(product_import)
+NameError: name 'product_import' is not defined
+
+2021/01/25 14:25:21 : customers_errors 1: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3598, in customer_import
+    self.insert_map(self.TYPE_CUSTOMER, convert['id'], customer_id, convert['code'])
+NameError: name 'customer_id' is not defined
+
+2021/01/25 14:25:21 : customers_errors 3: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3598, in customer_import
+    self.insert_map(self.TYPE_CUSTOMER, convert['id'], customer_id, convert['code'])
+NameError: name 'customer_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 1: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 2: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 3: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 4: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 5: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 6: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 7: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+
+2021/01/25 14:25:21 : orders_errors 8: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4013, in order_import
+    self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
+NameError: name 'order_id' is not defined
+

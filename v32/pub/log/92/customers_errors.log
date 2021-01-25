@@ -1,0 +1,14 @@
+2021/01/25 14:25:21 : customers_errors 1: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3598, in customer_import
+    self.insert_map(self.TYPE_CUSTOMER, convert['id'], customer_id, convert['code'])
+NameError: name 'customer_id' is not defined
+
+2021/01/25 14:25:21 : customers_errors 3: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 3598, in customer_import
+    self.insert_map(self.TYPE_CUSTOMER, convert['id'], customer_id, convert['code'])
+NameError: name 'customer_id' is not defined
+

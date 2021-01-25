@@ -192,13 +192,15 @@ class LeCartCustom(LeBasecart):
         # set data from get to base form
         category_data['id'] = category['categories_id']
         category_data['parent'] = parent
-        img = get_row_from_list_by_field(
-            category['categories_image'] if category['categories_image'] is not None else 'Demo',
-            category['categories_image'], category['categories_image'])
-        if img and img['image'] != '':
-            category_data['thumb_image']['label'] = img['image']
-            category_data['thumb_image']['url'] = 'https://unsplash.com/photos/KVyc-zNT8hE'
-            category_data['thumb_image']['path'] = img['image']
+        img = category['categories_image']
+        # url for shopify
+        URL_SHOPIFY = 'http://www.iemotorsport.com/mm5/'
+        #url for wq
+        URL_WP = 'http://localhost/wordpress/wp-content/uploads/2021/01/'
+        if img and img != '':
+            category_data['thumb_image']['label'] = img
+            category_data['thumb_image']['url'] = URL_WP
+            category_data['thumb_image']['path'] = img
 
         categories_description = get_row_from_list_by_field(categories_ext['data']['categories_description'],
                                                             'categories_id', category['categories_id'])
