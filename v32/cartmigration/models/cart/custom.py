@@ -740,8 +740,8 @@ class LeCartCustom(LeBasecart):
     def set_type_order_total(self, data):
         return {
             'title': data['title'],
-            'amount': data['products_tax'],
-            'percent': data['value'],
+            'amount': data['value'],
+            'percent': data['products_tax'],
         }
 
     def set_tmp_address(self, data, country, state, type_d=None):

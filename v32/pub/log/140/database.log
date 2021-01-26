@@ -1,0 +1,2 @@
+2021/01/26 17:36:56 : Changing sql mode 'NO_AUTO_CREATE_USER' is deprecated. It will be removed in a future release.
+2021/01/26 17:37:16 : INSERT INTO `migration_map` (`migration_id`, `type`, `id_src`, `code_src`, `id_desc`, `code_desc`, `value`) VALUES (140, 'order', '1', '('75081',)', '180', null, null): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '75081',)', '180', null, null)' at line 1
