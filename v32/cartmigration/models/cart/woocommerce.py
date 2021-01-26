@@ -9,7 +9,6 @@ from v32.cartmigration.models.cart.wordpress import LeCartWordpress
 
 
 # tested with woocommerce335
-
 class LeCartWoocommerce(LeCartWordpress):
     WARNING_VARIANT_LIMIT = 100
 
@@ -79,10 +78,14 @@ class LeCartWoocommerce(LeCartWordpress):
                     if "themedelights-addons/themedelights-addons.php" in active_plugin_v_data or "woocommerce-product-addons/woocommerce-product-addons.php" in active_plugin_v_data:
                         self._notice['src']['support']['addons'] = True
                     if active_plugin_v_data and ((
-                                                         "woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php" in active_plugin_v_data) or (
-                                                         "custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php" in active_plugin_v_data) or (
-                                                         "sequential-order-numbers-for-woocommerce/sequential-order-numbers.php" in active_plugin_v_data) or (
-                                                         "woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers-pro.php" in active_plugin_v_data) or (
+                                                         "woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php" in active_plugin_v_data)
+                                                 or (
+                                                         "custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php" in active_plugin_v_data)
+                                                 or (
+                                                         "sequential-order-numbers-for-woocommerce/sequential-order-numbers.php" in active_plugin_v_data)
+                                                 or (
+                                                         "woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers-pro.php" in active_plugin_v_data)
+                                                 or (
                                                          "woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers.php" in active_plugin_v_data)):
                         self._notice['src']['support']['plugin_pre_ord'] = True
                     if active_plugin_v_data and 'woocommerce-order-status-manager/woocommerce-order-status-manager.php' in active_plugin_v_data:
@@ -93,20 +96,17 @@ class LeCartWoocommerce(LeCartWordpress):
         queries_config = {
             'orders_status': {
                 'type': 'select',
-                # 'query': "SELECT * FROM `_DBPRF_term_taxonomy` AS term_taxonomy LEFT JOIN _DBPRF_terms AS terms ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'shop_order_status'",
                 'query': "SELECT DISTINCT(`post_status`) FROM `_DBPRF_posts` WHERE `post_type` = 'shop_order'",
             },
             'permalink_structure': {
                 'type': 'select',
                 'query': "SELECT * FROM `_DBPRF_options` WHERE option_name = 'woocommerce_permalinks' OR option_name = 'category_base'",
             }
-
         }
         if self._notice['src']['support']['wpml']:
             queries_config['wpml'] = {
                 'type': 'select',
                 'query': "SELECT * FROM `_DBPRF_icl_languages` WHERE code IN " + self.list_to_in_condition(active_langs)
-
             }
             queries_config['default_lang'] = {
                 'type': 'select',
@@ -291,12 +291,13 @@ class LeCartWoocommerce(LeCartWordpress):
                         if brand.get('taxonomy'):
                             self._notice['target']['config']['brand_taxonomy'] = brand['taxonomy']
                         break
-                # if ('woocommerce-brand/main.php' in active_plugin_v_data) or ("wc-brand/woocommerce-brand.php" in active_plugin_v_data) or ('woocommerce-brands/woocommerce-brands.php' in active_plugin_v_data) or ('brands-for-woocommerce/woocommerce-brand.php' in active_plugin_v_data):
-                # 	self._notice['target']['support']['manufacturers'] = True
                 if active_plugin_v_data and ((
-                                                     "woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php" in active_plugin_v_data) or (
-                                                     "custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php" in active_plugin_v_data) or (
-                                                     "sequential-order-numbers-for-woocommerce/sequential-order-numbers.php" in active_plugin_v_data) or (
+                                                     "woocommerce-sequential-order-numbers/woocommerce-sequential-order-numbers.php" in active_plugin_v_data)
+                                             or (
+                                                     "custom-order-numbers-for-woocommerce/custom-order-numbers-for-woocommerce.php" in active_plugin_v_data)
+                                             or (
+                                                     "sequential-order-numbers-for-woocommerce/sequential-order-numbers.php" in active_plugin_v_data)
+                                             or (
                                                      "woocommerce-sequential-order-numbers-pro/woocommerce-sequential-order-numbers-pro.php" in active_plugin_v_data)):
                     self._notice['target']['support']['plugin_pre_ord'] = True
                 if active_plugin_v_data and "wordpress-seo/wp-seo.php" in active_plugin_v_data:
@@ -310,18 +311,10 @@ class LeCartWoocommerce(LeCartWordpress):
                     self._notice['target']['support']['plugin_cus_pass'] = True
                 if "woocommerce-admin/woocommerce-admin.php" in active_plugin_v_data:
                     self._notice['target']['support']['plugin_woo_admin'] = True
-                # query_check_seo = {
-                # 	'type': 'select',
-                # 	'query': "SHOW TABLES LIKE '_DBPRF_lecm_rewrite';"
-                # }
-                # check_table_exit = self.select_data_connector(query_check_seo, 'seo')
-                # if check_table_exit['result'] == 'success' and to_len(check_table_exit['data']) > 0:
-                # self._notice['target']['support']['seo_301'] = True
                 if "woo-product-bundle-premium/index.php" in active_plugin_v_data or 'woo-product-bundle/index.php' in active_plugin_v_data:
                     self._notice['target']['support']['product_bundle'] = True
                 if "woocommerce-points-and-rewards/woocommerce-points-and-rewards.php" in active_plugin_v_data:
                     self._notice['target']['support']['customer_point_rewards'] = True
-                # if 'polylang/polylang.php' in active_plugin_v_data and 'polylang-wc/polylang-wc.php' in active_plugin_v_data:
                 if 'polylang/polylang.php' in active_plugin_v_data:
                     self._notice['target']['support']['polylang'] = True
                 if 'woocommerce-status-actions/woocommerce-status-actions.php' in active_plugin_v_data:
@@ -330,7 +323,6 @@ class LeCartWoocommerce(LeCartWordpress):
         queries_config = {
             'orders_status': {
                 'type': 'select',
-                # 'query': "SELECT DISTINCT(`post_status`) FROM `_DBPRF_posts` WHERE `post_type` = 'shop_order'",
                 'query': "SELECT * FROM `_DBPRF_term_taxonomy` AS term_taxonomy LEFT JOIN _DBPRF_terms AS terms ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'shop_order_status'",
             },
         }
@@ -375,8 +367,6 @@ class LeCartWoocommerce(LeCartWordpress):
                 for order_status_row in config['data']['orders_status']:
                     order_status_id = 'wc-' + to_str(order_status_row['name']).lower()
                     order_status_data[order_status_id] = order_status_row['name']
-            # order_status_id = order_status_row['post_status']
-            # order_status_data[order_status_id] = self.get_order_status_label(order_status_row['post_status'])
             else:
                 order_status_data = {
                     'wc-pending': 'Pending payment',
@@ -534,20 +524,12 @@ class LeCartWoocommerce(LeCartWordpress):
         if self._notice['src']['support']['wpml']:
             queries['categories'] = {
                 'type': 'select',
-                # 'query': "SELECT COUNT(1) AS count FROM _DBPRF_term_taxonomy tt LEFT JOIN _DBPRF_icl_translations il ON tt.term_id = il.element_id  "
-                #          "WHERE tt.term_id and il.`source_language_code` is NULL and il.`element_type` = 'tax_product_cat' and tt.taxonomy = 'product_cat' and tt.term_id > " + to_str(
-                #     self._notice['process']['categories']['id_src']),
-
                 'query': "SELECT COUNT(1) AS count FROM _DBPRF_term_taxonomy tt LEFT JOIN _DBPRF_icl_translations il ON tt.term_taxonomy_id = il.element_id "
                          "WHERE il.`element_type` = 'tax_product_cat' and il.`source_language_code` IS NULL and tt.taxonomy = 'product_cat' and tt.term_taxonomy_id " + compare_condition + to_str(
                     self._notice['process']['categories']['id_src']),
             }
             queries['products'] = {
                 'type': 'select',
-                # 'query': "SELECT COUNT(1) AS count FROM _DBPRF_posts p LEFT JOIN _DBPRF_icl_translations il ON p.ID = il.element_id  "
-                #          "WHERE p.`ID` and il.`source_language_code` is NULL and il.`element_type` = 'post_product' and p.post_type = 'product' AND p.post_status NOT IN ('inherit','auto-draft') AND p.ID > " + to_str(
-                #     self._notice['process']['products']['id_src']),
-
                 'query': "SELECT COUNT(1) AS count FROM _DBPRF_posts p LEFT JOIN _DBPRF_icl_translations il ON p.ID = il.element_id "
                          "WHERE il.`source_language_code` is NULL and il.`element_type` = 'post_product' and p.post_type = 'product' AND p.post_status NOT IN ('inherit','auto-draft') AND p.ID " + compare_condition + to_str(
                     self._notice['process']['products']['id_src']),
@@ -774,7 +756,8 @@ class LeCartWoocommerce(LeCartWordpress):
                     'query': json.dumps({
                         'type': 'query',
                         'query': "DELETE FROM `_DBPRF_icl_translations` "
-                                 "WHERE element_type = 'tax_product_cat' AND element_id IN " + category_id_con
+                                 + "WHERE element_type = 'tax_product_cat' AND element_id IN "
+                                 + category_id_con
                     })
                 })
             if self._notice['config']['seo'] or self._notice['config']['seo_301']:
@@ -811,7 +794,7 @@ class LeCartWoocommerce(LeCartWordpress):
         collections_query = {
             'type': 'select',
             'query': "SELECT * FROM `_DBPRF_posts` "
-                     "WHERE ID IN " + product_id_con + " OR post_parent IN " + product_id_con
+                     + " WHERE ID IN " + product_id_con + " OR post_parent IN " + product_id_con
         }
         products = self.get_connector_data(self.get_connector_url('query'),
                                            {'query': json.dumps(collections_query)})
@@ -821,14 +804,14 @@ class LeCartWoocommerce(LeCartWordpress):
         all_collections_query = {
             'type': 'query',
             'query': "DELETE FROM `_DBPRF_posts` "
-                     "WHERE ID IN " + self.list_to_in_condition(all_post_id)
+                     + " WHERE ID IN " + self.list_to_in_condition(all_post_id)
         }
         clear_table = self.get_connector_data(self.get_connector_url('query'),
                                               {'query': json.dumps(all_collections_query)})
         all_meta_query = {
             'type': 'query',
             'query': "DELETE FROM `_DBPRF_post_meta`"
-                     " WHERE post_id IN " + self.list_to_in_condition(all_post_id)
+                     + " WHERE post_id IN " + self.list_to_in_condition(all_post_id)
         }
         clear_table = self.get_connector_data(self.get_connector_url('query'),
                                               {'query': json.dumps(all_meta_query)})
@@ -845,15 +828,16 @@ class LeCartWoocommerce(LeCartWordpress):
         if attibutes_ids:
             del_transient_attr_query = {
                 'type': 'query',
-                'query': "DELETE FROM `_DBPRF_woocommerce_attribute_taxonomies` WHERE attribute_id IN " + self.list_to_in_condition(
-                    attibutes_ids)
+                'query': "DELETE FROM `_DBPRF_woocommerce_attribute_taxonomies` WHERE attribute_id IN "
+                         + self.list_to_in_condition(attibutes_ids)
             }
             self.get_connector_data(self.get_connector_url('query'),
                                     {'query': json.dumps(del_transient_attr_query)})
             term_query = {
                 "type": "select",
                 "query": "SELECT * FROM `_DBPRF_term_taxonomy` tt LEFT JOIN `_DBPRF_terms` t ON tt.term_id = t.term_id "
-                         "WHERE tt.taxonomy IN " + self.list_to_in_condition(attibutes_codes)
+                         + " WHERE tt.taxonomy IN "
+                         + self.list_to_in_condition(attibutes_codes)
             }
             terms = self.get_connector_data(self.get_connector_url('query'),
                                             {'query': json.dumps(term_query)})
@@ -862,15 +846,15 @@ class LeCartWoocommerce(LeCartWordpress):
                 taxonomy_ids = duplicate_field_value_from_list(terms['data'], 'term_taxonomy_id')
                 del_transient_attr_query = {
                     'type': 'query',
-                    'query': "DELETE FROM `_DBPRF_term_taxonomy` WHERE term_taxonomy_id IN " + self.list_to_in_condition(
-                        taxonomy_ids)
+                    'query': "DELETE FROM `_DBPRF_term_taxonomy` WHERE term_taxonomy_id IN "
+                             + self.list_to_in_condition(taxonomy_ids)
                 }
                 self.get_connector_data(self.get_connector_url('query'),
                                         {'query': json.dumps(del_transient_attr_query)})
                 del_transient_attr_query = {
                     'type': 'query',
-                    'query': "DELETE FROM `_DBPRF_terms` WHERE term_id IN " + self.list_to_in_condition(
-                        term_ids)
+                    'query': "DELETE FROM `_DBPRF_terms` WHERE term_id IN "
+                             + self.list_to_in_condition(term_ids)
                 }
                 self.get_connector_data(self.get_connector_url('query'),
                                         {'query': json.dumps(del_transient_attr_query)})
@@ -880,7 +864,7 @@ class LeCartWoocommerce(LeCartWordpress):
                 'query': json.dumps({
                     'type': 'query',
                     'query': "DELETE FROM `_DBPRF_icl_translations` "
-                             "WHERE element_type = 'post_product' AND element_id IN " + product_id_con
+                             + " WHERE element_type = 'post_product' AND element_id IN " + product_id_con
                 })
             })
         if self._notice['config']['seo'] or self._notice['config']['seo_301']:
@@ -1072,12 +1056,6 @@ class LeCartWoocommerce(LeCartWordpress):
         taxonomy = 'berocket_brand'
         if self._notice['target']['config'].get('brand_taxonomy'):
             taxonomy = self._notice['target']['config']['brand_taxonomy']
-        # all_collections_query = {
-        # 	'type': 'select',
-        # 	'query': "SELECT * FROM `_DBPRF_term_taxonomy` WHERE taxonomy = 'product_brand' OR taxonomy = 'brand' OR taxonomy = 'pwb-brand'  LIMIT 200"
-        # }
-        # manufacturers = self.get_connector_data(self.get_connector_url('query'),
-        #                                         {'query': json.dumps(all_collections_query)})
         tables = ['termmeta', 'terms', 'term_relationships', 'term_taxonomy']
         for table in tables:
             where = ''
@@ -1094,36 +1072,6 @@ class LeCartWoocommerce(LeCartWordpress):
             if (not clear_table) or (clear_table['result'] != 'success'):
                 self.log("Clear data failed. Error: Could not empty table " + table, 'clear')
                 continue
-        # if manufacturers:
-        # 	while manufacturers['data']:
-        # 		if not manufacturers:
-        # 			return next_clear
-        # 		term_ids = duplicate_field_value_from_list(manufacturers['data'], 'term_id')
-        # 		all_queries = list()
-        # 		taxonomy_ids = duplicate_field_value_from_list(manufacturers['data'], 'term_taxonomy_id')
-        # 		all_queries.append({
-        # 			'type': 'query',
-        # 			'query': "DELETE FROM `_DBPRF_" + taxonomy_meta_table + "` WHERE term_id IN " + self.list_to_in_condition(
-        # 				term_ids)
-        # 		})
-        # 		all_queries.append({
-        # 			'type': 'query',
-        # 			'query': "DELETE FROM `_DBPRF_terms` WHERE term_id IN " + self.list_to_in_condition(
-        # 				term_ids)
-        # 		})
-        # 		all_queries.append({
-        # 			'type': 'query',
-        # 			'query': "DELETE FROM `_DBPRF_term_taxonomy` WHERE term_taxonomy_id IN " + self.list_to_in_condition(
-        # 				taxonomy_ids)
-        # 		})
-        # 		if all_queries:
-        # 			self.import_multiple_data_connector(all_queries, 'cleardemo')
-        # 		all_collections_query = {
-        # 			'type': 'select',
-        # 			'query': "SELECT * FROM `_DBPRF_term_taxonomy` WHERE taxonomy = 'product_brand' OR taxonomy = 'brand' OR taxonomy = 'pwb-brand' LIMIT 200"
-        # 		}
-        # 		manufacturers = self.get_connector_data(self.get_connector_url('query'),
-        # 		                                        {'query': json.dumps(all_collections_query)})
         if self._notice['target']['support']['yoast_seo']:
             query_wpseo = {
                 'type': 'select',
@@ -1362,8 +1310,6 @@ class LeCartWoocommerce(LeCartWordpress):
         if not self._notice['config']['customers']:
             self._notice['target']['clear'] = next_clear
             return next_clear
-        # "DELETE FROM `wp_usermeta`
-        # WHERE meta_key IN ('wp_capabilities', 'wp_capabilities') AND meta_value = 'a:1:{s:8:"customer";b:1;}'"
         del_user_query = "DELETE _DBPRF_users FROM _DBPRF_users " \
                          "LEFT JOIN _DBPRF_usermeta ON _DBPRF_users.ID = _DBPRF_usermeta.user_id " \
                          "WHERE _DBPRF_usermeta.meta_key IN ('_DBPRF_capabilities', '_DBPRF_capabilities') " \
@@ -1373,9 +1319,8 @@ class LeCartWoocommerce(LeCartWordpress):
                 'type': 'query', 'query': del_user_query
             })
         })
-        if (not clear_table) or (clear_table['result'] != 'success') or (not clear_table['data']):
-            self.log("Clear data failed. Error: Could not empty customers ", 'clear')
-        del_user_meta_query = "DELETE _DBPRF_usermeta  FROM _DBPRF_usermeta " \
+
+        del_user_meta_query = "DELETE _DBPRF_usermeta FROM _DBPRF_usermeta " \
                               "LEFT JOIN _DBPRF_users ON _DBPRF_usermeta.user_id = _DBPRF_users.ID WHERE _DBPRF_users.ID IS NULL"
         clear_table = self.get_connector_data(self.get_connector_url('query'), {
             'query': json.dumps({
@@ -1383,14 +1328,15 @@ class LeCartWoocommerce(LeCartWordpress):
             })
         })
 
-        if self._notice['target']['support'].get('plugin_woo_admin') or self.convert_version(
-                self._notice['target']['config']['version'], 2) > 399:
-            del_customer_lookup_query = "DELETE _DBPRF_wc_customer_lookup  FROM _DBPRF_wc_customer_lookup LEFT JOIN _DBPRF_users ON _DBPRF_wc_customer_lookup.user_id = _DBPRF_users.ID WHERE _DBPRF_users.ID IS NULL"
-            clear_table = self.get_connector_data(self.get_connector_url('query'), {
-                'query': json.dumps({
-                    'type': 'query', 'query': del_customer_lookup_query
-                })
+        del_customer_lookup_query = "DELETE _DBPRF_wc_customer_lookup FROM _DBPRF_wc_customer_lookup LEFT JOIN _DBPRF_users ON _DBPRF_wc_customer_lookup.user_id = _DBPRF_users.ID WHERE _DBPRF_users.ID IS NULL"
+        clear_table = self.get_connector_data(self.get_connector_url('query'), {
+            'query': json.dumps({
+                'type': 'query', 'query': del_customer_lookup_query
             })
+        })
+
+        if (not clear_table) or (clear_table['result'] != 'success') or (not clear_table['data']):
+            self.log("Clear data failed. Error: Could not empty customers ", 'clear')
 
         self._notice['target']['clear'] = next_clear
         return self._notice['target']['clear']
@@ -1467,40 +1413,6 @@ class LeCartWoocommerce(LeCartWordpress):
         self._notice['target']['clear'] = next_clear
         return self._notice['target']['clear']
 
-    # def clear_target_blogs(self):
-    # 	next_clear = {
-    # 		'result': 'process',
-    # 		'function': 'clear_target_coupons',
-    # 		'msg': ''
-    # 	}
-    # 	self._notice['target']['clear'] = next_clear
-    # 	if not self._notice['config'].get('blogs'):
-    # 		return next_clear
-    # 	all_queries = {
-    # 		'term': {
-    # 			'type': 'delete',
-    # 			'query': 'DELETE FROM _DBPRF_terms WHERE term_id IN (SELECT term_id FROM _DBPRF_term_taxonomy WHERE taxonomy IN ' + self.list_to_in_condition(['category', 'post_tag']) + ')'
-    # 		},
-    # 		'term_taxonomy': {
-    # 			'type': 'delete',
-    # 			'query': 'DELETE FROM _DBPRF_term_taxonomy WHERE taxonomy IN ' + self.list_to_in_condition(['category', 'post_tag'])
-    # 		},
-    # 		'term_relationship': {
-    # 			'type': 'delete',
-    # 			'query': 'DELETE FROM _DBPRF_term_relationships WHERE object_id IN (SELECT ID FROM _DBPRF_posts WHERE post_type = "post")'
-    # 		},
-    # 		'postmeta': {
-    # 			'type': 'delete',
-    # 			'query': 'DELETE FROM _DBPRF_postmeta WHERE post_id IN (SELECT ID FROM _DBPRF_posts WHERE post_type = "post")'
-    # 		},
-    # 		'posts': {
-    # 			'type': 'delete',
-    # 			'query': 'DELETE FROM _DBPRF_posts WHERE post_type = "post"'
-    # 		},
-    # 	}
-    # 	delete = self.query_multiple_data_connector(all_queries, 'clear_blog')
-    # 	return next_clear
-
     def clear_target_coupons(self):
         next_clear = {
             'result': 'process',
@@ -1527,269 +1439,6 @@ class LeCartWoocommerce(LeCartWordpress):
                 self.log("Clear data failed. Error: Could not empty table " + table, 'clear')
                 continue
         return next_clear
-
-    # def clear_target_pages(self):
-    # 	next_clear = {
-    # 		'result': 'process',
-    # 		'function': '',
-    # 		'msg': ''
-    # 	}
-    # 	self._notice['target']['clear'] = next_clear
-    # 	if not self._notice['config']['pages']:
-    # 		return next_clear
-    # 	tables = [
-    # 		'postmeta',
-    # 		'posts'
-    # 	]
-    # 	for table in tables:
-    # 		where = ' post_type = "page"'
-    # 		if table == 'postmeta':
-    # 			where = ' post_id IN (SELECT ID FROM _DBPRF_posts WHERE post_type = "page")'
-    # 		clear_table = self.get_connector_data(self.get_connector_url('query'), {
-    # 			'query': json.dumps({
-    # 				'type': 'query', 'query': "DELETE FROM `_DBPRF_" + table + "` WHERE " + where
-    # 			})
-    # 		})
-    # 		if (not clear_table) or (clear_table['result'] != 'success'):
-    # 			self.log("Clear data failed. Error: Could not empty table " + table, 'clear')
-    # 			continue
-    # 	return next_clear
-
-    # TODO: TAX
-    def prepare_taxes_import(self):
-        return self
-
-    def prepare_taxes_export(self):
-        return self
-
-    def get_taxes_main_export(self):
-        id_src = self._notice['process']['taxes']['id_src']
-        limit = self._notice['setting']['taxes']
-        query = {
-            'type': 'select',
-            'query': "SELECT * FROM _DBPRF_options WHERE option_name = 'woocommerce_tax_classes'"
-        }
-        # taxes = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query)})
-        taxes = self.select_data_connector(query, 'taxes')
-        if not taxes or taxes['result'] != 'success':
-            return response_error('could not get taxes main to export')
-        list_taxes = response_success()
-
-        if taxes['data'] and to_len(taxes['data']) > 0:
-            list_taxes['data'] = list()
-            for tax in taxes['data']:
-                _taxes = tax['option_value'].splitlines()
-                if _taxes:
-                    tmp_taxes = [
-                        {
-                            'id': 1,
-                            'name': 'Standard'
-                        }
-                    ]
-                    i = 2
-                    for tax_name in _taxes:
-                        tax_data = dict()
-                        tax_data['id'] = i
-                        tax_data['name'] = tax_name
-                        tmp_taxes.append(tax_data)
-                        i += 1
-                    list_taxes['data'].extend(tmp_taxes)
-        return list_taxes
-
-    def get_taxes_ext_export(self, taxes):
-        url_query = self.get_connector_url('query')
-        tax_product_class_names = duplicate_field_value_from_list(taxes['data'], 'name')
-        tax_names = list()
-        for class_name in tax_product_class_names:
-            _class_name = to_str(class_name).lower()
-            _class_name = _class_name.replace(' ', '-')
-            tax_names.append(_class_name)
-        taxes_ext_queries = {
-            'tax_rates': {
-                'type': 'select',
-                'query': "SELECT * FROM _DBPRF_woocommerce_tax_rates WHERE 1"
-                # tax_rate_class IN " + self.list_to_in_condition(tax_names),
-            }
-        }
-        # taxes_ext = self.get_connector_data(url_query, {'serialize': True, 'query': json.dumps(taxes_ext_queries)})
-        taxes_ext = self.select_multiple_data_connector(taxes_ext_queries, 'taxes')
-        if not taxes_ext or taxes_ext['result'] != 'success':
-            return response_error()
-        tax_zone_ids = duplicate_field_value_from_list(taxes_ext['data']['tax_rates'], 'tax_rate_id')
-        taxes_ext_rel_queries = {
-            'tax_rates_location': {
-                'type': 'select',
-                'query': "SELECT * FROM _DBPRF_woocommerce_tax_rate_locations WHERE tax_rate_id IN " + self.list_to_in_condition(
-                    tax_zone_ids),
-            }
-        }
-        # taxes_ext_rel = self.get_connector_data(url_query,
-        #                                 {'serialize': True, 'query': json.dumps(taxes_ext_rel_queries)})
-        taxes_ext_rel = self.select_multiple_data_connector(taxes_ext_rel_queries, 'taxes')
-        if not taxes_ext_rel or taxes_ext_rel['result'] != 'success':
-            return response_error()
-        taxes_ext = self.sync_connector_object(taxes_ext, taxes_ext_rel)
-        return taxes_ext
-
-    def convert_tax_export(self, tax, taxes_ext):
-        tax_zones = list()
-        tax_rate_class_1 = to_str(tax['name']).lower()
-        tax_rate_class_1 = tax_rate_class_1.replace(' ', '-')
-        if tax['name'] == 'Standard':
-            tax_rate_class_1 = ''
-        src_tax_rate = get_list_from_list_by_field(taxes_ext['data']['tax_rates'], 'tax_rate_class', tax_rate_class_1)
-        if src_tax_rate and to_len(src_tax_rate) > 0:
-            for tax_rate in src_tax_rate:
-                tax_zone = self.construct_tax_zone()
-                # tax_zone = self.addConstructDefault(tax_zone)
-                tax_zone['id'] = tax_rate['tax_rate_id']
-                tax_zone['name'] = tax_rate['tax_rate_name']
-                tax_zone_country = self.construct_tax_zone_country()
-                tax_zone_country['name'] = self.get_country_name_by_code(tax_rate['tax_rate_country']) if tax_rate[
-                    'tax_rate_country'] else ''
-                tax_zone_country['code'] = get_value_by_key_in_dict(tax_rate, 'tax_rate_country', '')
-                tax_zone_country['country_code'] = get_value_by_key_in_dict(tax_rate, 'tax_rate_country', '')
-                tax_zone['country'] = tax_zone_country
-                tax_zone_state = self.construct_tax_zone_state()
-                tax_zone_state['name'] = ''
-                tax_zone_state['code'] = get_value_by_key_in_dict(tax_rate, 'tax_rate_state', '')
-                tax_zone_state['state_code'] = get_value_by_key_in_dict(tax_rate, 'tax_rate_state', '')
-                tax_zone['state'] = tax_zone_state
-                tax_zone['rate'] = self.construct_tax_zone_rate()
-                tax_zone['rate']['id'] = tax_rate['tax_rate_id']
-                tax_zone['rate']['name'] = tax_rate['tax_rate_name']
-                tax_zone['rate']['code'] = tax_rate['tax_rate_class']
-                tax_zone['rate']['rate'] = tax_rate['tax_rate']
-                tax_rates_locations = get_list_from_list_by_field(taxes_ext['data']['tax_rates_location'],
-                                                                  'tax_rate_id', tax_rate['tax_rate_id'])
-                tax_zone_city = get_list_from_list_by_field(tax_rates_locations, 'location_type', 'city')
-                tax_zone['postcode'] = get_row_value_from_list_by_field(tax_rates_locations, 'location_type',
-                                                                        'postcode', 'location_code')
-                if tax_zone_city:
-                    for _tax_zone_city in tax_zone_city:
-                        tax_zone['city'] += _tax_zone_city['location_code'] + ';'
-                tax_zone['priority'] = tax_rate['tax_rate_priority']
-                tax_zone['compound'] = True if tax_rate['tax_rate_compound'] and to_int(
-                    tax_rate['tax_rate_compound']) == 1 else False
-                tax_zone['is_shipping'] = True if tax_rate['tax_rate_shipping'] and to_int(
-                    tax_rate['tax_rate_shipping']) == 1 else False
-                tax_zones.append(tax_zone)
-
-        tax_product = self.construct_tax_product()
-        tax_product = self.add_construct_default(tax_product)
-        tax_code = to_str(tax['name']).lower()
-        tax_code = tax_code.replace(' ', '-')
-        tax_product['name'] = tax['name']
-        tax_product['code'] = tax_code
-        tax_product['created_at'] = get_current_time()
-        tax_product['updated_at'] = get_current_time()
-        tax_products = [tax_product]
-        tax_data = self.construct_tax()
-        tax_data = self.add_construct_default(tax_data)
-        # id_src = self._notice['process']['taxes']['id_src']
-        tax_data['id'] = tax['id']
-        tax_data['code'] = tax_code  # tax['name']
-        tax_data['name'] = tax['name']
-        tax_data['created_at'] = get_current_time()
-        tax_data['updated_at'] = get_current_time()
-        tax_data['tax_zones'] = tax_zones
-        tax_data['tax_products'] = tax_products
-        return response_success(tax_data)
-
-    def get_tax_id_import(self, convert, tax, taxes_ext):
-        # id_src = self._notice['process']['taxes']['id_src']
-        return tax['id']
-
-    def check_tax_import(self, convert, tax, taxes_ext):
-        return True if self.get_map_field_by_src(self.TYPE_TAX, convert['id'], convert['code']) else False
-
-    def router_tax_import(self, convert, tax, taxes_ext):
-        return response_success('tax_import')
-
-    def before_tax_import(self, convert, tax, taxes_ext):
-        return response_success()
-
-    def tax_import(self, convert, tax, taxes_ext):
-        slug = self.sanitize_title(convert['name'])
-        if convert['name'] != 'Standard':
-            query = {
-                'type': 'select',
-                'query': "SELECT * FROM _DBPRF_options WHERE option_name = 'woocommerce_tax_classes'"
-            }
-            taxes = self.select_data_connector(query, 'taxes')
-            if taxes and taxes['data']:
-                old_tax_data = taxes['data'][0]
-                new_option_value = old_tax_data['option_value'] + '\n' + convert['name'] if old_tax_data[
-                    'option_value'] else convert['name']
-                query_update = {
-                    'type': 'query',
-                    'query': "UPDATE `_DBPRF_options` SET `option_value` = '" + new_option_value + "' WHERE `option_name` = 'woocommerce_tax_classes'"
-                }
-                taxes = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(query_update)})
-            else:
-                tax_data = {
-                    'option_name': 'woocommerce_tax_classes',
-                    'option_value': convert['name'],
-                    'autoload': 'yes'
-                }
-                tax_query = self.create_insert_query_connector('options', tax_data)
-                tax_import = self.import_tax_data_connector(tax_query, True, convert['id'])
-        if self.convert_version(self._notice['target']['config']['version'], 2) >= 370:
-            tax_rate_classes = {
-                'name': convert['name'],
-                'slug': slug
-            }
-            tax_rate_classes_query = self.create_insert_query_connector('wc_tax_rate_classes', tax_rate_classes)
-            tax_rate_classes_import = self.import_data_connector(tax_rate_classes_query, 'wc_tax_rate_classes')
-
-        tax_code = to_str(convert['name']).lower()
-        tax_code = self.sanitize_title(tax_code.replace(' ', '-'))
-        self.insert_map(self.TYPE_TAX, convert['id'], 0, convert['code'], tax_code)
-        return response_success(convert['id'])
-
-    def after_tax_import(self, tax_id, convert, tax, taxes_ext):
-        if convert['tax_zones']:
-            tax_code = to_str(convert['name']).lower()
-            tax_code = tax_code.replace(' ', '-')
-            for tax_zone in convert['tax_zones']:
-                tax_rate = {
-                    'tax_rate_country': tax_zone['country']['country_code'],
-                    'tax_rate_state': tax_zone['state']['state_code'] if tax_zone['state']['state_code'] else '*',
-                    'tax_rate': tax_zone['rate']['rate'] if tax_zone['rate']['rate'] else '*',
-                    'tax_rate_name': tax_zone['rate']['name'] if tax_zone['rate']['name'] else 'Tax',
-                    'tax_rate_priority': tax_zone.get('priority', 1),
-                    'tax_rate_compound': 1 if tax_zone.get('compound') else 0,
-                    'tax_rate_shipping': 1 if tax_zone.get('is_shipping') else 0,
-                    'tax_rate_order': 0,
-                    'tax_rate_class': '' if convert['name'] == 'Standard' else self.convert_attribute_code(tax_code)
-                }
-                tax_rate_query = self.create_insert_query_connector('woocommerce_tax_rates', tax_rate)
-                tax_rate_import = self.import_data_connector(tax_rate_query, 'tax')
-                if get_value_by_key_in_dict(tax_zone, 'postcode', False):
-                    location_postcode = {
-                        'location_code': get_value_by_key_in_dict(tax_zone, 'postcode', ''),
-                        'tax_rate_id': tax_rate_import,
-                        'location_type': 'postcode'
-                    }
-                    self.import_data_connector(
-                        self.create_insert_query_connector('woocommerce_tax_rate_locations', location_postcode), 'tax')
-                if get_value_by_key_in_dict(tax_zone, 'city', False):
-                    tax_zone_city = tax_zone['city'].split(';')
-                    if tax_zone_city:
-                        for _tax_zone_city in tax_zone_city:
-                            if _tax_zone_city != '' and _tax_zone_city != ' ':
-                                location_city = {
-                                    'location_code': get_value_by_key_in_dict(tax_zone, 'city', ''),
-                                    'tax_rate_id': tax_rate_import,
-                                    'location_type': 'city'
-                                }
-                                self.import_data_connector(
-                                    self.create_insert_query_connector('woocommerce_tax_rate_locations', location_city),
-                                    'tax')
-        return response_success()
-
-    def addition_tax_import(self, convert, tax, taxes_ext):
-        return response_success()
 
     # TODO: CATEGORY
     def prepare_categories_import(self):
@@ -2039,7 +1688,7 @@ class LeCartWoocommerce(LeCartWordpress):
 
     def category_import(self, convert, category, categories_ext):
         # resource data: categories
-        self.log(convert, 'categories_convert')
+        self.log(convert, 'convert_category')
 
         # insert to terms
         terms = {
@@ -2048,21 +1697,24 @@ class LeCartWoocommerce(LeCartWordpress):
             'term_group': 0,
         }
         term_query = self.create_insert_query_connector('terms', terms)
-        term_id = self.import_category_data_connector(term_query, True, convert['id'])
-        if not term_id:
+        term_import_id = self.import_category_data_connector(term_query, True, convert['id'])
+        if not term_import_id:
             return response_warning('terms[' + to_str(terms) + '] cannot insert !')
+        self.insert_map(self.TYPE_CATEGORY, convert['id'], term_import_id)
+        return response_success(term_import_id)
 
+    def after_category_import(self, category_id, convert, category, categories_ext):
         # insert to term_taxonomy
         term_taxonomy = {
-            'term_id': term_id,
+            'term_id': category_id,
             'taxonomy': 'product_cat',
             'description': convert.get('description', ''),
             'parent': 0,
             'count': len(categories_ext['data']['products_to_categories']),
         }
         term_taxonomy_query = self.create_insert_query_connector('term_taxonomy', term_taxonomy)
-        term_taxonomy_import = self.import_category_data_connector(term_taxonomy_query, True, convert['id'])
-        if not term_taxonomy_import:
+        term_taxonomy_import_id = self.import_category_data_connector(term_taxonomy_query, True, convert['id'])
+        if not term_taxonomy_import_id:
             return response_warning('term_taxonomy[' + to_str(term_taxonomy) + '] cannot insert !')
 
         # insert to termmeta
@@ -2082,17 +1734,15 @@ class LeCartWoocommerce(LeCartWordpress):
         }
         for key, value in meta_key.items():
             termmeta = {
-                'term_id': term_id,
+                'term_id': category_id,
                 'meta_key': key,
                 'meta_value': value
             }
             termmeta_query = self.create_insert_query_connector('termmeta', termmeta)
-            termmeta_import = self.import_data_connector(termmeta_query, 'category', convert['id'], True)
-            if not termmeta_import:
+            termmeta_import_id = self.import_data_connector(termmeta_query, self.TYPE_CATEGORY, convert['id'], True)
+            if not termmeta_import_id:
                 return response_warning('termmeta[' + to_str(termmeta) + '] cannot insert !')
-
-        self.insert_map(self.TYPE_CATEGORY, convert['id'], term_id)
-        return response_success('term_import_categores')
+        return response_success(None, 'Migration data from category to term complete !')
 
     def get_new_trid(self):
         query = {
@@ -2104,9 +1754,6 @@ class LeCartWoocommerce(LeCartWordpress):
         if trid['data']:
             new_trid = to_int(trid['data'][0]['trid']) + 1
         return new_trid
-
-    def after_category_import(self, category_id, convert, category, categories_ext):
-        return response_success()
 
     def addition_category_import(self, convert, category, categories_ext):
         return response_success()
@@ -3411,10 +3058,11 @@ class LeCartWoocommerce(LeCartWordpress):
         return response_success()
 
     def product_import(self, convert, product, products_ext):
-        self.log(convert, 'convert product')
+        # resource data: product
+        self.log(convert, 'convert_product')
 
-        # posts table
-        posts_product_data = {
+        # insert to posts [type: product]
+        posts_product = {
             'post_author': 1,
             'post_date': convert['created_at'] if convert['created_at'] else get_current_time(),
             'post_date_gmt': convert['created_at'] if convert['created_at'] else get_current_time(),
@@ -3434,41 +3082,41 @@ class LeCartWoocommerce(LeCartWordpress):
             'post_parent': 0,
             'guid': '',
             'menu_order': 0,
-            'post_type': 'product',
+            'post_type': self.TYPE_PRODUCT,
             'post_mime_type': '',
             'comment_count': 0
         }
 
-        posts_query = self.create_insert_query_connector('posts', posts_product_data)
-        post_id = self.import_data_connector(posts_query, 'product', convert['id'])
-        if not post_id:
-            return response_warning('product id ' + to_str(convert['id']) + ' import fails!')
-        update_data = {
-            'guid': 'http://localhost:8082/wordpress/?post_type=product&#038;p=' + to_str(post_id)
+        posts_query = self.create_insert_query_connector('posts', posts_product)
+        post_import_id = self.import_data_connector(posts_query, self.TYPE_PRODUCT, convert['id'])
+        if not post_import_id:
+            return response_warning('posts[' + to_str(posts_product) + '] cannot insert !')
+        posts_update = {
+            'guid': 'http://localhost/wordpress/?post_type=product&#038;p=' + to_str(post_import_id)
         }
-        update_query = self.create_update_query_connector('posts', update_data, {'ID': post_id})
-        update_post = self.import_data_connector(update_query, 'product', convert['id'])
-        if not update_post:
-            return response_warning('post_id ' + to_str(post_id) + ' update fails!')
+        update_query = self.create_update_query_connector('posts', posts_update, {'ID': post_import_id})
+        update_post_id = self.import_data_connector(update_query, self.TYPE_PRODUCT, convert['id'])
+        if not update_post_id:
+            return response_warning('query: ' + to_str(update_query) + ' cannot execute !')
+        self.insert_map(self.TYPE_PRODUCT, convert['id'], post_import_id)
+        return response_success(post_import_id)
 
-        self.insert_map(self.TYPE_PRODUCT, convert['id'], post_id)
-
-        # post for product's image if not exist in post
-        image_file = convert['thumb_image']['path'].split('.')[:-1]
-        image_name = '.'.join(image_file)
-        image_id = ''
-        if image_name:
+    def after_product_import(self, product_id, convert, product, products_ext):
+        # get id image on posts
+        global image_id
+        image_path = convert['thumb_image']['url'] + convert['thumb_image']['path']
+        if image_path:
             search_image_query = {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_posts WHERE post_title='" + image_name + "' LIMIT 1"
+                'query': "SELECT p.ID FROM _DBPRF_posts p WHERE p.guid LIKE '" + image_path + "' LIMIT 1"
             }
-            post_image = self.get_connector_data(self.get_connector_url('query'),
-                                                 {'query': json.dumps(search_image_query)})
-            if post_image['data']:
-                image_id = post_image['data'][0]['ID']
-
-        # postmeta for product
-        post_product_meta_key = {
+            image_search = self.get_connector_data(
+                self.get_connector_url('query'),
+                {'query': json.dumps(search_image_query)}
+            )
+            image_id = image_search['data'][0]['ID'] if len(image_search['data']) > 0 else None
+        # insert to postmeta
+        meta_key = {
             '_edit_lock': to_str(int(time.time())) + ':1',
             '_edit_last': '1',
             '_sku': convert['sku'],
@@ -3495,31 +3143,30 @@ class LeCartWoocommerce(LeCartWordpress):
             '_product_version': '4.9.0',
             '_price': convert['products_wholesale_price'],
             '_thumbnail_id': image_id,
-            '_product_image_galley': ''
+            '_product_image_gallery': image_id,
         }
 
-        for meta_key, meta_value in post_product_meta_key.items():
+        for key, value in meta_key.items():
             postmeta = {
-                'post_id': post_id,
-                'meta_key': meta_key,
-                'meta_value': meta_value
+                'post_id': product_id,
+                'meta_key': key,
+                'meta_value': value
             }
-
             postmeta_query = self.create_insert_query_connector('postmeta', postmeta)
-            postmeta_import = self.import_data_connector(postmeta_query, 'product', post_id)
+            postmeta_import = self.import_data_connector(postmeta_query, self.TYPE_PRODUCT, product_id)
             if not postmeta_import:
-                return response_warning('postmeta post_id ' + to_str(post_id) + ' import fails!')
+                return response_warning('postmeta[' + to_str(postmeta) + '] cannot insert !')
 
-        # productmeta_lookup
-        product_meta_lookup_data = {
-            'product_id': post_id,
+        # insert to wc_product_meta_lookup
+        default_price = convert['products_wholesale_price'] if convert['products_wholesale_price'] else convert[
+            'products_msrp']
+        wc_product_meta_lookup = {
+            'product_id': product_id,
             'sku': convert['sku'],
             'virtual': 0,
             'downloadable': 0,
-            'min_price': convert['products_wholesale_price'] if convert['products_wholesale_price'] else convert[
-                'products_msrp'],
-            'max_price': convert['products_wholesale_price'] if convert['products_wholesale_price'] else convert[
-                'products_msrp'],
+            'min_price': default_price,
+            'max_price': default_price,
             'onsale': 1 if convert['products_wholesale_price'] else 0,
             'stock_quantity': convert['qty'],
             'stock_status': 'instock' if int(convert['qty']) > 0 else 'outofstock',
@@ -3530,47 +3177,46 @@ class LeCartWoocommerce(LeCartWordpress):
             'tax_class': ''
         }
 
-        product_meta_lookup_query = self.create_insert_query_connector('wc_product_meta_lookup',
-                                                                       product_meta_lookup_data)
-        product_meta_lookup_import = self.import_data_connector(product_meta_lookup_query, 'product', post_id)
-        if not product_meta_lookup_import:
-            return response_warning('product_id ' + to_str(post_id) + ' import to wc_product_meta_lookup fails!')
+        wc_product_meta_lookup_query = self.create_insert_query_connector('wc_product_meta_lookup',
+                                                                          wc_product_meta_lookup)
+        wc_product_meta_lookup_import_id = self.import_data_connector(wc_product_meta_lookup_query, self.TYPE_PRODUCT,
+                                                                      product_id)
+        if not wc_product_meta_lookup_import_id:
+            return response_warning('wc_product_meta_lookup[' + to_str(wc_product_meta_lookup) + '] cannot insert !')
 
-        # product with category
-        term_relationships_data = {
+        # insert to term_relationships
+        term_relationships = {
             'object_id': '',
             'term_taxonomy_id': '',
             'term_order': 0,
         }
 
-        cat_id = 2
-        for cat in convert['categories']:
-            cat_map_id = self.get_map_field_by_src(self.TYPE_CATEGORY, cat['id'])
-            if cat_map_id:
-                cat_id = cat_map_id
-                term_relationships_data['object_id'] = post_id
-                term_relationships_data['term_taxonomy_id'] = cat_id
+        PRODUCT_SIMPLE_ID = 2  # default value is simple (term_id = 2)
+        c_id = PRODUCT_SIMPLE_ID
+        for c in convert['categories']:
+            c_map_id = self.get_map_field_by_src(self.TYPE_CATEGORY, c['id'])
+            if c_map_id:
+                c_id = c_map_id
 
-                term_relationships_query = self.create_insert_query_connector('term_relationships',
-                                                                              term_relationships_data)
-                term_relationships_import = self.import_data_connector(term_relationships_query, 'product', post_id)
-                if not term_relationships_import:
-                    return response_warning(
-                        'Convert post_id ' + to_str(post_id) + ' import to term_relationships fails!')
+                term_relationships['object_id'] = product_id
+                term_relationships['term_taxonomy_id'] = c_id
 
-        if cat_id == 2:
-            term_relationships_data['object_id'] = post_id
-            term_relationships_data['term_taxonomy_id'] = 2
+                term_relationships_query = self.create_insert_query_connector('term_relationships', term_relationships)
+                term_relationships_import_id = self.import_data_connector(term_relationships_query, self.TYPE_PRODUCT,
+                                                                          product_id)
+                if not term_relationships_import_id:
+                    return response_warning('term_relationships[' + to_str(term_relationships) + '] cannot insert !')
 
-            term_relationships_query = self.create_insert_query_connector('term_relationships', term_relationships_data)
-            term_relationships_import = self.import_data_connector(term_relationships_query, 'product', post_id)
-            if not term_relationships_import:
-                return response_warning('Convert post_id ' + to_str(post_id) + ' import to term_relationships fails!')
+        if c_id == PRODUCT_SIMPLE_ID:
+            term_relationships['object_id'] = product_id
+            term_relationships['term_taxonomy_id'] = c_id
 
-        return response_success(post_id)
-
-    def after_product_import(self, product_id, convert, product, products_ext):
-        return response_success()
+            term_relationships_query = self.create_insert_query_connector('term_relationships', term_relationships)
+            term_relationships_import_id = self.import_data_connector(term_relationships_query, self.TYPE_PRODUCT,
+                                                                      product_id)
+            if not term_relationships_import_id:
+                return response_warning('term_relationships[' + to_str(term_relationships) + '] cannot insert !')
+        return response_success(None, 'Migration data from product to post complete !')
 
     def addition_product_import(self, convert, product, products_ext):
         return response_success()
@@ -3581,12 +3227,6 @@ class LeCartWoocommerce(LeCartWordpress):
         return response_success()
 
     # TODO: CUSTOMER
-    # def prepare_customers_import(self):
-    #     return self
-
-    # def prepare_customers_export(self):
-    # 	return self
-
     def prepare_customers_import(self):
         if self._notice['config'].get('cus_pass'):
             delete_query = {
@@ -3797,13 +3437,106 @@ class LeCartWoocommerce(LeCartWordpress):
         return response_success()
 
     def customer_import(self, convert, customer, customers_ext):
+        # resource: customer
+        self.log(convert, 'convert_customer')
 
-        self.insert_map(self.TYPE_CUSTOMER, convert['id'], customer_id, convert['code'])
-        return response_success(customer_id)
+        # insert to users
+        users = {
+            'user_login': convert['username'],
+            'user_pass': convert['password'],
+            'user_nicename': convert['username'],
+            'user_email': convert['email'],
+            'user_url': '',
+            'user_registered': convert['created_at'] if convert['created_at'] else get_current_time(),
+            'user_activation_key': '',
+            'user_status': 0,
+            'display_name': convert['first_name'] + ' ' + convert['last_name']
+        }
+        users_query = self.create_insert_query_connector('users', users)
+        users_import_id = self.import_customer_data_connector(users_query, True, convert['id'])
+        if not users_import_id:
+            return response_warning('users[' + to_str(users) + '] cannot insert !')
+
+        self.insert_map(self.TYPE_CUSTOMER, convert['id'], users_import_id, convert['code'])
+        return response_success(users_import_id)
 
     def after_customer_import(self, customer_id, convert, customer, customers_ext):
+        # insert to usermeta
+        usermeta_key = {
+            'nickname': convert['last_name'] + ' ' + convert['first_name'],
+            'first_name': convert['first_name'],
+            'last_name': convert['last_name'],
+            'description': '',
+            'rich_editing': 'true',
+            'syntax_highlighting': 'true',
+            'comment_shortcuts': 'false',
+            'admin_color': 'fresh',
+            'use_ssl': 0,
+            'show_admin_bar_front': 'true',
+            'locale': '',
+            'wp_capabilities': 'a:1:{s:8:"customer";b:1;}',
+            'wp_user_level': 0,
+            'dismissed_wp_pointers': '',
+            'last_update': int(round(datetime.fromisoformat(get_current_time()).timestamp())),
+            '_order_count': 0,
+            'billing_first_name': convert['first_name'],
+            'billing_last_name': convert['last_name'],
+            'billing_company': convert['address'][0]['company'],
+            'billing_address_1': convert['address'][0]['address_1'],
+            'billing_address_2': '',
+            'billing_city': convert['address'][0]['city'],
+            'billing_postcode': convert['address'][0]['postcode'],
+            'billing_country': convert['address'][0]['country']['country_code'],
+            'billing_state': convert['address'][0]['state']['state_code'],
+            'billing_phone': convert['address'][0]['telephone'],
+            'billing_email': convert['email'],
+            'shipping_first_name': convert['first_name'],
+            'shipping_last_name': convert['last_name'],
+            'shipping_company': convert['address'][0]['company'],
+            'shipping_address_1': convert['address'][0]['address_1'],
+            'shipping_address_2': '',
+            'shipping_city': convert['address'][0]['city'],
+            'shipping_postcode': convert['address'][0]['postcode'],
+            'shipping_country': convert['address'][0]['country']['country_code'],
+            'shipping_state': convert['address'][0]['state']['state_code'],
+            '_last_order': '',
+        }
 
-        return response_success()
+        for key, value in usermeta_key.items():
+            usermeta = {
+                'user_id': customer_id,
+                'meta_key': key,
+                'meta_value': value
+            }
+
+            usermeta_query = self.create_insert_query_connector('usermeta', usermeta)
+            usermeta_import_id = self.import_data_connector(usermeta_query, self.TYPE_CUSTOMER)
+            if not usermeta_import_id:
+                return response_warning('user[' + to_str(usermeta) + '] cannot insert !')
+
+        # insert to wc_customer_lookup
+        wc_customer_lookup = {
+            'user_id': customer_id,
+            'username': convert['username'],
+            'first_name': convert['first_name'],
+            'last_name': convert['last_name'],
+            'email': convert['email'],
+            'date_last_active': get_current_time(),
+            'date_registered': convert['created_at'] if convert['created_at'] else get_current_time(),
+            'country': convert['address'][0]['country']['country_code'] if convert['address'][0]['country'][
+                'country_code'] else 'Vie',
+            'postcode': convert['address'][0]['postcode'],
+            'city': convert['address'][0]['city'],
+            'state': convert['address'][0]['state']['state_code'] if convert['address'][0]['state'][
+                'state_code'] else 'VN',
+        }
+
+        wc_customer_lookup_query = self.create_insert_query_connector('wc_customer_lookup', wc_customer_lookup)
+        wc_customer_lookup_query_import_id = self.import_data_connector(wc_customer_lookup_query, 'customer',
+                                                                        convert['id'])
+        if not wc_customer_lookup_query_import_id:
+            return response_warning('wc_customer_lookup[' + to_str(wc_customer_lookup) + '] cannot insert !')
+        return response_success(None, 'Migration data from customer to user complete !')
 
     def addition_customer_import(self, convert, customer, customers_ext):
         return response_success()
@@ -3857,8 +3590,6 @@ class LeCartWoocommerce(LeCartWordpress):
         orders_ext = self.select_multiple_data_connector(customer_ext_queries, 'orders')
         if not orders_ext or orders_ext['result'] != 'success':
             return response_error()
-        # product_option_value_ids = duplicate_field_value_from_list(orders_ext['data']['order_option'], 'product_option_value_id')
-        # order_recurrings = duplicate_field_value_from_list(orders_ext['data']['order_recurring'], 'order_recurring_id')
         order_item_ids = duplicate_field_value_from_list(orders_ext['data']['woocommerce_order_items'], 'order_item_id')
 
         comment_ids = duplicate_field_value_from_list(orders_ext['data']['order_note'], 'comment_ID')
@@ -4099,8 +3830,6 @@ class LeCartWoocommerce(LeCartWordpress):
                 order_delivery['address_1']) + '-' + to_str(order_delivery['address_2']))
         order_data['shipping_address'] = order_delivery
 
-        # order_data['user_history'] = self.get_value_metadata(order_meta, '_user_history', '')
-
         order_products = get_list_from_list_by_field(order_items, 'order_item_type', 'line_item')
         order_items = list()
         for order_product in order_products:
@@ -4170,13 +3899,8 @@ class LeCartWoocommerce(LeCartWordpress):
         order_payment['id'] = order['ID']
         order_payment['method'] = self.get_value_metadata(order_meta, '_payment_method')
         order_payment['title'] = self.get_value_metadata(order_meta, '_payment_method_title')
-
-        # custom order_number plugin WooCommerce Sequential Order Numbers
-        # order_data['order_number'] = self.get_value_metadata(order_meta, '_order_number', '')
-        # order_data['order_number_formatted'] = self.get_value_metadata(order_meta, '_order_number_formatted', '')
-        # order_data['order_number_meta'] = self.get_value_metadata(order_meta, '_order_number_meta', '')
-
         order_data['payment'] = order_payment
+
         return response_success(order_data)
 
     def get_order_id_import(self, convert, order, orders_ext):
@@ -4251,17 +3975,273 @@ class LeCartWoocommerce(LeCartWordpress):
         return response_success()
 
     def order_import(self, convert, order, orders_ext):
-        self.insert_map(self.TYPE_ORDER, convert['id'], order_id, convert['code'])
-        return response_success(order_id)
+        # resource: orders
+        self.log(convert, 'convert_orders')
+
+        # insert to posts [type: order]
+        create_at = convert['created_at']
+        posts_order = {
+            'post_author': 1,
+            'post_date': create_at if create_at else get_current_time(),
+            'post_date_gmt': create_at if create_at else get_current_time(),
+            'post_content': '',
+            'post_title': datetime.fromisoformat(create_at).strftime('Order &ndash; %B %d, %Y @ %0l:%M %p'),
+            'post_excerpt': '',
+            'post_status': 'wc-pending',
+            'comment_status': 'closed',
+            'ping_status': 'closed',
+            'post_password': '',
+            'post_name': '',
+            'to_ping': '',
+            'pinged': '',
+            'post_modified': convert['updated_at'] if convert['updated_at'] else get_current_time(),
+            'post_modified_gmt': convert['updated_at'] if convert['updated_at'] else get_current_time(),
+            'post_content_filtered': '',
+            'post_parent': 0,
+            'guid': '',
+            'menu_order': 0,
+            'post_type': 'shop_order',
+            'post_mime_type': '',
+            'comment_count': 0
+        }
+
+        posts_order_query = self.create_insert_query_connector('posts', posts_order)
+        posts_order_import_id = self.import_data_connector(posts_order_query, self.TYPE_ORDER, convert['id'])
+        if not posts_order_import_id:
+            return response_warning('order[' + to_str(posts_order) + '] cannot insert !')
+
+        posts_update = {
+            'guid': 'http://localhost/wordpress/?post_type=shop_order&#038;p=' + to_str(posts_order_import_id)
+        }
+        update_query = self.create_update_query_connector('posts', posts_update, {'ID': posts_order_import_id})
+        update_post_id = self.import_data_connector(update_query, self.TYPE_ORDER, posts_order_import_id)
+        if not update_post_id:
+            return response_warning('query: ' + to_str(update_query) + ' cannot execute !')
+
+        self.insert_map(self.TYPE_ORDER, convert['id'], posts_order_import_id, convert['code'])
+        return response_success(posts_order_import_id)
 
     def after_order_import(self, order_id, convert, order, orders_ext):
+        # variable child
+        customer = convert['customer']
+        customer_address = convert['customer_address']
+        billing_address = convert['billing_address']
+        shipping_address = convert['shipping_address']
+
+        # insert to postmeta
+        order_customer_id = self.get_map_field_by_src(self.TYPE_CUSTOMER, customer['id'])
+        _billing_address_index = billing_address['first_name'] + '-' \
+                                 + billing_address['last_name'] + '-' \
+                                 + billing_address['company'] + '-' \
+                                 + billing_address['address_1'] + '-' \
+                                 + billing_address['address_2'] + '-' + billing_address['city'] + '-' \
+                                 + billing_address['state']['state_code'] + '-' \
+                                 + convert['customer']['email'] + '-' \
+                                 + billing_address['telephone']
+        _shipping_address_index = shipping_address['first_name'] + '-' \
+                                  + shipping_address['last_name'] + '-' \
+                                  + shipping_address['company'] + '-' \
+                                  + shipping_address['address_1'] + '-' \
+                                  + shipping_address['address_2'] + '-' \
+                                  + shipping_address['city'] + '-' \
+                                  + shipping_address['state']['state_code'] + '-' \
+                                  + shipping_address['postcode']
+        postmeta_order_key = {
+            '_edit_lock': to_str(int(time.time())) + ':1',
+            '_edit_last': '1',
+            '_customer_user': order_customer_id if order_customer_id else 0,
+            '_order_currency': convert['currency'],
+            '_order_shipping_tax': 0,
+            '_order_tax': convert['tax']['amount'],
+            '_order_total': convert['total']['amount'],
+            '_order_version': '4.9.0',
+            '_prices_include_tax': 'no',
+            '_billing_address_index': _billing_address_index,
+            '_shipping_address_index': _shipping_address_index,
+            '_cart_discount': 0,
+            '_cart_discount_tax': 0,
+            '_order_shipping': convert['shipping']['amount'],
+            '_order_key': 'wc_order_4ldQfbvtHNLzl',
+            '_create_via': 'admin',
+            '_billing_first_name': billing_address['first_name'],
+            '_billing_last_name': billing_address['last_name'],
+            '_billing_company': billing_address['company'],
+            '_billing_address_1': billing_address['address_1'],
+            '_billing_address_2': billing_address['address_2'],
+            '_billing_city': billing_address['city'],
+            '_billing_state': billing_address['state']['state_code'],
+            '_billing_postcode': billing_address['postcode'],
+            '_billing_country': billing_address['country']['country_code'],
+            '_billing_email': convert['customer']['email'],
+            '_billing_phone': billing_address['telephone'],
+            '_shipping_first_name': shipping_address['first_name'],
+            '_shipping_last_name': shipping_address['last_name'],
+            '_shipping_company': shipping_address['company'],
+            '_shipping_address_1': shipping_address['address_1'],
+            '_shipping_address_2': shipping_address['address_2'],
+            '_shipping_city': shipping_address['city'],
+            '_shipping_state': shipping_address['state']['state_code'],
+            '_shipping_postcode': shipping_address['postcode'],
+            '_shipping_country': shipping_address['country']['country_code']
+        }
+
+        for key, value in postmeta_order_key.items():
+            order_postmeta_data = {
+                'post_id': order_id,
+                'meta_key': key,
+                'meta_value': value
+            }
+            postmeta_order_query = self.create_insert_query_connector('postmeta', order_postmeta_data)
+            postmeta_order_import_id = self.import_data_connector(postmeta_order_query, self.TYPE_ORDER, order_id)
+            if not postmeta_order_import_id:
+                return response_warning('order_postmeta[' + to_str(order_id) + '] cannot insert !')
+
+        # insert to multiple woocommerce_order table
+        for product in convert['items']:
+            product_id = 0
+            product_map_id = self.get_map_field_by_src(self.TYPE_PRODUCT, product['id'])
+            if product_map_id:
+                product_id = product_map_id
+
+            # insert to woocommerce_order_items
+            woocommerce_order_items = {
+                'order_item_name': product['product']['name'],
+                'order_item_type': 'line_item',
+                'order_id': order_id
+            }
+            woocommerce_order_items_query = self.create_insert_query_connector('woocommerce_order_items',
+                                                                               woocommerce_order_items)
+            woocommerce_order_items_import_id = self.import_data_connector(woocommerce_order_items_query,
+                                                                           self.TYPE_ORDER, order_id)
+            if not woocommerce_order_items_import_id:
+                return response_warning(
+                    'woocommerce_order_items[' + to_str(woocommerce_order_items) + '] cannot insert !')
+
+            # insert to woocommerce_order_itemmeta
+            woocommerce_order_itemmeta_meta_key = {
+                '_product_id': product_id,
+                '_variation_id': 0,
+                '_qty': product['qty'],
+                '_tax_class': '',
+                '_line_subtotal': product['subtotal'],
+                '_line_subtotal_tax': 0,
+                '_line_total': product['total'],
+                '_line_tax': 0,
+                '_line_tax_data': 'a:2:{s:8:"subtotal";a:0:{}s:5:"total";a:0:{}}'
+            }
+
+            woocommerce_order_itemmeta = {
+                'order_item_id': woocommerce_order_items_import_id,
+                'meta_key': '',
+                'meta_value': ''
+            }
+
+            for key, value in woocommerce_order_itemmeta_meta_key.items():
+                woocommerce_order_itemmeta['meta_key'] = key
+                woocommerce_order_itemmeta['meta_value'] = value
+
+                woocommerce_order_itemmeta_query = self.create_insert_query_connector(
+                    'woocommerce_order_itemmeta', woocommerce_order_itemmeta)
+                woocommerce_order_itemmeta_import_id = self.import_data_connector(
+                    woocommerce_order_itemmeta_query, self.TYPE_ORDER, woocommerce_order_items_import_id)
+                if not woocommerce_order_itemmeta_import_id:
+                    return response_warning('woocommerce_order_itemmeta['
+                                            + to_str(woocommerce_order_itemmeta) + '] cannot insert !')
+
+            # insert to wc_order_product_lookup
+            wc_order_product_lookup = {
+                'order_item_id': woocommerce_order_items_import_id,
+                'order_id': order_id,
+                'product_id': product_id,
+                'variation_id': 0,
+                'customer_id': order_customer_id if order_customer_id else 0,
+                'date_created': product['created_at'] if product['created_at'] else product['updated_at'],
+                'product_qty': product['qty'],
+                'product_net_revenue': 0.0,
+                'product_gross_revenue': 0.0,
+                'coupon_amount': 0.0,
+                'tax_amount': 0.0,
+                'shipping_amount': float(convert['shipping']['amount']) / len(convert['items']),
+                'shipping_tax_amount': 0.0
+            }
+            wc_order_product_lookup_query = self.create_insert_query_connector('wc_order_product_lookup',
+                                                                               wc_order_product_lookup)
+            wc_order_product_lookup_import_id = self.import_data_connector(wc_order_product_lookup_query,
+                                                                           self.TYPE_ORDER, order_id)
+            if not wc_order_product_lookup_import_id:
+                return response_warning(
+                    'wc_order_product_lookup[' + to_str(wc_order_product_lookup) + '] cannot import !')
+
+        # insert shipping type to woocommerce_order_items
+        woocommerce_order_items_shipping = {
+            'order_item_name': 'Woocommerce Order Items Shipping',
+            'order_item_type': 'shipping',
+            'order_id': order_id
+        }
+        woocommerce_order_items_shipping_query = self.create_insert_query_connector('woocommerce_order_items',
+                                                                                    woocommerce_order_items_shipping)
+        woocommerce_order_items_shipping_import_id = self.import_data_connector(woocommerce_order_items_shipping_query,
+                                                                                self.TYPE_ORDER, order_id)
+        if not woocommerce_order_items_shipping_import_id:
+            return response_warning(
+                'type: shipping woocommerce_order_items_shipping[' + to_str(
+                    woocommerce_order_items_shipping) + '] cannot insert !')
+
+        # insert shipping type woocommerce_order_itemmeta
+        woocommerce_order_itemmeta_shipping_key = {
+            'method_id': '',
+            'instance_id': 0,
+            'cost': convert['shipping']['amount'],
+            'total_tax': 0,
+            'taxes': 'a:1:{s:5:"total";a:0:{}}'
+        }
+
+        woocommerce_order_itemmeta_shipping = {
+            'order_item_id': woocommerce_order_items_shipping_import_id,
+            'meta_key': '',
+            'meta_value': '',
+        }
+
+        for key, value in woocommerce_order_itemmeta_shipping_key.items():
+            woocommerce_order_itemmeta_shipping['meta_key'] = key
+            woocommerce_order_itemmeta_shipping['meta_value'] = value
+
+            woocommerce_order_itemmeta_shipping_query = self.create_insert_query_connector('woocommerce_order_itemmeta',
+                                                                                           woocommerce_order_itemmeta_shipping)
+            woocommerce_order_itemmeta_shipping_import = self.import_data_connector(
+                woocommerce_order_itemmeta_shipping_query, self.TYPE_ORDER, woocommerce_order_items_shipping_import_id)
+            if not woocommerce_order_itemmeta_shipping_import:
+                return response_warning('type: shipping woocommerce_order_itemmeta['
+                                        + to_str(woocommerce_order_itemmeta_shipping)
+                                        + ' cannot insert !')
+
+        # insert to wc_order_stats
+        wc_order_stats = {
+            'order_id': order_id,
+            'parent_id': 0,
+            'date_created': convert['created_at'] if convert['created_at'] else get_current_time(),
+            'date_created_gmt': convert['created_at'] if convert['created_at'] else get_current_time(),
+            'num_items_sold': len(convert['items']),
+            'total_sales': convert['total']['amount'],
+            'tax_total': convert['tax']['amount'],
+            'shipping_total': convert['shipping']['amount'],
+            'net_total': convert['total']['amount'],
+            'returning_customer': 0,
+            'status': 'wc-pending',
+            'customer_id': order_customer_id if order_customer_id else 0
+        }
+
+        wc_order_stats_query = self.create_insert_query_connector('wc_order_stats', wc_order_stats)
+        wc_order_stats_import_id = self.import_data_connector(wc_order_stats_query, self.TYPE_ORDER, order_id)
+        if not wc_order_stats_import_id:
+            return response_warning('wc_order_stats[' + to_str(wc_order_stats) + '] cannot insert !')
+
         return response_success()
 
     def addition_order_import(self, convert, order, orders_ext):
         return response_success()
 
     # TODO: Template
-
     def display_finish_target(self):
         migration_id = self._migration_id
         recent_exist = self.select_row(TABLE_RECENT, {'migration_id': migration_id})
@@ -4309,14 +4289,6 @@ class LeCartWoocommerce(LeCartWordpress):
             'type': 'query',
             'query': "UPDATE `_DBPRF_postmeta` SET `meta_value`= (SELECT AVG(cmta.`meta_value`) FROM `_DBPRF_comments` AS cmt LEFT JOIN `_DBPRF_commentmeta` AS cmta ON cmt.`comment_ID` = cmta.`comment_ID` WHERE cmt.`comment_post_ID` = `_DBPRF_postmeta`.`post_id` AND cmt.comment_approved = 1 AND cmta.`meta_key` = 'rating') WHERE `meta_key` = '_wc_average_rating'"
         })
-        # all_queries.append({
-        # 	'type': 'query',
-        # 	'query': "UPDATE `_DBPRF_term_taxonomy` tt "
-        # 	         "SET tt.count = (SELECT COUNT( *) as total "
-        # 	         "FROM _DBPRF_term_relationships r JOIN _DBPRF_posts p ON r.object_id = p.ID "
-        # 	         "WHERE r.term_taxonomy_id = tt.term_taxonomy_id AND p.post_type = 'product' AND p.post_parent = '') "
-        # 	         "WHERE tt.taxonomy IN('product_cat', 'product_type', 'product_tag', 'product_brand')"
-        # })
         all_queries.append({
             'type': 'query',
             'query': "UPDATE `_DBPRF_term_taxonomy` AS tt SET tt.count = (SELECT COUNT(1) AS total FROM _DBPRF_term_relationships AS tr WHERE tt.term_taxonomy_id = tr.term_taxonomy_id AND tr.object_id IN (SELECT ID FROM _DBPRF_posts WHERE post_type = 'product'))"
@@ -4504,18 +4476,8 @@ class LeCartWoocommerce(LeCartWordpress):
 
     def get_woo_attribute_id(self, pro_attr_code, attribute_name, language_code=None, language_attribute_data=None,
                              attribute_type='select'):
-        # if to_str(pro_attr_code)[0:3] != 'pa_':
-        #     pro_attr_code = "pa_" + pro_attr_code
-        # if self.is_wpml() and language_code != self._notice['target']['language_default']:
-        # 	attribute_data_default = self.get_convert_data_language(language_attribute_data, None, self._notice['target']['language_default'], 'option_languages')
-        # 	option_lang_name = attribute_data_default.get('option_name')
-        # 	if not option_lang_name:
-        # 		option_lang_name = attribute_data_default.get('attribute_name')
-        # 	if option_lang_name:
         pro_attr_code = urllib.parse.unquote(pro_attr_code)
         woo_attribute_id = self.get_map_field_by_src(self.TYPE_ATTR, None, 'pa_' + pro_attr_code)
-        # if woo_attribute_id:
-        # 	return woo_attribute_id
         if not woo_attribute_id:
             attribute_data = {
                 'attribute_name': pro_attr_code,

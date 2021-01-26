@@ -7,6 +7,11 @@ from v32.cartmigration.models.basecart import LeBasecart
 
 
 class LeCartCustom(LeBasecart):
+    # url for shopify
+    URL_SHOPIFY = 'http://www.iemotorsport.com/mm5/'
+    # url for wq
+    URL_WP = 'http://localhost/wordpress/wp-content/uploads/2021/01/'
+
     def display_config_source(self):
         parent = super().display_config_source()
         if parent['result'] != 'success':
@@ -193,13 +198,9 @@ class LeCartCustom(LeBasecart):
         category_data['id'] = category['categories_id']
         category_data['parent'] = parent
         img = category['categories_image']
-        # url for shopify
-        URL_SHOPIFY = 'http://www.iemotorsport.com/mm5/'
-        #url for wq
-        URL_WP = 'http://localhost/wordpress/wp-content/uploads/2021/01/'
         if img and img != '':
             category_data['thumb_image']['label'] = img
-            category_data['thumb_image']['url'] = URL_WP
+            category_data['thumb_image']['url'] = self.URL_WP
             category_data['thumb_image']['path'] = img
 
         categories_description = get_row_from_list_by_field(categories_ext['data']['categories_description'],
@@ -315,7 +316,7 @@ class LeCartCustom(LeBasecart):
 
         if product['products_image']:
             product_data['thumb_image']['label'] = product['products_image']
-            product_data['thumb_image']['url'] = 'http://www.iemotorsport.com/mm5/'
+            product_data['thumb_image']['url'] = self.URL_WP
             product_data['thumb_image']['path'] = product['products_image']
 
         product_data['name'] = product_description['products_name']
@@ -324,8 +325,11 @@ class LeCartCustom(LeBasecart):
         product_data['url_key'] = product_description['products_url']
         product_data['description'] = html.unescape(product_description['products_description'])
         product_data['short_description'] = html.unescape(product_description['products_description'])
+        product_data['products_viewed'] = product_description['products_viewed']
         product_data['price'] = product['products_price']
         product_data['cost'] = product['products_cost']
+        product_data['products_wholesale_price'] = product['products_wholesale_price']
+        product_data['products_msrp'] = product['products_msrp']
         product_data['weight'] = product['products_weight']
         product_data['length'] = to_decimal(product['products_length'])
         product_data['width'] = to_decimal(product['products_width'])
@@ -581,8 +585,6 @@ class LeCartCustom(LeBasecart):
                 'query': f"SELECT * FROM _DBPRF_zones z WHERE z.zone_code RLIKE '{state_ids}'",
             }
         }
-        print(orders_ext_queries['orders_countries']['query'])
-        print(orders_ext_queries['orders_zones']['query'])
         orders_ext = self.get_connector_data(url_query, {'serialize': True, 'query': json.dumps(orders_ext_queries)})
         if not orders_ext or orders_ext['result'] != 'success':
             return response_error()
