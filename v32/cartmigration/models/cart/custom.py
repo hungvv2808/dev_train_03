@@ -10,7 +10,7 @@ class LeCartCustom(LeBasecart):
     # url for shopify
     URL_SHOPIFY = 'http://www.iemotorsport.com/mm5/'
     # url for wq
-    URL_WP = 'http://localhost/wordpress/wp-content/uploads/2021/01/'
+    URL_WP = 'http://localhost/customcart/image/'
 
     def display_config_source(self):
         parent = super().display_config_source()

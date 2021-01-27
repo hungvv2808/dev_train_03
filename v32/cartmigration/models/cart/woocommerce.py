@@ -2706,7 +2706,11 @@ class LeCartWoocommerce(LeCartWordpress):
                         product_id
                     )
                     if not woocommerce_attribute_taxonomies_import_id:
-                        return response_warning('woocommerce_attribute_taxonomies[' + to_str(woocommerce_attribute_taxonomies) + '] cannot insert !')
+                        self.log(
+                            'woocommerce_attribute_taxonomies[' + to_str(woocommerce_attribute_taxonomies) + '] cannot insert !',
+                            'woocommerce_attribute_taxonomies_log'
+                        )
+                        return
 
                     self.insert_map(
                         self.TYPE_ATTR, attr['attribute_id'],
@@ -2737,7 +2741,11 @@ class LeCartWoocommerce(LeCartWordpress):
                 term_attr_query = self.create_insert_query_connector('terms', term_attr)
                 term_attr_import_id = self.import_data_connector(term_attr_query, self.TYPE_ATTR, product_id)
                 if not term_attr_import_id:
-                    return response_warning('type: attr terms[' + to_str(term_attr) + '] cannot insert !')
+                    self.log(
+                        'type: attr terms[' + to_str(term_attr) + '] cannot insert !',
+                        'term_attr_log'
+                    )
+                    return
 
                 # insert data attr to termmeta
                 termmeta_attr = {
@@ -2749,7 +2757,11 @@ class LeCartWoocommerce(LeCartWordpress):
                 termmeta_attr_import_id = self.import_data_connector(termmeta_attr_query, self.TYPE_ATTR,
                                                                      term_attr_import_id)
                 if not termmeta_attr_import_id:
-                    return response_warning('type: attr termmeta[' + to_str(termmeta_attr) + '] cannot insert !')
+                    self.log(
+                        'type: attr termmeta[' + to_str(termmeta_attr) + '] cannot insert !',
+                        'termmeta_log'
+                    )
+                    return
 
                 # insert attr to term_taxonomy
                 term_taxonomy_attr = {
@@ -2802,7 +2814,11 @@ class LeCartWoocommerce(LeCartWordpress):
                 product_id
             )
             if not term_relationship_import_id:
-                return response_warning('term_relationship[' + to_str(term_relationship_attr) + '] cannot insert !')
+                self.log(
+                    'term_relationship[' + to_str(term_relationship_attr) + '] cannot insert !',
+                    'term_relationship_log'
+                )
+                return
 
             # create meta_value for _product_attributes on postmeta
             product_attribute['pa_' + attr_map_code_src] = {
@@ -2826,7 +2842,53 @@ class LeCartWoocommerce(LeCartWordpress):
         postmeta_update_query = self.create_update_query_connector('postmeta', data_update, condition)
         postmeta_update_id = self.import_data_connector(postmeta_update_query, self.TYPE_PRODUCT, product_id)
         if not postmeta_update_id:
-            return response_warning('query: ' + to_str(postmeta_update_query) + ' cannot execute !')
+            self.log(
+                'query: ' + to_str(postmeta_update_query) + ' cannot execute !',
+                'postmeta_update_query_log'
+            )
+            return
+
+        # update image for postmeta
+        global _thumbnail_id
+        global src_path
+
+        path_default = ['BSNIDESS1.39VANNPW-100.png', 'chpultmtchoc60ct-s.png']
+
+        url = convert['thumb_image']['url']
+        path = convert['thumb_image']['path']
+        if url and path:
+            if path in path_default:
+                image_import_path = self.uploadImageConnector(
+                    self.process_image_before_import(url, path),
+                    self.add_prefix_path(
+                        self.make_woocommerce_image_path(path, self.TYPE_PRODUCT),
+                        'wp-content/uploads'.rstrip('/')
+                    )
+                )
+                if image_import_path:
+                    src_path = self.remove_prefix_path(image_import_path, 'wp-content/uploads'.rstrip('/'))
+                    image_details = self.get_sizes(url)
+                    _thumbnail_id = self.wp_image(src_path, image_details)
+            else:
+                _thumbnail_id = None
+
+        if _thumbnail_id:
+            data_img_update = {
+                'meta_value': _thumbnail_id
+            }
+            condition_img = {
+                'post_id': product_id,
+                'meta_key': '_thumbnail_id'
+            }
+            postmeta_update_img_query = self.create_update_query_connector('postmeta', data_img_update, condition_img)
+            product_update_img_id = self.import_data_connector(postmeta_update_img_query, self.TYPE_PRODUCT, product_id)
+            if not product_update_img_id:
+                self.log(
+                    'query: ' + to_str(postmeta_update_img_query) + ' cannot execute !',
+                    'update_img_postmeta_log'
+                )
+                return
+
         return True
 
     def update_latest_data_product(self, product_id, convert, product, products_ext):

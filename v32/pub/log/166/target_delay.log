@@ -1,0 +1,76 @@
+2021/01/27 16:26:35 : Url: http://127.0.0.1/wordpress/le_connector/connector.php?action=image&token=200f90ecc40048f9b967fd815154110a&cart_type=woocommerce&time=1611739594
+Data: {"images": "{\"ci\": {\"type\": \"download\", \"path\": \"wp-content/uploads/2021/01/BSNIDESS1.39CHCOPW-100.png\", \"params\": {\"url\": \"http://45.56.81.195/img_proxy.php?img=http://localhost/customcart/image/BSNIDESS1.39CHCOPW-100.png\", \"rename\": true}}}"}
+Data_encode: {"images": "hY/BCoJAEIZfRfacu65llBBBFtSlAg8dY1kXFdbdYXfERHz3tLp3+2fm4xv+gciapMFAsAc1BVLYzmgrCrIICAis5l0HobQGlUHWwnz0LI5iziLODvn1cjzlOafLbXbObvdHyKOIgim/Aica//G3Ts+qChFSxlYJTdZ0wynfJqxuyic4++opVLCfpt2P0lYKXVmPTLYebSOFw4kWpfrz1ykjmrkOulaN4/gG"}
+Method: POST
+Status: 200
+Response: <br />
+<b>Fatal error</b>:  Uncaught ArgumentCountError: flush() expects exactly 0 arguments, 1 given in /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php:628
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(628): flush(Resource id #5)
+#1 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(843): LECM_Connector_Action_File-&gt;download('wp-content/uplo...', Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(814): LECM_Connector_Action_Image-&gt;download('wp-content/uplo...', Array)
+#3 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(798): LECM_Connector_Action_Image-&gt;processImage('download', 'wp-content/uplo...', Array)
+#4 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(149): LECM_Connector_Action_Image-&gt;run()
+#5 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(55): LECM_Connector_Action-&gt;run()
+#6 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(3537): LECM_Connector-&gt;run()
+#7 {main}
+  thrown in <b>/Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php</b> on line <b>628</b><br />
+
+Error: Decode data failed, delay 3m and retry 1 time
+2021/01/27 16:29:36 : Url: http://127.0.0.1/wordpress/le_connector/connector.php?action=image&token=200f90ecc40048f9b967fd815154110a&cart_type=woocommerce&time=1611739594
+Data: {"images": "{\"ci\": {\"type\": \"download\", \"path\": \"wp-content/uploads/2021/01/BSNIDESS1.39CHCOPW-100.png\", \"params\": {\"url\": \"http://45.56.81.195/img_proxy.php?img=http://localhost/customcart/image/BSNIDESS1.39CHCOPW-100.png\", \"rename\": true}}}"}
+Data_encode: {"images": "hY/BCoJAEIZfRfacu65llBBBFtSlAg8dY1kXFdbdYXfERHz3tLp3+2fm4xv+gciapMFAsAc1BVLYzmgrCrIICAis5l0HobQGlUHWwnz0LI5iziLODvn1cjzlOafLbXbObvdHyKOIgim/Aica//G3Ts+qChFSxlYJTdZ0wynfJqxuyic4++opVLCfpt2P0lYKXVmPTLYebSOFw4kWpfrz1ykjmrkOulaN4/gG"}
+Method: POST
+Status: 200
+Response: <br />
+<b>Fatal error</b>:  Uncaught ArgumentCountError: flush() expects exactly 0 arguments, 1 given in /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php:628
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(628): flush(Resource id #5)
+#1 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(843): LECM_Connector_Action_File-&gt;download('wp-content/uplo...', Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(814): LECM_Connector_Action_Image-&gt;download('wp-content/uplo...', Array)
+#3 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(798): LECM_Connector_Action_Image-&gt;processImage('download', 'wp-content/uplo...', Array)
+#4 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(149): LECM_Connector_Action_Image-&gt;run()
+#5 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(55): LECM_Connector_Action-&gt;run()
+#6 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(3537): LECM_Connector-&gt;run()
+#7 {main}
+  thrown in <b>/Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php</b> on line <b>628</b><br />
+
+Error: Decode data failed, delay 6m and retry 2 time
+2021/01/27 16:35:36 : Url: http://127.0.0.1/wordpress/le_connector/connector.php?action=image&token=200f90ecc40048f9b967fd815154110a&cart_type=woocommerce&time=1611739594
+Data: {"images": "{\"ci\": {\"type\": \"download\", \"path\": \"wp-content/uploads/2021/01/BSNIDESS1.39CHCOPW-100.png\", \"params\": {\"url\": \"http://45.56.81.195/img_proxy.php?img=http://localhost/customcart/image/BSNIDESS1.39CHCOPW-100.png\", \"rename\": true}}}"}
+Data_encode: {"images": "hY/BCoJAEIZfRfacu65llBBBFtSlAg8dY1kXFdbdYXfERHz3tLp3+2fm4xv+gciapMFAsAc1BVLYzmgrCrIICAis5l0HobQGlUHWwnz0LI5iziLODvn1cjzlOafLbXbObvdHyKOIgim/Aica//G3Ts+qChFSxlYJTdZ0wynfJqxuyic4++opVLCfpt2P0lYKXVmPTLYebSOFw4kWpfrz1ykjmrkOulaN4/gG"}
+Method: POST
+Status: 200
+Response: <br />
+<b>Fatal error</b>:  Uncaught ArgumentCountError: flush() expects exactly 0 arguments, 1 given in /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php:628
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(628): flush(Resource id #5)
+#1 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(843): LECM_Connector_Action_File-&gt;download('wp-content/uplo...', Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(814): LECM_Connector_Action_Image-&gt;download('wp-content/uplo...', Array)
+#3 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(798): LECM_Connector_Action_Image-&gt;processImage('download', 'wp-content/uplo...', Array)
+#4 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(149): LECM_Connector_Action_Image-&gt;run()
+#5 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(55): LECM_Connector_Action-&gt;run()
+#6 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(3537): LECM_Connector-&gt;run()
+#7 {main}
+  thrown in <b>/Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php</b> on line <b>628</b><br />
+
+Error: Decode data failed, delay 9m and retry 3 time
+2021/01/27 16:44:37 : Url: http://127.0.0.1/wordpress/le_connector/connector.php?action=image&token=200f90ecc40048f9b967fd815154110a&cart_type=woocommerce&time=1611739594
+Data: {"images": "{\"ci\": {\"type\": \"download\", \"path\": \"wp-content/uploads/2021/01/BSNIDESS1.39CHCOPW-100.png\", \"params\": {\"url\": \"http://45.56.81.195/img_proxy.php?img=http://localhost/customcart/image/BSNIDESS1.39CHCOPW-100.png\", \"rename\": true}}}"}
+Data_encode: {"images": "hY/BCoJAEIZfRfacu65llBBBFtSlAg8dY1kXFdbdYXfERHz3tLp3+2fm4xv+gciapMFAsAc1BVLYzmgrCrIICAis5l0HobQGlUHWwnz0LI5iziLODvn1cjzlOafLbXbObvdHyKOIgim/Aica//G3Ts+qChFSxlYJTdZ0wynfJqxuyic4++opVLCfpt2P0lYKXVmPTLYebSOFw4kWpfrz1ykjmrkOulaN4/gG"}
+Method: POST
+Status: 200
+Response: <br />
+<b>Fatal error</b>:  Uncaught ArgumentCountError: flush() expects exactly 0 arguments, 1 given in /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php:628
+Stack trace:
+#0 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(628): flush(Resource id #5)
+#1 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(843): LECM_Connector_Action_File-&gt;download('wp-content/uplo...', Array)
+#2 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(814): LECM_Connector_Action_Image-&gt;download('wp-content/uplo...', Array)
+#3 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(798): LECM_Connector_Action_Image-&gt;processImage('download', 'wp-content/uplo...', Array)
+#4 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(149): LECM_Connector_Action_Image-&gt;run()
+#5 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(55): LECM_Connector_Action-&gt;run()
+#6 /Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php(3537): LECM_Connector-&gt;run()
+#7 {main}
+  thrown in <b>/Applications/XAMPP/xamppfiles/htdocs/wordpress/le_connector/connector.php</b> on line <b>628</b><br />
+
+Error: Decode data failed, delay 12m and retry 4 time
