@@ -597,7 +597,6 @@ class LeCartCustom(LeBasecart):
         return orders_ext
 
     def convert_order_export(self, order, orders_ext):
-        global order_items
         order_data = self.construct_order()
 
         orders_customers_products_total = get_list_from_list_by_field(
@@ -609,6 +608,8 @@ class LeCartCustom(LeBasecart):
         order_data['id'] = order['orders_id']
         order_data['order_number'] = order['order_number']
         order_data['status'] = order['orders_status']
+
+        order_items = list()
         for ocpt in orders_customers_products_total:
             order_data['code'] = ocpt['delivery_postcode'] if ocpt['delivery_postcode'] else ocpt['billing_postcode'],
 
@@ -712,7 +713,6 @@ class LeCartCustom(LeBasecart):
                 'title': 'Payment Infor',
             }
 
-            order_items = list()
             order_item_subtotal = to_decimal(ocpt['products_price']) * to_decimal(ocpt['products_quantity'])
             order_item_tax = to_decimal(ocpt['products_tax']) * to_decimal(ocpt['products_quantity'])
             order_item_total = to_decimal(order_item_subtotal) + to_decimal(order_item_tax)

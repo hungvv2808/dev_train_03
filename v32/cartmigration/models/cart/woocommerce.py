@@ -1718,19 +1718,20 @@ class LeCartWoocommerce(LeCartWordpress):
             return response_warning('term_taxonomy[' + to_str(term_taxonomy) + '] cannot insert !')
 
         # insert to termmeta
-        global thumbnail_id
+        thumbnail_id = ''
         image_path = convert['thumb_image']['url'] + convert['thumb_image']['path']
         if image_path:
             search_image_query = {
                 'type': 'select',
                 'query': "SELECT p.ID FROM _DBPRF_posts p WHERE p.guid LIKE '" + image_path + "' LIMIT 1"
             }
-            thumbnail_id = self.get_connector_data(self.get_connector_url('query'),
-                                                   {'query': json.dumps(search_image_query)})
+            result = self.get_connector_data(self.get_connector_url('query'), {'query': json.dumps(search_image_query)})
+            if len(result['data']) > 0:
+                thumbnail_id = result['data'][0]['ID']
         meta_key = {
             'order': 0,
             'display_type': '',
-            'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+            'thumbnail_id': thumbnail_id
         }
         for key, value in meta_key.items():
             termmeta = {
@@ -4197,13 +4198,13 @@ class LeCartWoocommerce(LeCartWordpress):
         self.log(convert, 'convert_orders')
 
         # insert to posts [type: order]
-        create_at = convert['created_at']
+        create_at = convert['created_at'] if convert['created_at'] else get_current_time()
         posts_order = {
             'post_author': 1,
             'post_date': create_at if create_at else get_current_time(),
             'post_date_gmt': create_at if create_at else get_current_time(),
             'post_content': '',
-            'post_title': datetime.fromisoformat(create_at).strftime('Order &ndash; %B %d, %Y @ %0l:%M %p'),
+            'post_title': datetime.fromisoformat(to_str(create_at)).strftime('Order &ndash; %B %d, %Y @ %0l:%M %p'),
             'post_excerpt': '',
             'post_status': 'wc-pending',
             'comment_status': 'closed',

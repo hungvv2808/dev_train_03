@@ -1,0 +1,112 @@
+2021/01/27 17:42:20 : categories_errors 2: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:20 : categories_errors 3: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:20 : categories_errors 4: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:20 : categories_errors 5: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:20 : categories_errors 6: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:20 : categories_errors 7: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:20 : categories_errors 9: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 10: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 11: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 12: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 15: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 16: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 19: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 20: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 22: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+
+2021/01/27 17:42:21 : categories_errors 23: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1113, in migration
+    after_import = fn_after_import(id_desc, convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 1736, in after_category_import
+    'thumbnail_id': thumbnail_id['data'][0]['ID'] if len(thumbnail_id['data']) > 0 else None
+TypeError: 'NoneType' object is not subscriptable
+

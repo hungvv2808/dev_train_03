@@ -1,0 +1,56 @@
+2021/01/27 17:50:02 : orders_errors 1: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
+2021/01/27 17:50:02 : orders_errors 2: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
+2021/01/27 17:50:02 : orders_errors 3: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
+2021/01/27 17:50:02 : orders_errors 4: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
+2021/01/27 17:50:02 : orders_errors 5: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
+2021/01/27 17:50:02 : orders_errors 6: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
+2021/01/27 17:50:02 : orders_errors 7: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
+2021/01/27 17:50:02 : orders_errors 8: Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1072, in migration
+    import_data = fn_import(convert_data, main, ext)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/woocommerce.py", line 4208, in order_import
+    'post_excerpt': '',
+ValueError: Invalid isoformat string: ''
+
