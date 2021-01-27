@@ -289,6 +289,17 @@ class LeCartCustom(LeBasecart):
                          + " ON p.products_id = ptc.products_id WHERE p.products_id IN "
                          + product_id_con,
             },
+            'attributes': {
+                'type': 'select',
+                'query': "SELECT * FROM _DBPRF_attribute ",
+            },
+            'product_attribute': {
+                'type': 'select',
+                'query': "SELECT pa.* FROM _DBPRF_products p "
+                         + " INNER JOIN _DBPRF_product_attribute pa ON p.products_id = pa.product_id "
+                         + " WHERE p.products_id IN "
+                         + product_id_con,
+            },
         }
         product_ext = self.get_connector_data(url_query, {
             'serialize': True, 'query': json.dumps(product_ext_queries)
@@ -351,13 +362,8 @@ class LeCartCustom(LeBasecart):
                 ptc_d['id'] = ptc
                 product_data['categories'].append(ptc_d)
 
-        for language in self._notice['src']['languages_select']:
-            pl = self.construct_product_lang()
-            pl['name'] = product_data['name']
-            pl['description'] = product_data['description']
-            pl['short_description'] = product_data['description']
-            pl['price'] = product_data['price']
-        product_data['languages'][product_description['language_id']] = pl
+        product_data['attributes'] = products_ext['data']['attributes']
+        product_data['product_attribute'] = products_ext['data']['product_attribute']
 
         if self._notice['config']['seo_301']:
             detect_seo = self.detect_seo()
