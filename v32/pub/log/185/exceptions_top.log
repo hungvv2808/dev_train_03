@@ -1,0 +1,9 @@
+2021/01/28 09:20:25 : Traceback (most recent call last):
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 665, in storage_data
+    getattr(self.get_source_cart(), 'finish_storage_data')()
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 4043, in finish_storage_data
+    folder_upload = self.get_folder_upload(self._migration_id)
+  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 4055, in get_folder_upload
+    folder_upload = root_path + '/' + DIR_UPLOAD + '/' + get_config_ini('src', 'file', file='test.ini')
+TypeError: can only concatenate str (not "NoneType") to str
+

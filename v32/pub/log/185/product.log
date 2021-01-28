@@ -1,0 +1,2 @@
+2021/01/28 09:20:34 : Product 994: INSERT INTO `_DBPRF_term_relationships` (`object_id`, `term_taxonomy_id`, `term_order`) VALUES ('994', 743, 0): <span class="message-alert-error">SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '994-743' for key 'PRIMARY'</span>
+2021/01/28 09:20:35 : Product 995: INSERT INTO `_DBPRF_term_relationships` (`object_id`, `term_taxonomy_id`, `term_order`) VALUES ('995', 743, 0): <span class="message-alert-error">SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '995-743' for key 'PRIMARY'</span>

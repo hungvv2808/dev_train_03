@@ -738,7 +738,8 @@ class LeCartCustom(LeBasecart):
                 'created_at': order['date_purchased'] if order['date_purchased'] else get_current_time(),
                 'updated_at': get_current_time(),
             }
-            order_items.append(item)
+            if item not in order_items:
+                order_items.append(item)
         order_data['items'] = order_items
 
         return response_success(order_data)
