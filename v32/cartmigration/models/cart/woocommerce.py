@@ -2687,13 +2687,13 @@ class LeCartWoocommerce(LeCartWordpress):
         if convert['attributes']:
             for attr in convert['attributes']:
                 # check exists id_src type attr on migration_map
-                migration_map = self.select_map(self._migration_id, self.TYPE_ATTR, attr['attribute_id'])
+                migration_map = self.select_map(self._migration_id, self.TYPE_ATTR, attr['option_id'])
 
                 if not migration_map:
                     woocommerce_attribute_taxonomies = {
-                        'attribute_name': attr['attribute_code'],
-                        'attribute_label': attr['attribute_name'],
-                        'attribute_type': attr['attribute_type'],
+                        'attribute_name': attr['option_code'],
+                        'attribute_label': attr['option_name'],
+                        'attribute_type': attr['option_type'],
                         'attribute_orderby': 'menu_order',
                         'attribute_public': 1
                     }
@@ -2714,29 +2714,29 @@ class LeCartWoocommerce(LeCartWordpress):
                         return
 
                     self.insert_map(
-                        self.TYPE_ATTR, attr['attribute_id'],
+                        self.TYPE_ATTR, attr['option_id'],
                         woocommerce_attribute_taxonomies_import_id,
-                        attr['attribute_code']
+                        attr['option_code']
                     )
 
         # insert attribute for side by product
         product_attribute = dict()
         position = 1
-        for pa in convert['product_attribute']:
-            attr_map_code_src = self.get_map_field_by_src(self.TYPE_ATTR, pa['attribute_id'], field='code_src')
+        for attr_v in convert['attributes_value']:
+            attr_map_code_src = self.get_map_field_by_src(self.TYPE_ATTR, attr_v['attribute_id'], field='code_src')
             attr_map_value = self.select_map(
                 self._migration_id,
                 self.TYPE_ATTR_VALUE,
-                code_src=pa['attribute_id'],
-                value=pa['value']
+                code_src=attr_v['attribute_id'],
+                value=attr_v['value']
             )
 
-            global term_taxonomy_attr_import_id
+            term_taxonomy_attr_import_id = ''
             if not attr_map_value:
                 # insert attr to term
                 term_attr = {
-                    'name': pa['value'],
-                    'slug': self.sanitize_title(pa['value']),
+                    'name': attr_v['value'],
+                    'slug': self.sanitize_title(attr_v['value']),
                     'term_group': 0,
                 }
                 term_attr_query = self.create_insert_query_connector('terms', term_attr)
@@ -2768,7 +2768,7 @@ class LeCartWoocommerce(LeCartWordpress):
                 term_taxonomy_attr = {
                     'term_id': term_attr_import_id,
                     'taxonomy': 'pa_' + attr_map_code_src,
-                    'description': pa['value'],
+                    'description': attr_v['value'],
                     'parent': 0,
                     'count': 0
                 }
@@ -2778,11 +2778,11 @@ class LeCartWoocommerce(LeCartWordpress):
 
                 self.insert_map(
                     self.TYPE_ATTR_VALUE,
-                    id_src=pa['value_id'],
+                    id_src=attr_v['value_id'],
                     id_desc=term_attr_import_id,
-                    code_src=pa['attribute_id'],
+                    code_src=attr_v['attribute_id'],
                     code_desc=term_taxonomy_attr_import_id,
-                    value=pa['value']
+                    value=attr_v['value']
                 )
             else:
                 term_taxonomy_attr_import_id = attr_map_value['code_desc']
@@ -2850,8 +2850,8 @@ class LeCartWoocommerce(LeCartWordpress):
             return
 
         # update image for postmeta
-        global _thumbnail_id
-        global src_path
+        _thumbnail_id = False
+        src_path = ''
 
         path_default = ['BSNIDESS1.39VANNPW-100.png', 'chpultmtchoc60ct-s.png']
 
@@ -3321,7 +3321,7 @@ class LeCartWoocommerce(LeCartWordpress):
 
     def after_product_import(self, product_id, convert, product, products_ext):
         # get id image on posts
-        global image_id
+        image_id = 0
         image_path = convert['thumb_image']['url'] + convert['thumb_image']['path']
         if image_path:
             search_image_query = {

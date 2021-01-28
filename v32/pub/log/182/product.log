@@ -1,2 +1,0 @@
-2021/01/28 08:57:34 : Product 906: INSERT INTO `_DBPRF_term_relationships` (`object_id`, `term_taxonomy_id`, `term_order`) VALUES ('906', 653, 0): <span class="message-alert-error">SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '906-653' for key 'PRIMARY'</span>
-2021/01/28 08:57:35 : Product 907: INSERT INTO `_DBPRF_term_relationships` (`object_id`, `term_taxonomy_id`, `term_order`) VALUES ('907', 653, 0): <span class="message-alert-error">SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '907-653' for key 'PRIMARY'</span>

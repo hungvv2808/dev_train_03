@@ -362,8 +362,18 @@ class LeCartCustom(LeBasecart):
                 ptc_d['id'] = ptc
                 product_data['categories'].append(ptc_d)
 
-        product_data['attributes'] = products_ext['data']['attributes']
-        product_data['product_attribute'] = products_ext['data']['product_attribute']
+        attr = products_ext['data']['attributes']
+        attributes = list()
+        for a in attr:
+            product_attribute = self.construct_product_attribute()
+            product_attribute['option_id'] = a['attribute_id']
+            product_attribute['option_name'] = a['attribute_name']
+            product_attribute['option_code'] = a['attribute_code']
+            product_attribute['option_type'] = a['attribute_type']
+            attributes.append(product_attribute)
+
+        product_data['attributes'] = attributes
+        product_data['attributes_value'] = products_ext['data']['product_attribute']
 
         if self._notice['config']['seo_301']:
             detect_seo = self.detect_seo()
@@ -558,6 +568,7 @@ class LeCartCustom(LeBasecart):
     def get_orders_ext_export(self, orders):
         url_query = self.get_connector_url('query')
         order_ids = duplicate_field_value_from_list(orders['data'], 'orders_id')
+        customer_ids = duplicate_field_value_from_list(orders['data'], 'client_customers_id')
 
         bil_country = duplicate_field_value_from_list(orders['data'], 'billing_country')
         delivery_country = duplicate_field_value_from_list(orders['data'], 'delivery_country')
@@ -571,16 +582,23 @@ class LeCartCustom(LeBasecart):
         # print(f"si: {state_ids}")
 
         orders_ext_queries = {
-            'orders_customers_products_total': {
+            'orders_products': {
                 'type': 'select',
-                'query': "SELECT * FROM _DBPRF_orders o "
-                         + " INNER JOIN _DBPRF_orders_products op ON o.orders_id = op.orders_id "
-                         + " INNER JOIN _DBPRF_orders_total ot ON o.orders_id = ot.orders_id "
-                         + " INNER JOIN _DBPRF_customers c ON o.client_customers_id = c.customers_id "
+                'query': "SELECT * FROM _DBPRF_orders_products op WHERE op.orders_id IN "
+                         + self.list_to_in_condition(order_ids)
+            },
+            'orders_total': {
+                'type': 'select',
+                'query': "SELECT * FROM _DBPRF_orders_total ot WHERE ot.orders_id IN "
+                         + self.list_to_in_condition(order_ids)
+            },
+            'orders_customers': {
+                'type': 'select',
+                'query': "SELECT * FROM _DBPRF_customers c "
                          + " LEFT JOIN _DBPRF_customers_info ci ON c.customers_id = ci.customers_info_id "
                          + " LEFT JOIN _DBPRF_address_book ab ON c.customers_id = ab.customers_id "
-                         + " WHERE o.orders_id IN "
-                         + self.list_to_in_condition(order_ids)
+                         + " WHERE c.customers_id IN "
+                         + self.list_to_in_condition(customer_ids)
             },
             'orders_countries': {
                 'type': 'select',
@@ -598,6 +616,8 @@ class LeCartCustom(LeBasecart):
 
     def convert_order_export(self, order, orders_ext):
         order_data = self.construct_order()
+
+        # orders_products =
 
         orders_customers_products_total = get_list_from_list_by_field(
             orders_ext['data']['orders_customers_products_total'],
