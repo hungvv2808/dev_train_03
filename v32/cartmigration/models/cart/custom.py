@@ -617,137 +617,147 @@ class LeCartCustom(LeBasecart):
     def convert_order_export(self, order, orders_ext):
         order_data = self.construct_order()
 
-        # orders_products =
-
-        orders_customers_products_total = get_list_from_list_by_field(
-            orders_ext['data']['orders_customers_products_total'],
+        orders_products = get_list_from_list_by_field(
+            orders_ext['data']['orders_products'],
             'orders_id',
             order['orders_id']
+        )
+        orders_total = get_list_from_list_by_field(
+            orders_ext['data']['orders_total'],
+            'orders_id',
+            order['orders_id']
+        )
+        orders_customers = get_row_from_list_by_field(
+            orders_ext['data']['orders_customers'],
+            'customers_id',
+            order['client_customers_id']
         )
 
         order_data['id'] = order['orders_id']
         order_data['order_number'] = order['order_number']
         order_data['status'] = order['orders_status']
+        order_data['code'] = order['delivery_postcode'] if order['delivery_postcode'] else order['billing_postcode']
 
-        order_items = list()
-        for ocpt in orders_customers_products_total:
-            order_data['code'] = ocpt['delivery_postcode'] if ocpt['delivery_postcode'] else ocpt['billing_postcode'],
-
-            type_class = ocpt['class']
+        for ot in orders_total:
+            type_class = ot['class']
+            percent = get_row_from_list_by_field(orders_products, 'orders_id', order['orders_id']).get('products_tax', 0.0000)
             if type_class == 'ot_tax':
-                order_data['tax'] = self.set_type_order_total(ocpt)
+                order_data['tax'] = self.set_type_order_total(ot, type_class, percent)
             elif type_class == 'ot_discount':
-                order_data['discount'] = self.set_type_order_total(ocpt)
+                order_data['discount'] = self.set_type_order_total(ot, type_class, percent)
             elif type_class == 'ot_shipping':
-                order_data['shipping'] = self.set_type_order_total(ocpt)
+                order_data['shipping'] = self.set_type_order_total(ot, type_class, percent)
             elif type_class == 'ot_subtotal':
-                order_data['subtotal'] = self.set_type_order_total(ocpt)
+                order_data['subtotal'] = self.set_type_order_total(ot, type_class, percent)
             else:
-                order_data['total'] = self.set_type_order_total(ocpt)
+                order_data['total'] = self.set_type_order_total(ot, type_class, percent)
 
-            order_data['currency'] = ocpt['currency']
-            order_data['created_at'] = ocpt['date_purchased']
+        order_data['currency'] = order['currency']
+        order_data['created_at'] = order['date_purchased']
 
+        if orders_customers:
             orders_countries_c = orders_ext['data']['orders_countries'][0]
             orders_zones_c = orders_ext['data']['orders_zones'][0]
-            tmp_address_c = self.set_tmp_address(ocpt, orders_countries_c, orders_zones_c, None)
+            tmp_address_c = self.set_tmp_address(orders_customers, order, orders_countries_c, orders_zones_c, None)
             customer_address = {
-                'gender': ocpt['entry_gender'],
+                'gender': orders_customers['entry_gender'],
                 'default': {
                     'billing': True,
                     'shipping': True,
                 },
                 'billing': True,
                 'shipping': True,
-                'created_at': ocpt['customers_info_date_account_created'],
+                'created_at': orders_customers['customers_info_date_account_created'],
                 'update_at': get_current_time(),
             }
             tmp_address_c.update(customer_address)
 
             order_data['customer'] = {
-                'phone': ocpt['customers_telephone'],
-                'id': ocpt['customers_id'],
-                'code': ocpt['entry_postcode'],
+                'phone': orders_customers['customers_telephone'],
+                'id': orders_customers['customers_id'],
+                'code': orders_customers['entry_postcode'],
                 'note': '',
                 'group_id': '',
-                'username': ocpt['customers_email_address'],
-                'email': ocpt['customers_email_address'],
-                'password': ocpt['customers_password'],
-                'first_name': ocpt['customers_firstname'],
+                'username': orders_customers['customers_email_address'],
+                'email': orders_customers['customers_email_address'],
+                'password': orders_customers['customers_password'],
+                'first_name': orders_customers['customers_firstname'],
                 'middle_name': '',
-                'last_name': ocpt['customers_lastname'],
-                'gender': ocpt['customers_gender'],
-                'dob': ocpt['customers_dob'],
+                'last_name': orders_customers['customers_lastname'],
+                'gender': orders_customers['customers_gender'],
+                'dob': orders_customers['customers_dob'],
                 'is_subscribed': True,
                 'active': True,
                 'capabilities': list(),
-                'created_at': ocpt['customers_info_date_account_created'],
+                'created_at': orders_customers['customers_info_date_account_created'],
                 'update_at': get_current_time(),
                 'address': tmp_address_c,
                 'groups': list(),
                 'balance': 0.00
             }
 
-            order_data['customer_address'] = {
-                'id': ocpt['address_book_id'],
-                'code': ocpt['entry_postcode'],
-                'username': ocpt['customers_email_address'],
-                'email': ocpt['customers_email_address'],
-                'first_name': ocpt['entry_firstname'],
-                'middle_name': '',
-                'last_name': ocpt['entry_lastname'],
-            }
+        order_data['customer_address'] = {
+            'id': orders_customers['address_book_id'],
+            'code': orders_customers['entry_postcode'],
+            'username': orders_customers['customers_email_address'],
+            'email': orders_customers['customers_email_address'],
+            'first_name': orders_customers['entry_firstname'],
+            'middle_name': '',
+            'last_name': orders_customers['entry_lastname'],
+        }
 
-            # billing
-            orders_countries_b = get_row_from_list_by_field(
-                orders_ext['data']['orders_countries'],
-                'countries_name',
-                ocpt['billing_country']
-            )
-            orders_zones_b = get_row_from_list_by_field(
-                orders_ext['data']['orders_zones'],
-                'zone_code',
-                ocpt['billing_state']
-            )
-            tmp_address_b = self.set_tmp_address(ocpt, orders_countries_b, orders_zones_b, 1)
-            order_data['billing_address'] = tmp_address_b
+        # billing
+        orders_countries_b = get_row_from_list_by_field(
+            orders_ext['data']['orders_countries'],
+            'countries_name',
+            order['billing_country']
+        )
+        orders_zones_b = get_row_from_list_by_field(
+            orders_ext['data']['orders_zones'],
+            'zone_code',
+            order['billing_state']
+        )
+        tmp_address_b = self.set_tmp_address(orders_customers, order, orders_countries_b, orders_zones_b, 1)
+        order_data['billing_address'] = tmp_address_b
 
-            # delivery
-            orders_countries_s = get_row_from_list_by_field(
-                orders_ext['data']['orders_countries'],
-                'countries_name',
-                ocpt['delivery_country']
-            )
-            orders_zones_s = get_row_from_list_by_field(
-                orders_ext['data']['orders_zones'],
-                'zone_code',
-                ocpt['delivery_state']
-            )
-            tmp_address_s = self.set_tmp_address(ocpt, orders_countries_s, orders_zones_s, 0)
-            order_data['shipping_address'] = tmp_address_s
+        # delivery
+        orders_countries_s = get_row_from_list_by_field(
+            orders_ext['data']['orders_countries'],
+            'countries_name',
+            order['delivery_country']
+        )
+        orders_zones_s = get_row_from_list_by_field(
+            orders_ext['data']['orders_zones'],
+            'zone_code',
+            order['delivery_state']
+        )
+        tmp_address_s = self.set_tmp_address(orders_customers, order, orders_countries_s, orders_zones_s, 0)
+        order_data['shipping_address'] = tmp_address_s
 
-            order_data['payment'] = {
-                'id': None,
-                'code': None,
-                'method': ocpt['payment_method'],
-                'title': 'Payment Infor',
-            }
+        order_data['payment'] = {
+            'id': None,
+            'code': None,
+            'method': order['payment_method'],
+            'title': 'Payment Infor',
+        }
 
-            order_item_subtotal = to_decimal(ocpt['products_price']) * to_decimal(ocpt['products_quantity'])
-            order_item_tax = to_decimal(ocpt['products_tax']) * to_decimal(ocpt['products_quantity'])
+        order_items = list()
+        for op in orders_products:
+            order_item_subtotal = to_decimal(op['products_price']) * to_decimal(op['products_quantity'])
+            order_item_tax = to_decimal(op['products_tax']) * to_decimal(op['products_quantity'])
             order_item_total = to_decimal(order_item_subtotal) + to_decimal(order_item_tax)
             item = {
-                'id': ocpt['orders_products_id'],
+                'id': op['orders_products_id'],
                 'code': None,
                 'product': {
                     'id': None,
                     'code': None,
-                    'name': ocpt['products_name'],
+                    'name': op['products_name'],
                     'sku': '',
                 },
-                'qty': ocpt['products_quantity'],
-                'price': ocpt['final_price'],
-                'original_price': ocpt['products_price'],
+                'qty': op['products_quantity'],
+                'price': op['final_price'],
+                'original_price': op['products_price'],
                 'tax_amount': order_item_tax,
                 'tax_percent': (order_item_tax / order_item_subtotal) * 100 if order_item_subtotal != 0 else 0.0,
                 'discount_amount': 0.0000,
@@ -758,24 +768,48 @@ class LeCartCustom(LeBasecart):
                 'created_at': order['date_purchased'] if order['date_purchased'] else get_current_time(),
                 'updated_at': get_current_time(),
             }
-            if item not in order_items:
-                order_items.append(item)
+            order_items.append(item)
         order_data['items'] = order_items
 
         return response_success(order_data)
 
-    def set_type_order_total(self, data):
-        return {
-            'title': data['title'],
-            'amount': data['value'],
-            'percent': data['products_tax'],
-        }
+    def set_type_order_total(self, data, type_class, percent):
+        if type_class == 'ot_tax':
+            order_total = {
+                'title': data['title'],
+                'amount': data['value'],
+                'percent': percent,
+            }
+        elif type_class == 'ot_discount':
+            order_total = {
+                'code': '',
+                'title': data['title'],
+                'amount': data['value'],
+                'percent': percent,
+            }
+        elif type_class == 'ot_shipping':
+            order_total = {
+                'title': data['title'],
+                'amount': data['value'],
+                'percent': percent,
+            }
+        elif type_class == 'ot_subtotal':
+            order_total = {
+                'title': data['title'],
+                'amount': data['value'],
+            }
+        else:
+            order_total = {
+                'title': data['title'],
+                'amount': data['value'],
+            }
+        return order_total
 
-    def set_tmp_address(self, data, country, state, type_d=None):
+    def set_tmp_address(self, data_customer, data_order, country, state, type_d=None):
         if 'zone_id' not in state:
             pass
         tmp = {
-            'id': data.get('address_book_id', None),
+            'id': data_customer.get('address_book_id', None),
             'country': {
                 'id': country.get('countries_id', None),
                 'code': '%s/%s' % (country.get('countries_iso_code_2', 'VN'), country.get('countries_iso_code_3', 'vn')),
@@ -788,48 +822,48 @@ class LeCartCustom(LeBasecart):
                 'state_code': state.get('zone_code', ''),
                 'name': state.get('zone_name', ''),
             },
-            'telephone': data['customers_telephone'],
-            'fax': data['customers_fax'],
+            'telephone': data_customer['customers_telephone'],
+            'fax': data_customer['customers_fax'],
         }
         result = tmp
 
         if type_d is None:
             ext = {
-                'code': data['entry_postcode'],
-                'first_name': data['entry_firstname'],
+                'code': data_customer['entry_postcode'],
+                'first_name': data_customer['entry_firstname'],
                 'middle_name': '',
-                'last_name': data['entry_lastname'],
-                'address_1': data['entry_street_address'],
-                'address_2': '%s/%s' % (data['entry_city'], data['entry_state']),
-                'city': data['entry_city'],
-                'postcode': data['entry_postcode'],
-                'company': data['entry_company'],
+                'last_name': data_customer['entry_lastname'],
+                'address_1': data_customer['entry_street_address'],
+                'address_2': '%s/%s' % (data_customer['entry_city'], data_customer['entry_state']),
+                'city': data_customer['entry_city'],
+                'postcode': data_customer['entry_postcode'],
+                'company': data_customer['entry_company'],
             }
             result.update(ext)
         elif type_d == 0:  # delivery
             ext = {
-                'code': data['delivery_postcode'] if data['delivery_postcode'] else data['entry_postcode'],
-                'first_name': data['delivery_name'].split(' ')[0] if data['delivery_name'] else data['entry_firstname'],
+                'code': data_order['delivery_postcode'] if data_order['delivery_postcode'] else data_customer['entry_postcode'],
+                'first_name': data_order['delivery_name'].split(' ')[0] if data_order['delivery_name'] else data_customer['entry_firstname'],
                 'middle_name': '',
-                'last_name': data['delivery_name'].split(' ')[1] if data['delivery_name'] else data['entry_firstname'],
-                'address_1': data['delivery_address1'] if data['delivery_address1'] else data['entry_street_address'],
-                'address_2': data['delivery_address2'] if data['delivery_address2'] else '%s/%s' % (data['entry_city'], data['entry_state']),
-                'city': data['delivery_city'] if data['delivery_city'] else data['entry_city'],
-                'postcode': data['delivery_postcode'] if data['delivery_postcode'] else data['entry_postcode'],
-                'company': data['entry_company'] if data['entry_company'] else data['delivery_company'],
+                'last_name': data_order['delivery_name'].split(' ')[1] if data_order['delivery_name'] else data_customer['entry_firstname'],
+                'address_1': data_order['delivery_address1'] if data_order['delivery_address1'] else data_customer['entry_street_address'],
+                'address_2': data_order['delivery_address2'] if data_order['delivery_address2'] else '%s/%s' % (data_customer['entry_city'], data_customer['entry_state']),
+                'city': data_order['delivery_city'] if data_order['delivery_city'] else data_customer['entry_city'],
+                'postcode': data_order['delivery_postcode'] if data_order['delivery_postcode'] else data_customer['entry_postcode'],
+                'company': data_order['delivery_company'] if data_order['delivery_company'] else data_customer['entry_company'],
             }
             result.update(ext)
         else:  # billing
             ext = {
-                'code': data['billing_postcode'] if data['billing_postcode'] else data['entry_postcode'],
-                'first_name': data['billing_name'].split(' ')[0] if data['billing_name'] else data['entry_firstname'],
+                'code': data_order['billing_postcode'] if data_order['billing_postcode'] else data_customer['entry_postcode'],
+                'first_name': data_order['billing_name'].split(' ')[0] if data_order['billing_name'] else data_customer['entry_firstname'],
                 'middle_name': '',
-                'last_name': data['billing_name'].split(' ')[1] if data['billing_name'] else data['entry_firstname'],
-                'address_1': data['billing_address1'] if data['billing_address1'] else data['entry_street_address'],
-                'address_2': data['billing_address2'] if data['billing_address2'] else '%s/%s' % (data['entry_city'], data['entry_state']),
-                'city': data['billing_city'] if data['billing_city'] else data['entry_city'],
-                'postcode': data['billing_postcode'] if data['billing_postcode'] else data['entry_postcode'],
-                'company': data['billing_country'] if data['billing_country'] else data['delivery_company'],
+                'last_name': data_order['billing_name'].split(' ')[1] if data_order['billing_name'] else data_customer['entry_firstname'],
+                'address_1': data_order['billing_address1'] if data_order['billing_address1'] else data_customer['entry_street_address'],
+                'address_2': data_order['billing_address2'] if data_order['billing_address2'] else '%s/%s' % (data_customer['entry_city'], data_customer['entry_state']),
+                'city': data_order['billing_city'] if data_order['billing_city'] else data_customer['entry_city'],
+                'postcode': data_order['billing_postcode'] if data_order['billing_postcode'] else data_customer['entry_postcode'],
+                'company': data_order['billing_company'] if data_order['billing_company'] else data_customer['entry_company'],
             }
             result.update(ext)
         return result
