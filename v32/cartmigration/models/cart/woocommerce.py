@@ -2684,6 +2684,9 @@ class LeCartWoocommerce(LeCartWordpress):
             return False
 
         # insert all attributes to woocommerce_attribute_taxonomies
+        # insert attribute for side by product
+        product_attribute = dict()
+        position = 1
         if convert['attributes']:
             for attr in convert['attributes']:
                 # check exists id_src type attr on migration_map
@@ -2719,118 +2722,115 @@ class LeCartWoocommerce(LeCartWordpress):
                         attr['option_code']
                     )
 
-        # insert attribute for side by product
-        product_attribute = dict()
-        position = 1
-        for attr_v in convert['attributes_value']:
-            attr_map_code_src = self.get_map_field_by_src(self.TYPE_ATTR, attr_v['attribute_id'], field='code_src')
-            attr_map_value = self.select_map(
-                self._migration_id,
-                self.TYPE_ATTR_VALUE,
-                code_src=attr_v['attribute_id'],
-                value=attr_v['value']
-            )
-
-            term_taxonomy_attr_import_id = ''
-            if not attr_map_value:
-                # insert attr to term
-                term_attr = {
-                    'name': attr_v['value'],
-                    'slug': self.sanitize_title(attr_v['value']),
-                    'term_group': 0,
-                }
-                term_attr_query = self.create_insert_query_connector('terms', term_attr)
-                term_attr_import_id = self.import_data_connector(term_attr_query, self.TYPE_ATTR, product_id)
-                if not term_attr_import_id:
-                    self.log(
-                        'type: attr terms[' + to_str(term_attr) + '] cannot insert !',
-                        'term_attr_log'
-                    )
-                    return
-
-                # insert data attr to termmeta
-                termmeta_attr = {
-                    'term_id': term_attr_import_id,
-                    'meta_key': 'order_pa_' + attr_map_code_src,
-                    'meta_value': 0
-                }
-                termmeta_attr_query = self.create_insert_query_connector('termmeta', termmeta_attr)
-                termmeta_attr_import_id = self.import_data_connector(termmeta_attr_query, self.TYPE_ATTR,
-                                                                     term_attr_import_id)
-                if not termmeta_attr_import_id:
-                    self.log(
-                        'type: attr termmeta[' + to_str(termmeta_attr) + '] cannot insert !',
-                        'termmeta_log'
-                    )
-                    return
-
-                # insert attr to term_taxonomy
-                term_taxonomy_attr = {
-                    'term_id': term_attr_import_id,
-                    'taxonomy': 'pa_' + attr_map_code_src,
-                    'description': attr_v['value'],
-                    'parent': 0,
-                    'count': 0
-                }
-                term_taxonomy_attr_query = self.create_insert_query_connector('term_taxonomy', term_taxonomy_attr)
-                term_taxonomy_attr_import_id = self.import_data_connector(term_taxonomy_attr_query, self.TYPE_ATTR,
-                                                                          term_attr_import_id)
-
-                self.insert_map(
+                # process add attr for product
+                attr_map_code_src = self.get_map_field_by_src(self.TYPE_ATTR, attr['option_id'], field='code_src')
+                attr_map_value = self.select_map(
+                    self._migration_id,
                     self.TYPE_ATTR_VALUE,
-                    id_src=attr_v['value_id'],
-                    id_desc=term_attr_import_id,
-                    code_src=attr_v['attribute_id'],
-                    code_desc=term_taxonomy_attr_import_id,
-                    value=attr_v['value']
+                    code_src=attr['option_id'],
+                    value=attr['option_value_name']
                 )
-            else:
-                term_taxonomy_attr_import_id = attr_map_value['code_desc']
 
-            # term_relationships
-            term_relationship_attr = {
-                'object_id': product_id,
-                'term_taxonomy_id': term_taxonomy_attr_import_id,
-                'term_order': 0
-            }
-            # drop if exists term_relationships
-            del_term_relationships_query = {
-                'type': 'query',
-                'query': "DELETE FROM _DBPRF_term_relationships "
-                         + " WHERE object_id = " + to_str(product_id)
-                         + " AND term_taxonomy_id = " + to_str(term_taxonomy_attr_import_id),
-            }
-            self.get_connector_data(
-                self.get_connector_url('query'),
-                {'query': json.dumps(del_term_relationships_query)}
-            )
-            # re-import term_relationships
-            term_relationship_query = self.create_insert_query_connector(
-                'term_relationships',
-                term_relationship_attr
-            )
-            term_relationship_import_id = self.import_data_connector(
-                term_relationship_query,
-                self.TYPE_ATTR,
-                product_id
-            )
-            if not term_relationship_import_id:
-                self.log(
-                    'term_relationship[' + to_str(term_relationship_attr) + '] cannot insert !',
-                    'term_relationship_log'
+                term_taxonomy_attr_import_id = ''
+                if not attr_map_value:
+                    # insert attr to term
+                    term_attr = {
+                        'name': attr['option_value_name'],
+                        'slug': self.sanitize_title(attr['option_value_name']),
+                        'term_group': 0,
+                    }
+                    term_attr_query = self.create_insert_query_connector('terms', term_attr)
+                    term_attr_import_id = self.import_data_connector(term_attr_query, self.TYPE_ATTR, product_id)
+                    if not term_attr_import_id:
+                        self.log(
+                            'type: attr terms[' + to_str(term_attr) + '] cannot insert !',
+                            'term_attr_log'
+                        )
+                        return
+
+                    # insert data attr to termmeta
+                    termmeta_attr = {
+                        'term_id': term_attr_import_id,
+                        'meta_key': 'order_pa_' + attr_map_code_src,
+                        'meta_value': 0
+                    }
+                    termmeta_attr_query = self.create_insert_query_connector('termmeta', termmeta_attr)
+                    termmeta_attr_import_id = self.import_data_connector(termmeta_attr_query, self.TYPE_ATTR,
+                                                                         term_attr_import_id)
+                    if not termmeta_attr_import_id:
+                        self.log(
+                            'type: attr termmeta[' + to_str(termmeta_attr) + '] cannot insert !',
+                            'termmeta_log'
+                        )
+                        return
+
+                    # insert attr to term_taxonomy
+                    term_taxonomy_attr = {
+                        'term_id': term_attr_import_id,
+                        'taxonomy': 'pa_' + attr_map_code_src,
+                        'description': attr['option_value_name'],
+                        'parent': 0,
+                        'count': 0
+                    }
+                    term_taxonomy_attr_query = self.create_insert_query_connector('term_taxonomy', term_taxonomy_attr)
+                    term_taxonomy_attr_import_id = self.import_data_connector(term_taxonomy_attr_query, self.TYPE_ATTR,
+                                                                              term_attr_import_id)
+
+                    self.insert_map(
+                        self.TYPE_ATTR_VALUE,
+                        id_src=attr['option_value_code'],
+                        id_desc=term_attr_import_id,
+                        code_src=attr['option_id'],
+                        code_desc=term_taxonomy_attr_import_id,
+                        value=attr['option_value_name']
+                    )
+                else:
+                    term_taxonomy_attr_import_id = attr_map_value['code_desc']
+
+                # term_relationships
+                term_relationship_attr = {
+                    'object_id': product_id,
+                    'term_taxonomy_id': term_taxonomy_attr_import_id,
+                    'term_order': 0
+                }
+                # drop if exists term_relationships
+                del_term_relationships_query = {
+                    'type': 'query',
+                    'query': "DELETE FROM _DBPRF_term_relationships "
+                             + " WHERE object_id = " + to_str(product_id)
+                             + " AND term_taxonomy_id = " + to_str(term_taxonomy_attr_import_id),
+                }
+                self.get_connector_data(
+                    self.get_connector_url('query'),
+                    {'query': json.dumps(del_term_relationships_query)}
                 )
-                return
+                # re-import term_relationships
+                term_relationship_query = self.create_insert_query_connector(
+                    'term_relationships',
+                    term_relationship_attr
+                )
+                term_relationship_import_id = self.import_data_connector(
+                    term_relationship_query,
+                    self.TYPE_ATTR,
+                    product_id
+                )
+                if not term_relationship_import_id:
+                    self.log(
+                        'term_relationship[' + to_str(term_relationship_attr) + '] cannot insert !',
+                        'term_relationship_log'
+                    )
+                    return
 
-            # create meta_value for _product_attributes on postmeta
-            product_attribute['pa_' + attr_map_code_src] = {
-                'name': 'pa_' + attr_map_code_src,
-                'value': '',
-                'position': position,
-                'is_visible': 1,
-                'is_variation': 0,
-                'is_taxonomy': 1
-            }
-            position += 1
+                # create meta_value for _product_attributes on postmeta
+                product_attribute['pa_' + attr_map_code_src] = {
+                    'name': 'pa_' + attr_map_code_src,
+                    'value': '',
+                    'position': position,
+                    'is_visible': 1,
+                    'is_variation': 0,
+                    'is_taxonomy': 1
+                }
+                position += 1
 
         # update value _product_attributes to postmeta
         data_update = {
@@ -4393,7 +4393,7 @@ class LeCartWoocommerce(LeCartWordpress):
 
         # insert shipping type to woocommerce_order_items
         woocommerce_order_items_shipping = {
-            'order_item_name': 'Woocommerce Order Items Shipping',
+            'order_item_name': 'Shipping',
             'order_item_type': 'shipping',
             'order_id': order_id
         }

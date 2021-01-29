@@ -1,4 +1,4 @@
-2021/01/29 09:09:35 : Traceback (most recent call last):
+2021/01/29 11:34:55 : Traceback (most recent call last):
   File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 665, in storage_data
     getattr(self.get_source_cart(), 'finish_storage_data')()
   File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/basecart.py", line 4043, in finish_storage_data

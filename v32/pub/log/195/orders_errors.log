@@ -1,9 +1,0 @@
-2021/01/29 09:28:56 : orders_errors 1: Traceback (most recent call last):
-  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/controllers/migration.py", line 1036, in migration
-    convert = fn_convert_export(main, ext)
-  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/custom.py", line 650, in convert_order_export
-    order_data['subtotal'] = self.set_type_order_total(ot)
-  File "/Users/vuhung/Desktop/dev_train_03/v32/cartmigration/models/cart/custom.py", line 779, in set_type_order_total
-    'percent': data['products_tax'],
-KeyError: 'products_tax'
-

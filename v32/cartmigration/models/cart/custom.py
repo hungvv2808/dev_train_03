@@ -363,6 +363,7 @@ class LeCartCustom(LeBasecart):
                 product_data['categories'].append(ptc_d)
 
         attr = products_ext['data']['attributes']
+        attr_val = get_row_from_list_by_field(products_ext['data']['product_attribute'], 'product_id', product['products_id'])
         attributes = list()
         for a in attr:
             product_attribute = self.construct_product_attribute()
@@ -370,10 +371,10 @@ class LeCartCustom(LeBasecart):
             product_attribute['option_name'] = a['attribute_name']
             product_attribute['option_code'] = a['attribute_code']
             product_attribute['option_type'] = a['attribute_type']
+            product_attribute['option_value_code'] = attr_val['value_id']
+            product_attribute['option_value_name'] = attr_val['value']
             attributes.append(product_attribute)
-
         product_data['attributes'] = attributes
-        product_data['attributes_value'] = products_ext['data']['product_attribute']
 
         if self._notice['config']['seo_301']:
             detect_seo = self.detect_seo()
